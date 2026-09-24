@@ -1,0 +1,118 @@
+"""Deterministic stroke cleanup and a renderer-independent drawing timeline."""
+import math
+
+import cv2
+import numpy as np
+
+SCENE_VERSION = 2
+
+
+def resample(points, step=3.0):
+    """Bound segment size without moving corners or endpoints."""
+    result = [np.asarray(points[0], dtype=float)]
+    for a, b in zip(points, points[1:]):
+        a, b = np.asarray(a, dtype=float), np.asarray(b, dtype=float)
+        count = max(1, math.ceil(float(np.linalg.norm(b - a)) / step))
+        for i in range(1, count + 1):
+            point = a + (b - a) * (i / count)
+            if np.linalg.norm(point - result[-1]) > 1e-6:
+                result.append(point)
+    return np.array(result)
+
+
+def smooth_path(points):
+    """One corner-cutting pass; keep sharp corners and open endpoints intact."""
+    points = np.asarray(points, dtype=float)
+    result = [points[0]]
+    for i in range(1, len(points) - 1):
+        a, b, c = points[i - 1:i + 2]
+        u, v = b - a, c - b
+        cosine = float(np.dot(u, v) / max(1e-9, np.linalg.norm(u) * np.linalg.norm(v)))
+        if cosine < .45:
+            result.append(b)
+        else:
+            # Limit displacement to one pixel to avoid shrinking recognizable details.
+            result.extend([b - u * min(.2, 1 / max(1, np.linalg.norm(u))),
+                           b + v * min(.2, 1 / max(1, np.linalg.norm(v)))])
+    result.append(points[-1])
+    return resample(result)
+
+
+def clean_paths(contours, shape):
+    """Suppress near-identical edge loops, while keeping separate nearby detail."""
+    covered = np.zeros(shape, np.uint8)
+    accepted = []
+    for contour in contours[:1600]:
+        if cv2.arcLength(contour, True) < 12:
+            continue
+        points = cv2.approxPolyDP(contour, .65, True).reshape(-1, 2)
+        if len(points) < 2:
+            continue
+        points = np.vstack([points, points[0]])
+        samples = resample(points, 1.5).round().astype(int)
+        if np.mean(covered[samples[:, 1], samples[:, 0]] > 0) > .9:
+            continue
+        accepted.append(smooth_path(points))
+        cv2.polylines(covered, [points.astype(np.int32)], False, 255, 3)
+    return accepted
+
+
+def make_timeline(paths):
+    """Normalized events shared verbatim by the browser and MP4 renderers.
+
+    Drawing takes 88% of the line-work phase and travel takes 12%. Curves and
+    stroke endpoints receive extra time. Gaps never draw connecting marks.
+    """
+    events, previous = [], None
+    for stroke, path in enumerate(paths):
+        points = np.asarray(path, dtype=float)
+        if len(points) < 2:
+            continue
+        lengths = np.linalg.norm(np.diff(points, axis=0), axis=1)
+        total = float(lengths.sum())
+        if total <= 1e-6:
+            continue
+        if previous is not None:
+            distance = math.dist(previous, points[0])
+            events.append({'kind': 'lift', 'a': list(previous), 'b': points[0].tolist(),
+                           'cost': 12 + min(70, math.sqrt(distance) * 4), 'pressure': 0})
+        travelled = 0
+        for i, length in enumerate(lengths):
+            if length <= 1e-6:
+                continue
+            t = (travelled + float(length) / 2) / total
+            envelope = math.sin(math.pi * t) ** .55
+            pressure = max(.3, min(1, .38 + .52 * envelope + .07 * math.sin(t * 19 + stroke * 1.7)))
+            bend = 0
+            if i and lengths[i - 1] > 1e-6:
+                u, v = points[i] - points[i - 1], points[i + 1] - points[i]
+                bend = (1 - float(np.clip(np.dot(u, v) / (lengths[i - 1] * length), -1, 1))) / 2
+            cost = float(length) * (1 + 1.8 * bend + .65 * (1 - envelope))
+            events.append({'kind': 'draw', 'a': points[i].tolist(), 'b': points[i + 1].tolist(),
+                           'cost': cost, 'pressure': round(pressure, 4)})
+            travelled += float(length)
+        previous = points[-1]
+    drawing = sum(e['cost'] for e in events if e['kind'] == 'draw')
+    lifting = sum(e['cost'] for e in events if e['kind'] == 'lift')
+    cursor = 0.0
+    for event in events:
+        budget = (.12 if event['kind'] == 'lift' else .88) if lifting else 1
+        total = lifting if event['kind'] == 'lift' else drawing
+        event['start'] = cursor
+        cursor += event.pop('cost') / total * budget
+        event['end'] = cursor
+    if events:
+        events[-1]['end'] = 1.0
+    return events
+
+
+def event_position(event, fraction):
+    """Pause briefly, then arc above the paper during a pen lift."""
+    fraction = max(0, min(1, fraction))
+    lift = 0
+    if event['kind'] == 'lift':
+        t = max(0, min(1, (fraction - .15) / .7))
+        fraction = t * t * (3 - 2 * t)
+        lift = math.sin(math.pi * fraction)
+    point = [event['a'][k] + (event['b'][k] - event['a'][k]) * fraction for k in range(2)]
+    return point, lift

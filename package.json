@@ -1,0 +1,23 @@
+{
+  "name": "strokeberry",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "server": ".venv/bin/uvicorn backend.app:app --host 127.0.0.1 --port 8000",
+    "test": ".venv/bin/python -m pytest backend/tests -q",
+    "start": "npm run build && npm run server",
+    "gallery:images": "node scripts/generate-gallery.mjs",
+    "gallery:render": "node scripts/render-gallery.mjs"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "lucide-react": "^0.468.0"
+  },
+  "devDependencies": {
+    "vite": "^6.1.0"
+  }
+}

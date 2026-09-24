@@ -1,0 +1,37 @@
+[
+  {
+    "key": "cat",
+    "style": "pencil",
+    "duration": 10
+  },
+  {
+    "key": "sneaker",
+    "style": "ink",
+    "duration": 10
+  },
+  {
+    "key": "coffee",
+    "style": "ink",
+    "duration": 10
+  },
+  {
+    "key": "wreath",
+    "style": "pencil",
+    "duration": 12
+  },
+  {
+    "key": "balloon",
+    "style": "ink",
+    "duration": 10
+  },
+  {
+    "key": "owl",
+    "style": "steps",
+    "duration": 16
+  },
+  {
+    "key": "strawberry",
+    "style": "steps",
+    "duration": 16
+  }
+]
