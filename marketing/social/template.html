@@ -1,0 +1,95 @@
+<!doctype html>
+<!--
+  Strokeberry social templates. Rendered at exact pixel sizes by scripts/render-social.sh.
+  URL hash parameters:
+    mode=banner&w=1500&h=500&box=x,y,w,h   composition fitted inside the platform's safe box
+    mode=profile&w=1080&h=1080&bg=cream|sun
+    mode=highlight&w=1080&h=1920&icon=gallery|tutorials|tips|new&bg=berry|teal|leaf|sun
+-->
+<html>
+<head>
+<meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Figtree:wght@500;600&display=block" rel="stylesheet"/>
+<style>
+  :root{--paper:#fff8ec;--ink:#1b1b1b;--body:#5b544a;--berry:#ec2d34;--berry-deep:#d42630;--leaf:#69b644;--teal:#00bec8;--sun:#fabe3a;--canvas:#faf9f6}
+  html,body{margin:0;overflow:hidden}
+  body{position:relative;background:var(--paper);font-family:Figtree,sans-serif;color:var(--ink)}
+  .glow{position:absolute;inset:0;background:
+    radial-gradient(38% 60% at 88% 20%,rgba(236,45,52,.14),transparent 70%),
+    radial-gradient(34% 55% at 70% 100%,rgba(0,190,200,.14),transparent 70%),
+    radial-gradient(34% 60% at 4% 0%,rgba(250,190,58,.22),transparent 70%)}
+  /* Banner composition, designed on a 1600×460 grid and scaled into the safe box. */
+  .comp{position:absolute;width:1600px;height:460px;transform-origin:0 0;display:flex;align-items:center;gap:64px}
+  .copy{flex:0 0 700px}
+  .logo{display:flex;align-items:center;gap:16px;font-family:'Bricolage Grotesque';font-weight:800;font-size:54px;letter-spacing:-.025em;line-height:1}
+  .logo img{width:93px;height:96px}
+  h1{font-family:'Bricolage Grotesque';font-weight:700;font-size:70px;line-height:1.02;letter-spacing:-.03em;margin:34px 0 26px}
+  em{font-style:normal;padding:0 .08em;margin:0 -.05em;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 30' preserveAspectRatio='none'%3E%3Cpath d='M4 13C48 6 120 3 196 8c1 5-1 10-4 13C130 16 70 18 9 26 3 24 2 17 4 13Z' fill='%23FABE3A'/%3E%3C/svg%3E") no-repeat 0 90%/100% 42%}
+  .url{display:inline-flex;align-items:center;gap:10px;font-size:26px;font-weight:600;color:var(--body)}
+  .url:before{content:'';width:10px;height:10px;border-radius:50%;background:var(--berry)}
+  .stages{flex:1;display:flex;align-items:center;justify-content:flex-end;gap:0;position:relative;height:100%}
+  .card{position:relative;width:236px;border-radius:22px;background:var(--canvas);box-shadow:0 2px 3px rgba(27,27,27,.05),0 24px 44px -22px rgba(27,27,27,.35),inset 0 0 0 1px rgba(27,27,27,.08);overflow:hidden;margin-left:-26px}
+  .card img{display:block;width:100%;aspect-ratio:1}
+  .card b{position:absolute;left:12px;bottom:12px;font-size:17px;font-weight:600;background:rgba(255,253,248,.94);padding:5px 12px;border-radius:999px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .card:nth-child(1){transform:rotate(-5deg) translateY(14px)}
+  .card:nth-child(2){transform:rotate(-1.5deg) translateY(-6px)}
+  .card:nth-child(3){transform:rotate(2deg) translateY(10px)}
+  .card:nth-child(4){width:300px;transform:rotate(4deg);box-shadow:10px 10px 0 var(--berry),0 30px 50px -24px rgba(27,27,27,.4);border:3px solid var(--ink);z-index:2}
+  .card:nth-child(4) b{background:var(--ink);color:#fff}
+  /* Profile picture */
+  .profile{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .profile img{width:82%;height:82%;object-fit:contain}
+  /* Instagram highlight covers */
+  .hl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .hl svg{width:360px;height:360px;fill:none;stroke:#fff8ec;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<div class="glow" id="glow"></div>
+<div id="root"></div>
+<template id="banner">
+  <div class="comp">
+    <div class="copy">
+      <div class="logo"><img src="src/mascot.png" alt=""/>strokeberry</div>
+      <h1>Turn any image into a <em>hand&#8209;drawn</em> video.</h1>
+      <span class="url">strokeberry.com</span>
+    </div>
+    <div class="stages">
+      <div class="card"><img src="src/berry-2.6.jpg" alt=""/><b>Shape</b></div>
+      <div class="card"><img src="src/berry-6.8.jpg" alt=""/><b>Outline</b></div>
+      <div class="card"><img src="src/berry-11.8.jpg" alt=""/><b>Details</b></div>
+      <div class="card"><img src="src/berry-15.9.jpg" alt=""/><b>Color</b></div>
+    </div>
+  </div>
+</template>
+<script>
+  const p = Object.fromEntries(new URLSearchParams(location.hash.slice(1)));
+  const W = +p.w, H = +p.h, root = document.getElementById('root');
+  document.body.style.width = W + 'px'; document.body.style.height = H + 'px';
+  const icons = {
+    gallery: '<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/>',
+    tutorials: '<path d="M4 20l4-1 11-11-3-3L5 16l-1 4Z"/><path d="m14 7 3 3"/>',
+    tips: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.3 1 2.1V16h5v-.1c0-.8.4-1.6 1-2.1A6 6 0 0 0 12 3Z"/>',
+    new: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/>',
+  };
+  const bgs = {berry: '#ec2d34', teal: '#0096a0', leaf: '#4f9a32', sun: '#fabe3a', cream: '#fff8ec'};
+  if (p.mode === 'banner') {
+    root.append(document.getElementById('banner').content.cloneNode(true));
+    const [x, y, bw, bh] = p.box.split(',').map(Number), comp = root.querySelector('.comp');
+    const s = Math.min(bw / 1600, bh / 460);
+    comp.style.left = (x + (bw - 1600 * s) / 2) + 'px'; comp.style.top = (y + (bh - 460 * s) / 2) + 'px';
+    comp.style.transform = `scale(${s})`;
+  } else if (p.mode === 'profile') {
+    document.getElementById('glow').remove();
+    document.body.style.background = bgs[p.bg || 'cream'];
+    root.innerHTML = '<div class="profile"><img src="src/mascot.png" alt=""/></div>';
+  } else if (p.mode === 'highlight') {
+    document.getElementById('glow').remove();
+    document.body.style.background = bgs[p.bg || 'berry'];
+    root.innerHTML = `<div class="hl"><svg viewBox="0 0 24 24">${icons[p.icon]}</svg></div>`;
+    if (p.bg === 'sun') root.querySelector('svg').style.stroke = '#1b1b1b';
+  }
+  document.fonts.ready.then(() => document.body.dataset.ready = '1');
+</script>
+</body>
+</html>

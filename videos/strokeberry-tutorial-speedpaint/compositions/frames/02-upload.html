@@ -1,0 +1,68 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+@font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/BricolageGrotesque.woff2") format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "Figtree"; src: url("assets/fonts/Figtree.woff2") format("woff2"); font-weight: 300 900; }
+    #root-f2 { position: absolute; inset: 0; width: 1080px; height: 1920px; overflow: hidden; font-family: "Figtree", sans-serif; color: #1B1B1B; }
+    .bg-f2 { position: absolute; inset: 0; background:
+      radial-gradient(520px 520px at 88% 12%, rgba(236,45,52,.12), transparent 70%),
+      radial-gradient(520px 520px at 6% 60%, rgba(250,190,58,.18), transparent 70%),
+      radial-gradient(520px 520px at 94% 88%, rgba(0,190,200,.12), transparent 70%), #FFF8EC; }
+    #f2 .sw { padding: 0 .06em; margin: 0 -.04em; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 30' preserveAspectRatio='none'%3E%3Cpath d='M4 13C48 6 120 3 196 8c1 5-1 10-4 13C130 16 70 18 9 26 3 24 2 17 4 13Z' fill='%23FABE3A'/%3E%3C/svg%3E") no-repeat 0 92%/0% 40%; }
+    #f2-chip { position: absolute; left: 80px; top: 196px; height: 58px; padding: 0 26px; border-radius: 9999px; background: #EC2D34; color: #fff;
+      display: flex; align-items: center; font-weight: 800; font-size: 26px; letter-spacing: .12em; border: 2px solid #1B1B1B; }
+    #f2-h { position: absolute; left: 80px; right: 110px; top: 272px; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 76px; line-height: 1.02; letter-spacing: -.025em; }
+    #f2-h .w { display: inline-block; }
+    .f2-hint { position: absolute; left: 80px; right: 110px; top: 360px; margin: 0; font-size: 33px; font-weight: 600; line-height: 1.25; color: #5B544A; }
+    #f2-phone { position: absolute; left: 246px; top: 456px; width: 588px; height: 1240px; border-radius: 76px; background: #1B1B1B;
+      box-shadow: 14px 14px 0 rgba(27,27,27,.08), 0 40px 80px -30px rgba(27,27,27,.45); }
+    #f2-screen { position: absolute; left: 14px; top: 14px; width: 560px; height: 1212px; border-radius: 62px; overflow: hidden; background: #FFF8EC; }
+    #f2-zoom { position: absolute; inset: 0; transform-origin: 50% 50%; }
+    .f2-scr { position: absolute; left: 0; top: 0; width: 560px; height: 1212px; }
+    .f2-ring { position: absolute; border: 4px solid #EC2D34; border-radius: 16px; box-shadow: 0 0 0 6px rgba(236,45,52,.18); opacity: 0; }
+  </style>
+  <div id="f2" data-composition-id="02-upload" data-width="1080" data-height="1920">
+    <div id="root-f2">
+      <div id="f2-bg" class="bg-f2 clip" data-start="0" data-duration="8" data-track-index="0"></div>
+      <div id="f2-chip">STEP 1 / 5</div>
+      <h1 id="f2-h"><span class="w">Upload</span> <span class="w">your</span> <span class="sw"><span class="w">art</span></span></h1>
+      <p class="f2-hint" id="f2-t0">Tap Replace and pick your illustration</p>
+      <p class="f2-hint" id="f2-t1">Finished art with clean outlines works best</p>
+      <div id="f2-phone"><div id="f2-screen"><div id="f2-zoom" data-layout-allow-overflow>
+        <img class="f2-scr" id="f2-s0" src="assets/screens/01-start.png" alt="" />
+        <img class="f2-scr" id="f2-s1" src="assets/screens/02-uploaded.png" alt="" />
+        <div class="f2-ring" id="f2-r0" style="left:274.3px;top:714.7px;width:249.8px;height:64.6px"></div>
+      </div></div></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#f2-chip", { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.05);
+      tl.fromTo("#f2-h .w", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out", stagger: 0.06 }, 0.12);
+      tl.to("#f2 .sw", { backgroundSize: "100% 40%", duration: 0.5, ease: "power2.inOut" }, 0.75);
+      tl.set(".f2-scr", { opacity: 0 }, 0);
+      tl.set(".f2-hint", { opacity: 0 }, 0);
+      tl.set("#f2-zoom", { scale: 1, x: 0, y: 0, transformOrigin: "0px 0px" }, 0);
+      tl.set(".f2-ring", { opacity: 0, scale: 1, backgroundColor: "rgba(236,45,52,0)" }, 0);
+      tl.fromTo("#f2-phone", { opacity: 0, y: 80 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
+      tl.set("#f2-s0", { opacity: 1 }, 0);
+      tl.set("#f2-s1", { opacity: 0 }, 0);
+      tl.fromTo("#f2-t0", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.6);
+      tl.to("#f2-zoom", { scale: 1.6, x: -336.0, y: -589.2, duration: 0.7, ease: "power3.inOut" }, 1.4);
+      tl.fromTo("#f2-r0", { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2.4)", immediateRender: false }, 2.2);
+      tl.fromTo("#f2-r0", { backgroundColor: "rgba(236,45,52,0)" }, { backgroundColor: "rgba(236,45,52,.22)", duration: 0.12, yoyo: true, repeat: 1, ease: "power1.inOut", immediateRender: false }, 2.5500000000000003);
+      tl.to("#f2-r0", { opacity: 0, duration: 0.25, ease: "power1.in" }, 3.2);
+      tl.to("#f2-zoom", { scale: 1, x: 0, y: 0, duration: 0.6, ease: "power3.inOut" }, 3.2);
+      tl.fromTo("#f2-s1", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power1.out" }, 3.6);
+      tl.set("#f2-s0", { opacity: 0 }, 3.85);
+      tl.fromTo("#f2-t1", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 4.3);
+      tl.to("#f2-t0", { opacity: 0, y: -10, duration: 0.25, ease: "power1.in" }, 4);
+      tl.to("#f2-zoom", { scale: 1.4, x: -112.0, y: 0.0, duration: 0.7, ease: "power3.inOut" }, 4.5);
+      tl.to("#f2-zoom", { scale: 1, x: 0, y: 0, duration: 0.6, ease: "power3.inOut" }, 7.2);
+      tl.to({}, { duration: 8 }, 0);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["02-upload"] = tl;
+    })();
+  </script>
+</template>

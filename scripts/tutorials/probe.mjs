@@ -1,0 +1,11 @@
+import puppeteer from 'puppeteer-core';
+const out = process.argv[2];
+const b = await puppeteer.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless:'new', args:['--hide-scrollbars']});
+const p = await b.newPage();
+await p.setViewport({width:390,height:844,deviceScaleFactor:1,isMobile:true,hasTouch:true});
+await p.goto('http://127.0.0.1:8001/studio/',{waitUntil:'networkidle0'});
+await new Promise(r=>setTimeout(r,2500));
+await p.screenshot({path:out+'/probe-top.png'});
+await p.screenshot({path:out+'/probe-full.png',fullPage:true});
+console.log(await p.evaluate(()=>document.body.scrollHeight));
+await b.close();

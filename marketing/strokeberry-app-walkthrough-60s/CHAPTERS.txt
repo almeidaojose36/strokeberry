@@ -1,0 +1,17 @@
+00:00 Upload your artwork
+Click New project, choose your image, and see it appear in the app preview.
+
+00:10 Choose your settings
+Select Ink, enable the drawing pencil and color, then choose 9:16 portrait and HD quality.
+
+00:20 Set up drawing steps
+Review the 2 × 2 crops and the top-left, top-right, bottom-left, bottom-right order. Set each stage to 15 seconds, then prepare.
+
+00:34 Preview your drawing
+Use Play or select a completed stage. The exported result excerpt is shown at 4× speed.
+
+00:43 Export and download
+Click Export video. When rendering is complete, choose Download MP4.
+
+00:54 Create with Strokeberry
+Save this walkthrough and create your own drawing video.

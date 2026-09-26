@@ -1,0 +1,68 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/BricolageGrotesque.woff2") format("woff2"); font-weight: 200 800; }
+    @font-face { font-family: "Figtree"; src: url("assets/fonts/Figtree.woff2") format("woff2"); font-weight: 300 900; }
+    #root { position: absolute; inset: 0; width: 1080px; height: 1920px; overflow: hidden; font-family: "Figtree", sans-serif; color: #1B1B1B; }
+    .f4-bg { position: absolute; inset: 0; background:
+      radial-gradient(560px 560px at 50% 22%, rgba(236,45,52,.12), transparent 70%),
+      radial-gradient(520px 520px at 90% 80%, rgba(0,190,200,.14), transparent 70%),
+      radial-gradient(460px 460px at 8% 70%, rgba(250,190,58,.2), transparent 70%), #FFF8EC; }
+    #f4-mascot { position: absolute; left: 280px; top: 442px; width: 520px; height: 560px; object-fit: contain; }
+    #f4-word { position: absolute; left: 0; right: 0; top: 590px; text-align: center; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 150px; letter-spacing: -.025em; line-height: 1; }
+    #f4-promise { position: absolute; left: 0; right: 0; top: 800px; text-align: center; font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-size: 72px; letter-spacing: -.025em; line-height: 1.12; }
+    #f4-promise .f4-w { display: inline-block; }
+    #f4-hd { position: relative; display: inline-block; isolation: isolate; }
+    #f4-swash { position: absolute; left: -12px; width: calc(100% + 24px); bottom: -4px; height: 34px; transform-origin: 0 50%; }
+    #f4-hd b { position: relative; font-weight: 700; }
+    #f4-cta { position: absolute; left: 0; right: 0; margin: 0 auto; top: 1050px; width: 760px; height: 140px; }
+    #f4-cta svg { position: absolute; inset: 0; overflow: visible; }
+    #f4-cta-fill { position: absolute; inset: 0; border-radius: 9999px; background: #D42630; }
+    #f4-cta-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-weight: 700; font-size: 46px; letter-spacing: -.005em; }
+    #f4-note { position: absolute; left: 0; right: 0; top: 1232px; text-align: center; font-weight: 600; font-size: 38px; color: #5B544A; }
+  </style>
+  <div data-hf-id="hf-dpqn" id="root" data-composition-id="04-ad-draws-itself" data-width="1080" data-height="1920">
+    <div data-hf-id="hf-vdn6" id="f4-bg" class="f4-bg clip" data-start="0" data-duration="5.5" data-track-index="0"></div>
+
+    <img id="f4-mascot" src="assets/strokeberry-mascot.png" alt="" />
+
+    <div data-hf-id="hf-9zmk" id="f4-word">strokeberry</div>
+
+    <div data-hf-id="hf-9cs3" id="f4-promise">
+      <span data-hf-id="hf-084k" class="f4-w">Turn</span> <span data-hf-id="hf-3093" class="f4-w">any</span> <span data-hf-id="hf-vojw" class="f4-w">image</span> <span data-hf-id="hf-lqr9" class="f4-w">into</span> <span data-hf-id="hf-brk2" class="f4-w">a</span><br data-hf-id="hf-x5px">
+      <span data-hf-id="hf-c0r4" class="f4-w" id="f4-hd"><svg data-hf-id="hf-odc0" id="f4-swash" viewBox="0 0 200 30" preserveAspectRatio="none" aria-hidden="true"><path data-hf-id="hf-pon4" d="M4 13C48 6 120 3 196 8c1 5-1 10-4 13C130 16 70 18 9 26 3 24 2 17 4 13Z" fill="#FABE3A" /></svg><b data-hf-id="hf-eq7h">hand‑drawn</b></span> <span data-hf-id="hf-ehcc" class="f4-w">video.</span>
+    </div>
+
+    <div data-hf-id="hf-nqf2" id="f4-cta">
+      <div data-hf-id="hf-6zts" id="f4-cta-fill"></div>
+      <svg data-hf-id="hf-j8rb" viewBox="0 0 760 140" aria-hidden="true"><rect data-hf-id="hf-bc0c" id="f4-cta-line" x="2" y="2" width="756" height="136" rx="68" fill="none" stroke="#1B1B1B" stroke-width="4" pathLength="1" stroke-dasharray="1 2" stroke-dashoffset="1" /></svg>
+      <div data-hf-id="hf-d2uk" id="f4-cta-text">Try it free · strokeberry.com</div>
+    </div>
+    <div data-hf-id="hf-z4b6" id="f4-note">3 videos free · no card needed</div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      tl.set("#f4-mascot", { clipPath: "inset(0% 0% 100% 0%)", rotation: -4, y: 0, scale: 1 }, 0);
+      // Scene 1 (0–1.6s): the approved mark is revealed top to bottom, like a pen pass, then settles.
+      tl.fromTo("#f4-mascot", { clipPath: "inset(0% 0% 100% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.35, ease: "power2.inOut", immediateRender: false }, 0.05);
+      tl.fromTo("#f4-mascot", { rotation: -4 }, { rotation: 0, duration: 1.4, ease: "back.out(2)", immediateRender: false }, 0.05);
+      // Scene 2 (1.6–2.2s): the lockup rises and the wordmark writes on.
+      tl.fromTo("#f4-mascot", { y: 0, scale: 1 }, { y: -322, scale: 0.62, duration: 0.6, ease: "power3.inOut", transformOrigin: "50% 50%", immediateRender: false }, 1.6);
+      tl.fromTo("#f4-word", { clipPath: "inset(0 100% 0 0)", opacity: 1 }, { clipPath: "inset(0 0% 0 0)", duration: 0.6, ease: "power2.inOut" }, 1.75);
+      // Scene 3 (2.2–3.4s): the promise reveals word by word; the marker swash draws under "hand-drawn".
+      tl.fromTo("#f4-promise .f4-w", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out", stagger: 0.12 }, 2.25);
+      tl.fromTo("#f4-swash", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power2.inOut" }, 3.05);
+      // Scene 4 (3.4–4.4s): the CTA pill outline draws, fills berry, then a press-release spring.
+      tl.fromTo("#f4-cta-line", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.45, ease: "power2.inOut" }, 3.4);
+      tl.fromTo("#f4-cta-fill", { opacity: 0 }, { opacity: 1, duration: 0.18, ease: "power1.out" }, 3.85);
+      tl.fromTo("#f4-cta-text", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out" }, 3.9);
+      tl.to("#f4-cta", { scale: 0.95, duration: 0.09, ease: "power2.in" }, 4.15);
+      tl.to("#f4-cta", { scale: 1, duration: 0.4, ease: "back.out(3)" }, 4.24);
+      tl.fromTo("#f4-note", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 4.3);
+      // Scene 5 (4.4–5.5s): final still hold on the end card.
+      window.__timelines = window.__timelines || {};
+      window.__timelines["04-ad-draws-itself"] = tl;
+    })();
+  </script>
+</template>

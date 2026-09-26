@@ -1,0 +1,55 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/BricolageGrotesque.woff2") format("woff2"); font-weight: 200 800; }
+    @font-face { font-family: "Figtree"; src: url("assets/fonts/Figtree.woff2") format("woff2"); font-weight: 300 900; }
+    #root { position: absolute; inset: 0; width: 1080px; height: 1920px; overflow: hidden; font-family: "Figtree", sans-serif; color: #1B1B1B; }
+    .f2-bg { position: absolute; inset: 0; background:
+      radial-gradient(520px 520px at 88% 10%, rgba(0,190,200,.18), transparent 70%),
+      radial-gradient(480px 480px at 6% 90%, rgba(236,45,52,.12), transparent 70%),
+      radial-gradient(420px 420px at 8% 10%, rgba(250,190,58,.22), transparent 70%), #FFF8EC; }
+    #f2-head { position: absolute; left: 0; right: 0; top: 196px; display: flex; align-items: center; justify-content: center; gap: 26px; }
+    #f2-title { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 124px; letter-spacing: -.03em; line-height: 1; }
+    #f2-chip { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 46px; padding: 14px 30px 16px; border: 4px solid #1E1E1E; border-radius: 9999px; background: #00BEC8; color: #1B1B1B; box-shadow: 6px 6px 0 rgba(26,26,26,.1); }
+    #f2-card { position: absolute; left: 190px; top: 372px; width: 700px; height: 700px; border: 4px solid #1E1E1E; border-radius: 44px; background: #FAF9F6; box-shadow: 12px 12px 0 rgba(26,26,26,.1); }
+    #f2-card img { position: absolute; left: 20px; top: 20px; width: 652px; height: 652px; border-radius: 22px; }
+    #f2-answer { position: absolute; left: 0; right: 0; margin: 0 auto; top: 1100px; width: 470px; height: 106px; border: 4px solid #1E1E1E; border-radius: 9999px; background: #EC2D34; color: #fff; display: flex; align-items: center; justify-content: center; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 56px; letter-spacing: -.02em; box-shadow: 8px 8px 0 rgba(26,26,26,.1); }
+    #f2-value { position: absolute; left: 0; right: 0; top: 1238px; text-align: center; font-weight: 700; font-size: 62px; line-height: 1.22; letter-spacing: -.01em; }
+    #f2-value .f2-chunk { display: inline-block; margin: 0 10px; }
+    #f2-mark { position: relative; display: inline-block; isolation: isolate; }
+    #f2-mark i { position: absolute; left: -10px; right: -10px; bottom: 2px; height: 30px; border-radius: 10px; background: #FABE3A; transform-origin: 0 50%; }
+    #f2-mark b { position: relative; }
+    #f2-mark b { font-weight: 800; }
+  </style>
+  <div data-hf-id="hf-ajru" id="root" data-composition-id="02-guess-two" data-width="1080" data-height="1920">
+    <div data-hf-id="hf-8klm" id="f2-bg" class="f2-bg clip" data-start="0" data-duration="4.8" data-track-index="0"></div>
+
+    <div data-hf-id="hf-3ggs" id="f2-head"><span data-hf-id="hf-2fcj" id="f2-title">Round 2</span><span data-hf-id="hf-96v7" id="f2-chip">harder</span></div>
+
+    <div data-hf-id="hf-xcsg" id="f2-card"><img data-hf-id="hf-yxk1" src="assets/owl.jpg" alt=""></div>
+    <!-- approved frame video hoisted by assemble-index -->
+
+    <div data-hf-id="hf-3s2j" id="f2-answer">It's an owl!</div>
+
+    <div data-hf-id="hf-nbex" id="f2-value">
+      <span data-hf-id="hf-jv8y" class="f2-chunk">1 image in.</span><span data-hf-id="hf-y7u6" class="f2-chunk">1 click.</span><br data-hf-id="hf-x5px">
+      <span data-hf-id="hf-rjyn" class="f2-chunk" id="f2-mark"><i data-hf-id="hf-wt6k"></i><b data-hf-id="hf-trx8">No drawing skills.</b></span>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // Scene 1 (0–0.6s): the header hard-cuts in (the in-place swap from frame 1's question); chip pops.
+      tl.fromTo("#f2-title", { opacity: 0 }, { opacity: 1, duration: 0.01 }, 0);
+      tl.fromTo("#f2-chip", { opacity: 0, scale: 0.3, rotation: -8 }, { opacity: 1, scale: 1, rotation: -4, duration: 0.45, ease: "back.out(2.4)" }, 0.3);
+      // Scene 2 (0.6–2.9s): the value line assembles chunk by chunk on the beat.
+      tl.fromTo("#f2-value .f2-chunk", { opacity: 0, y: 30, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "power3.out", stagger: 0.5 }, 0.7);
+      tl.fromTo("#f2-mark i", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: "power2.inOut" }, 2.25);
+      // Scene 3 (3.1–3.7s): the owl colors in; the answer spring-pops.
+      tl.fromTo("#f2-answer", { opacity: 0, scale: 0.2 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.2)" }, 4.05);
+      // Scene 4 (3.7–4.8s): held read.
+      window.__timelines = window.__timelines || {};
+      window.__timelines["02-guess-two"] = tl;
+    })();
+  </script>
+</template>

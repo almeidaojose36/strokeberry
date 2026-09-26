@@ -1,0 +1,1 @@
+Four continuous drawing stages at 0, 14, 28, 42 seconds. Mascot closing card at 56 seconds. Existing spring-pop-entrance title and mascot, linear progress rule. Duration 60 seconds.

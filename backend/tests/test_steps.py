@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 
 from backend import app as module
 from backend import pipeline
-from backend.steps import alignment, detect_panels, prepare_steps, StepFrames
+from backend.steps import alignment, detect_panels, prepare_steps, StepFrames, four_step_reading_order
 from backend.steps import reading_regions, swept_scene, PAPER, color_layers, REVEAL_VERSION
 
 
@@ -33,6 +33,17 @@ def config_for(folder):
     assert layout['detected'] and len(layout['crops']) == 4
     return module.StepConfig(stages=[{'crop': crop, 'label': f'Stage {i+1}', 'seconds': 2}
                                       for i,crop in enumerate(layout['crops'])]).model_dump()
+
+
+def test_four_step_order_is_always_top_left_to_bottom_right():
+    crops = [
+        {'x': .5, 'y': .5, 'width': .5, 'height': .5},
+        {'x': 0, 'y': 0, 'width': .5, 'height': .5},
+        {'x': 0, 'y': .5, 'width': .5, 'height': .5},
+        {'x': .5, 'y': 0, 'width': .5, 'height': .5},
+    ]
+    stages = [{'crop': crop, 'label': label} for crop, label in zip(crops, ['BR', 'TL', 'BL', 'TR'])]
+    assert [stage['label'] for stage in four_step_reading_order(stages)] == ['TL', 'TR', 'BL', 'BR']
 
 
 def test_registration_recovers_translation():

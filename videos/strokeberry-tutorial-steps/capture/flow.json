@@ -1,0 +1,365 @@
+{
+ "image": "videos/strokeberry-tutorial-steps/capture/owl-drawing-tutorial.jpg",
+ "name": "owl-drawing-tutorial.jpg",
+ "actions": [
+  {
+   "scroll": [
+    ".preview-stage",
+    null,
+    70
+   ]
+  },
+  {
+   "shot": "01-start",
+   "targets": {
+    "replace": [
+     ".source-actions button",
+     "Replace"
+    ],
+    "steps": [
+     ".steps-entry"
+    ]
+   }
+  },
+  {
+   "upload": true
+  },
+  {
+   "shot": "02-uploaded",
+   "targets": {
+    "preview": [
+     ".preview-stage"
+    ],
+    "source": [
+     ".source-row"
+    ],
+    "steps": [
+     ".steps-entry"
+    ],
+    "stepsButton": [
+     ".steps-entry button"
+    ]
+   }
+  },
+  {
+   "click": [
+    ".steps-entry button"
+   ]
+  },
+  {
+   "waitFor": [
+    ".step-editor .detect-layout"
+   ]
+  },
+  {
+   "wait": 1200
+  },
+  {
+   "shot": "03-editor",
+   "targets": {
+    "found": [
+     ".step-editor .layout-picker"
+    ],
+    "sheet": [
+     ".step-editor .crop-sheet"
+    ],
+    "layout": [
+     ".step-editor select"
+    ]
+   }
+  },
+  {
+   "scrollIn": [
+    ".step-editor",
+    ".stage-order",
+    null,
+    30
+   ]
+  },
+  {
+   "shot": "04-stages",
+   "targets": {
+    "order": [
+     ".step-editor .stage-order"
+    ],
+    "s1": [
+     ".stage-order > *:nth-child(1)"
+    ],
+    "s4": [
+     ".stage-order > *:nth-child(4)"
+    ]
+   }
+  },
+  {
+   "scrollIn": [
+    ".step-editor",
+    null
+   ]
+  },
+  {
+   "shot": "05-prepare",
+   "targets": {
+    "align": [
+     ".step-editor .align-checkbox"
+    ],
+    "prepare": [
+     ".step-editor button",
+     "Prepare drawing steps"
+    ]
+   }
+  },
+  {
+   "click": [
+    ".step-editor button",
+    "Prepare drawing steps"
+   ]
+  },
+  {
+   "wait": 1500
+  },
+  {
+   "shot": "06-preparing",
+   "targets": {
+    "prepare": [
+     ".step-editor button",
+     "Prepar"
+    ]
+   }
+  },
+  {
+   "waitFor": [
+    ".sequence-strip button"
+   ]
+  },
+  {
+   "wait": 2500
+  },
+  {
+   "pause": true
+  },
+  {
+   "scroll": [
+    ".preview-stage",
+    null,
+    70
+   ]
+  },
+  {
+   "click": [
+    ".sequence-strip button",
+    "1."
+   ]
+  },
+  {
+   "wait": 800
+  },
+  {
+   "shot": "07-sequence",
+   "targets": {
+    "preview": [
+     ".preview-stage"
+    ],
+    "strip": [
+     ".sequence-strip"
+    ],
+    "s1": [
+     ".sequence-strip button",
+     "1."
+    ]
+   }
+  },
+  {
+   "scroll": [
+    ".settings-panel",
+    null,
+    20
+   ]
+  },
+  {
+   "shot": "08-settings",
+   "targets": {
+    "summary": [
+     ".sequence-summary"
+    ],
+    "pen": [
+     ".toggle-row",
+     "Show drawing pencil"
+    ],
+    "duration": [
+     ".duration-slider"
+    ]
+   }
+  },
+  {
+   "range": [
+    ".duration-slider",
+    20
+   ]
+  },
+  {
+   "shot": "09-duration",
+   "targets": {
+    "duration": [
+     ".duration-slider"
+    ],
+    "label": [
+     ".field-label",
+     "Duration"
+    ]
+   }
+  },
+  {
+   "click": [
+    ".settings-tabs button",
+    "Video settings"
+   ]
+  },
+  {
+   "click": [
+    ".ratio-options button",
+    "9:16"
+   ]
+  },
+  {
+   "select": [
+    "#resolution",
+    "1080p"
+   ]
+  },
+  {
+   "shot": "10-video",
+   "targets": {
+    "tab": [
+     ".settings-tabs button",
+     "Video settings"
+    ],
+    "ratio": [
+     ".ratio-options button",
+     "9:16"
+    ],
+    "quality": [
+     "#resolution"
+    ],
+    "summary": [
+     ".export-summary"
+    ]
+   }
+  },
+  {
+   "scroll": [
+    ".preview-stage",
+    null,
+    70
+   ]
+  },
+  {
+   "play": true
+  },
+  {
+   "wait": 4000
+  },
+  {
+   "shot": "11-preview-1",
+   "targets": {
+    "preview": [
+     ".preview-stage"
+    ],
+    "play": [
+     ".playback button"
+    ],
+    "strip": [
+     ".sequence-strip"
+    ]
+   }
+  },
+  {
+   "wait": 5000
+  },
+  {
+   "shot": "11-preview-2",
+   "targets": {
+    "preview": [
+     ".preview-stage"
+    ]
+   }
+  },
+  {
+   "wait": 5000
+  },
+  {
+   "shot": "11-preview-3",
+   "targets": {
+    "preview": [
+     ".preview-stage"
+    ]
+   }
+  },
+  {
+   "wait": 5000
+  },
+  {
+   "shot": "11-preview-4",
+   "targets": {
+    "preview": [
+     ".preview-stage"
+    ]
+   }
+  },
+  {
+   "wait": 1500
+  },
+  {
+   "scroll": [
+    ".export-button",
+    null,
+    420
+   ]
+  },
+  {
+   "shot": "12-export",
+   "targets": {
+    "export": [
+     ".export-button"
+    ]
+   }
+  },
+  {
+   "click": [
+    ".export-button"
+   ]
+  },
+  {
+   "wait": 1500
+  },
+  {
+   "shot": "13-exporting",
+   "targets": {
+    "dialog": [
+     "[role=dialog]"
+    ]
+   }
+  },
+  {
+   "waitFor": [
+    "[role=dialog] a",
+    "Download MP4",
+    600000
+   ]
+  },
+  {
+   "shot": "14-ready",
+   "targets": {
+    "download": [
+     "[role=dialog] a",
+     "Download MP4"
+    ],
+    "player": [
+     "[role=dialog] video"
+    ]
+   }
+  },
+  {
+   "download": true
+  }
+ ]
+}

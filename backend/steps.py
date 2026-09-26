@@ -175,6 +175,30 @@ def occupied_bands(values):
             if b-a > length * .06]
 
 
+def four_step_reading_order(stages):
+    """Return four tutorial panels in natural reading order.
+
+    Horizontal strips read left-to-right, vertical strips read top-to-bottom,
+    and the usual 2×2 sheet reads top-left, top-right, bottom-left,
+    bottom-right. Stage metadata stays attached to its crop.
+    """
+    if len(stages) != 4:
+        return list(stages)
+    def center(stage):
+        crop = stage['crop'] if isinstance(stage, dict) else stage
+        return crop['x'] + crop['width'] / 2, crop['y'] + crop['height'] / 2
+    points = [center(stage) for stage in stages]
+    x_span = max(x for x, _ in points) - min(x for x, _ in points)
+    y_span = max(y for _, y in points) - min(y for _, y in points)
+    if y_span < max(.04, x_span * .2):
+        return sorted(stages, key=lambda stage: center(stage)[0])
+    if x_span < max(.04, y_span * .2):
+        return sorted(stages, key=lambda stage: center(stage)[1])
+    by_row = sorted(stages, key=lambda stage: center(stage)[1])
+    return sorted(by_row[:2], key=lambda stage: center(stage)[0]) + \
+           sorted(by_row[2:], key=lambda stage: center(stage)[0])
+
+
 def detect_panels(folder):
     image = np.array(Image.open(original_path(folder)).convert('RGB'))
     gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
@@ -189,7 +213,12 @@ def detect_panels(folder):
             boxes.append((x, y, w, h))
     # Bordered tutorial panels on a dark background.
     if 2 <= len(boxes) <= 8:
-        boxes.sort(key=lambda b: b[1] + b[0] / width * height * .05)
+        boxes = four_step_reading_order([
+            {'crop': {'x': x/width, 'y': y/height, 'width': w/width, 'height': h/height},
+             'box': (x, y, w, h)} for x, y, w, h in boxes
+        ]) if len(boxes) == 4 else sorted(boxes, key=lambda b: (b[1], b[0]))
+        if boxes and isinstance(boxes[0], dict):
+            boxes = [item['box'] for item in boxes]
         row_starts = []
         for _, y, _, h in boxes:
             if not row_starts or abs(y-row_starts[-1]) > h*.2:

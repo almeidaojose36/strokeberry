@@ -1,0 +1,11 @@
+{
+  "provider": "auto",
+  "speed": 1,
+  "lines": [],
+  "bgm": {
+    "mode": "retrieve",
+    "query": "light upbeat playful acoustic pop, plucky guitar and soft claps, friendly tutorial background, around 110 bpm, no vocals",
+    "blob": "Turn your logo into a hand-drawn video in four taps",
+    "arc": "Hook (the result) → Step 1 Upload → Step 2 Drawing style → Step 3 Video settings → Step 4 Preview → Step 5 Export → Result + CTA"
+  }
+}

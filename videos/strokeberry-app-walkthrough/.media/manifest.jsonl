@@ -1,0 +1,12 @@
+{"id":"video_001","type":"video","path":"assets/actual-export.mp4","source":"existing","description":"actual export","duration":60,"width":720,"height":1280,"provenance":{"provider":"local","adopted":true}}
+{"id":"image_001","type":"image","path":"assets/captures/01-new-project.png","source":"existing","description":"01 new project","width":1280,"height":720,"provenance":{"provider":"local","adopted":true}}
+{"id":"image_002","type":"image","path":"assets/captures/02-style.png","source":"existing","description":"02 style","width":1280,"height":720,"provenance":{"provider":"local","adopted":true}}
+{"id":"image_003","type":"image","path":"assets/captures/03-format.png","source":"existing","description":"03 format","width":1280,"height":720,"provenance":{"provider":"local","adopted":true}}
+{"id":"image_004","type":"image","path":"assets/captures/04-four-steps.png","source":"existing","description":"04 four steps","width":1280,"height":720,"provenance":{"provider":"local","adopted":true}}
+{"id":"image_005","type":"image","path":"assets/captures/05-prepare.png","source":"existing","description":"05 prepare","width":1280,"height":720,"provenance":{"provider":"local","adopted":true}}
+{"id":"image_006","type":"image","path":"assets/captures/06-preview-controls.png","source":"existing","description":"06 preview controls","width":1280,"height":720,"provenance":{"provider":"local","adopted":true}}
+{"id":"image_007","type":"image","path":"assets/captures/06-preview.png","source":"existing","description":"06 preview","width":1280,"height":720,"provenance":{"provider":"local","adopted":true}}
+{"id":"image_008","type":"image","path":"assets/captures/07-export.png","source":"existing","description":"07 export","width":1280,"height":720,"provenance":{"provider":"local","adopted":true}}
+{"id":"image_009","type":"image","path":"assets/captures/08-ready.png","source":"existing","description":"08 ready","width":1280,"height":720,"provenance":{"provider":"local","adopted":true}}
+{"id":"image_010","type":"image","path":"assets/input-sheet.jpg","source":"existing","description":"input sheet","width":640,"height":640,"provenance":{"provider":"local","adopted":true}}
+{"id":"image_011","type":"image","path":"assets/mascot.png","source":"existing","description":"mascot","width":1254,"height":1254,"provenance":{"provider":"local","adopted":true}}

@@ -1,0 +1,537 @@
+{
+ "image": "videos/strokeberry-tutorial-settings/capture/botanical-wreath.jpg",
+ "name": "botanical-wreath.jpg",
+ "actions": [
+  {
+   "scroll": [
+    ".preview-stage",
+    null,
+    70
+   ]
+  },
+  {
+   "upload": true
+  },
+  {
+   "scroll": [
+    ".preview-stage",
+    null,
+    70
+   ]
+  },
+  {
+   "shot": "01-uploaded",
+   "targets": {
+    "preview": [
+     ".preview-stage"
+    ],
+    "canvas": [
+     ".preview-stage canvas"
+    ]
+   }
+  },
+  {
+   "scroll": [
+    ".settings-panel",
+    null,
+    20
+   ]
+  },
+  {
+   "click": [
+    ".style-card",
+    "Pencil"
+   ]
+  },
+  {
+   "scroll": [
+    ".preview-stage",
+    null,
+    70
+   ]
+  },
+  {
+   "pause": true
+  },
+  {
+   "range": [
+    "input[aria-label=\"Preview timeline\"]",
+    6
+   ]
+  },
+  {
+   "wait": 900
+  },
+  {
+   "shot": "s-pencil",
+   "targets": {
+    "canvas": [
+     ".preview-stage canvas"
+    ]
+   }
+  },
+  {
+   "scroll": [
+    ".settings-panel",
+    null,
+    20
+   ]
+  },
+  {
+   "shot": "s-cards",
+   "targets": {
+    "pencil": [
+     ".style-card",
+     "Pencil"
+    ],
+    "ink": [
+     ".style-card",
+     "Ink"
+    ]
+   }
+  },
+  {
+   "click": [
+    ".style-card",
+    "Ink"
+   ]
+  },
+  {
+   "scroll": [
+    ".preview-stage",
+    null,
+    70
+   ]
+  },
+  {
+   "pause": true
+  },
+  {
+   "range": [
+    "input[aria-label=\"Preview timeline\"]",
+    6
+   ]
+  },
+  {
+   "wait": 900
+  },
+  {
+   "shot": "s-ink",
+   "targets": {
+    "canvas": [
+     ".preview-stage canvas"
+    ]
+   }
+  },
+  {
+   "pause": true
+  },
+  {
+   "range": [
+    "input[aria-label=\"Preview timeline\"]",
+    5
+   ]
+  },
+  {
+   "wait": 900
+  },
+  {
+   "shot": "p-on",
+   "targets": {
+    "canvas": [
+     ".preview-stage canvas"
+    ]
+   }
+  },
+  {
+   "scroll": [
+    ".settings-panel",
+    null,
+    20
+   ]
+  },
+  {
+   "click": [
+    ".toggle-row",
+    "Show drawing pencil"
+   ]
+  },
+  {
+   "shot": "p-toggle",
+   "targets": {
+    "pen": [
+     ".toggle-row",
+     "Show drawing pencil"
+    ]
+   }
+  },
+  {
+   "scroll": [
+    ".preview-stage",
+    null,
+    70
+   ]
+  },
+  {
+   "pause": true
+  },
+  {
+   "range": [
+    "input[aria-label=\"Preview timeline\"]",
+    5
+   ]
+  },
+  {
+   "wait": 900
+  },
+  {
+   "shot": "p-off",
+   "targets": {
+    "canvas": [
+     ".preview-stage canvas"
+    ]
+   }
+  },
+  {
+   "scroll": [
+    ".settings-panel",
+    null,
+    20
+   ]
+  },
+  {
+   "click": [
+    ".toggle-row",
+    "Show drawing pencil"
+   ]
+  },
+  {
+   "scroll": [
+    ".preview-stage",
+    null,
+    70
+   ]
+  },
+  {
+   "pause": true
+  },
+  {
+   "range": [
+    "input[aria-label=\"Preview timeline\"]",
+    14.9
+   ]
+  },
+  {
+   "wait": 900
+  },
+  {
+   "shot": "c-on",
+   "targets": {
+    "canvas": [
+     ".preview-stage canvas"
+    ]
+   }
+  },
+  {
+   "scroll": [
+    ".settings-panel",
+    null,
+    20
+   ]
+  },
+  {
+   "click": [
+    ".toggle-row",
+    "Bring in the color"
+   ]
+  },
+  {
+   "shot": "c-toggle",
+   "targets": {
+    "color": [
+     ".toggle-row",
+     "Bring in the color"
+    ]
+   }
+  },
+  {
+   "scroll": [
+    ".preview-stage",
+    null,
+    70
+   ]
+  },
+  {
+   "pause": true
+  },
+  {
+   "range": [
+    "input[aria-label=\"Preview timeline\"]",
+    14.9
+   ]
+  },
+  {
+   "wait": 900
+  },
+  {
+   "shot": "c-off",
+   "targets": {
+    "canvas": [
+     ".preview-stage canvas"
+    ]
+   }
+  },
+  {
+   "scroll": [
+    ".settings-panel",
+    null,
+    20
+   ]
+  },
+  {
+   "click": [
+    ".toggle-row",
+    "Bring in the color"
+   ]
+  },
+  {
+   "scroll": [
+    ".settings-panel",
+    null,
+    20
+   ]
+  },
+  {
+   "range": [
+    ".duration-slider",
+    10
+   ]
+  },
+  {
+   "shot": "d-10",
+   "targets": {
+    "label": [
+     ".field-label",
+     "Duration"
+    ],
+    "slider": [
+     ".duration-slider"
+    ]
+   }
+  },
+  {
+   "range": [
+    ".duration-slider",
+    60
+   ]
+  },
+  {
+   "shot": "d-60",
+   "targets": {
+    "label": [
+     ".field-label",
+     "Duration"
+    ],
+    "slider": [
+     ".duration-slider"
+    ]
+   }
+  },
+  {
+   "range": [
+    ".duration-slider",
+    15
+   ]
+  },
+  {
+   "click": [
+    ".settings-tabs button",
+    "Video settings"
+   ]
+  },
+  {
+   "scroll": [
+    ".settings-panel",
+    null,
+    20
+   ]
+  },
+  {
+   "click": [
+    ".ratio-options button",
+    "16:9"
+   ]
+  },
+  {
+   "scroll": [
+    ".preview-stage",
+    null,
+    70
+   ]
+  },
+  {
+   "pause": true
+  },
+  {
+   "range": [
+    "input[aria-label=\"Preview timeline\"]",
+    14.9
+   ]
+  },
+  {
+   "wait": 900
+  },
+  {
+   "shot": "f-169",
+   "targets": {
+    "canvas": [
+     ".preview-stage canvas"
+    ],
+    "stage": [
+     ".preview-stage"
+    ]
+   }
+  },
+  {
+   "scroll": [
+    ".settings-panel",
+    null,
+    20
+   ]
+  },
+  {
+   "click": [
+    ".ratio-options button",
+    "9:16"
+   ]
+  },
+  {
+   "scroll": [
+    ".preview-stage",
+    null,
+    70
+   ]
+  },
+  {
+   "pause": true
+  },
+  {
+   "range": [
+    "input[aria-label=\"Preview timeline\"]",
+    14.9
+   ]
+  },
+  {
+   "wait": 900
+  },
+  {
+   "shot": "f-916",
+   "targets": {
+    "canvas": [
+     ".preview-stage canvas"
+    ],
+    "stage": [
+     ".preview-stage"
+    ]
+   }
+  },
+  {
+   "scroll": [
+    ".settings-panel",
+    null,
+    20
+   ]
+  },
+  {
+   "click": [
+    ".ratio-options button",
+    "1:1"
+   ]
+  },
+  {
+   "scroll": [
+    ".preview-stage",
+    null,
+    70
+   ]
+  },
+  {
+   "pause": true
+  },
+  {
+   "range": [
+    "input[aria-label=\"Preview timeline\"]",
+    14.9
+   ]
+  },
+  {
+   "wait": 900
+  },
+  {
+   "shot": "f-11",
+   "targets": {
+    "canvas": [
+     ".preview-stage canvas"
+    ],
+    "stage": [
+     ".preview-stage"
+    ]
+   }
+  },
+  {
+   "scroll": [
+    ".settings-panel",
+    null,
+    20
+   ]
+  },
+  {
+   "click": [
+    ".ratio-options button",
+    "9:16"
+   ]
+  },
+  {
+   "select": [
+    "#resolution",
+    "1080p"
+   ]
+  },
+  {
+   "shot": "f-settings",
+   "targets": {
+    "ratios": [
+     ".ratio-options"
+    ],
+    "quality": [
+     "#resolution"
+    ],
+    "summary": [
+     ".export-summary"
+    ]
+   }
+  },
+  {
+   "scroll": [
+    ".export-button",
+    null,
+    420
+   ]
+  },
+  {
+   "click": [
+    ".export-button"
+   ]
+  },
+  {
+   "waitFor": [
+    "[role=dialog] a",
+    "Download MP4",
+    600000
+   ]
+  },
+  {
+   "download": true
+  }
+ ]
+}

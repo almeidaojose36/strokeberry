@@ -1,0 +1,508 @@
+{
+ "voiceover": "vo-lines.json",
+ "frames": [
+  {
+   "id": "01-hook",
+   "kind": "intro",
+   "duration": 5,
+   "title": "Turn your logo into a drawing video",
+   "key": "drawing video",
+   "chip": "Step-by-step tutorial",
+   "card": [
+    190,
+    540,
+    700,
+    700
+   ],
+   "videos": [
+    {
+     "rect": [
+      190,
+      540,
+      700,
+      700
+     ],
+     "at": 0.2,
+     "duration": 4.8,
+     "media_start": 0,
+     "radius": 32
+    }
+   ]
+  },
+  {
+   "id": "02-upload",
+   "kind": "step",
+   "duration": 13,
+   "chip": "STEP 1 / 5",
+   "title": "Upload your logo",
+   "key": "logo",
+   "enter": true,
+   "events": [
+    {
+     "t": 0,
+     "do": "show",
+     "screen": "01-start"
+    },
+    {
+     "t": 0.6,
+     "do": "hint",
+     "text": "Open the studio and tap Replace"
+    },
+    {
+     "t": 1.8,
+     "do": "zoom",
+     "screen": "01-start",
+     "target": "replace",
+     "scale": 1.6
+    },
+    {
+     "t": 2.6,
+     "do": "tap",
+     "screen": "01-start",
+     "target": "replace",
+     "hold": 1.0
+    },
+    {
+     "t": 3.6,
+     "do": "unzoom"
+    },
+    {
+     "t": 3.8,
+     "do": "show",
+     "screen": "02-uploading"
+    },
+    {
+     "t": 4.0,
+     "do": "hint",
+     "text": "Works best with clean line art or a transparent PNG"
+    },
+    {
+     "t": 6.0,
+     "do": "show",
+     "screen": "03-uploaded"
+    },
+    {
+     "t": 6.8,
+     "do": "zoom",
+     "screen": "03-uploaded",
+     "target": "source",
+     "scale": 1.45
+    },
+    {
+     "t": 7.3,
+     "do": "hint",
+     "text": "Your logo is loaded and ready to draw"
+    },
+    {
+     "t": 7.4,
+     "do": "ring",
+     "screen": "03-uploaded",
+     "target": "source",
+     "hold": 1.6
+    },
+    {
+     "t": 9.3,
+     "do": "zoom",
+     "screen": "03-uploaded",
+     "target": "steps",
+     "scale": 1.45
+    },
+    {
+     "t": 9.9,
+     "do": "hint",
+     "text": "Got a step-by-step drawing sheet? Try Set up steps"
+    },
+    {
+     "t": 10.0,
+     "do": "ring",
+     "screen": "03-uploaded",
+     "target": "steps",
+     "hold": 2.4
+    },
+    {
+     "t": 12.4,
+     "do": "unzoom"
+    }
+   ]
+  },
+  {
+   "id": "03-style",
+   "kind": "step",
+   "duration": 11,
+   "chip": "STEP 2 / 5",
+   "title": "Pick Ink for logos",
+   "key": "Ink",
+   "events": [
+    {
+     "t": 0,
+     "do": "show",
+     "screen": "04-settings"
+    },
+    {
+     "t": 0.6,
+     "do": "hint",
+     "text": "Ink draws bold, confident lines"
+    },
+    {
+     "t": 1.6,
+     "do": "zoom",
+     "screen": "04-settings",
+     "target": "ink",
+     "scale": 1.5
+    },
+    {
+     "t": 2.4,
+     "do": "tap",
+     "screen": "04-settings",
+     "target": "ink",
+     "hold": 1.0
+    },
+    {
+     "t": 3.0,
+     "do": "show",
+     "screen": "05-style"
+    },
+    {
+     "t": 4.2,
+     "do": "unzoom"
+    },
+    {
+     "t": 4.6,
+     "do": "show",
+     "screen": "06-toggles"
+    },
+    {
+     "t": 5.0,
+     "do": "zoom",
+     "screen": "06-toggles",
+     "target": "color",
+     "scale": 1.2
+    },
+    {
+     "t": 5.6,
+     "do": "hint",
+     "text": "Keep the pencil and the colour switched on"
+    },
+    {
+     "t": 5.6,
+     "do": "ring",
+     "screen": "06-toggles",
+     "target": "pen",
+     "hold": 1.3
+    },
+    {
+     "t": 7.0,
+     "do": "ring",
+     "screen": "06-toggles",
+     "target": "color",
+     "hold": 1.5
+    },
+    {
+     "t": 8.6,
+     "do": "unzoom"
+    },
+    {
+     "t": 8.9,
+     "do": "hint",
+     "text": "15 seconds is perfect for Reels and TikTok"
+    },
+    {
+     "t": 9.0,
+     "do": "ring",
+     "screen": "06-toggles",
+     "target": "duration",
+     "hold": 1.7
+    }
+   ]
+  },
+  {
+   "id": "04-video",
+   "kind": "step",
+   "duration": 7.2,
+   "chip": "STEP 3 / 5",
+   "title": "Set it up for Reels",
+   "key": "Reels",
+   "events": [
+    {
+     "t": 0.0,
+     "do": "show",
+     "screen": "06-toggles"
+    },
+    {
+     "t": 0.4,
+     "do": "hint",
+     "text": "Open Video settings"
+    },
+    {
+     "t": 0.8,
+     "do": "tap",
+     "screen": "07-video-tab",
+     "target": "tab",
+     "hold": 0.64
+    },
+    {
+     "t": 1.28,
+     "do": "show",
+     "screen": "07-video-tab"
+    },
+    {
+     "t": 1.92,
+     "do": "zoom",
+     "screen": "07-video-tab",
+     "target": "ratio",
+     "scale": 1.5
+    },
+    {
+     "t": 2.08,
+     "do": "hint",
+     "text": "Choose 9:16 Portrait"
+    },
+    {
+     "t": 2.48,
+     "do": "tap",
+     "screen": "07-video-tab",
+     "target": "ratio",
+     "hold": 0.64
+    },
+    {
+     "t": 2.96,
+     "do": "show",
+     "screen": "08-video-set"
+    },
+    {
+     "t": 3.68,
+     "do": "unzoom"
+    },
+    {
+     "t": 4.0,
+     "do": "hint",
+     "text": "\u2026and Full HD \u00b7 1080p"
+    },
+    {
+     "t": 4.0,
+     "do": "ring",
+     "screen": "08-video-set",
+     "target": "quality",
+     "hold": 1.44
+    },
+    {
+     "t": 5.6,
+     "do": "hint",
+     "text": "Ready: 1080p \u00b7 9:16 \u00b7 15 seconds"
+    },
+    {
+     "t": 5.6,
+     "do": "ring",
+     "screen": "08-video-set",
+     "target": "summary",
+     "hold": 1.44
+    }
+   ]
+  },
+  {
+   "id": "05-preview",
+   "kind": "step",
+   "duration": 7,
+   "chip": "STEP 4 / 5",
+   "title": "Preview the drawing",
+   "key": "Preview",
+   "events": [
+    {
+     "t": 0,
+     "do": "show",
+     "screen": "09-preview-1"
+    },
+    {
+     "t": 0.4,
+     "do": "hint",
+     "text": "Press play to watch it draw"
+    },
+    {
+     "t": 0.5,
+     "do": "tap",
+     "screen": "09-preview-1",
+     "target": "play",
+     "hold": 1.0
+    },
+    {
+     "t": 1.5,
+     "do": "zoom",
+     "screen": "09-preview-1",
+     "target": "preview",
+     "scale": 1.45
+    },
+    {
+     "t": 2.2,
+     "do": "show",
+     "screen": "09-preview-2"
+    },
+    {
+     "t": 2.6,
+     "do": "hint",
+     "text": "Sketch \u2192 details \u2192 colour"
+    },
+    {
+     "t": 3.7,
+     "do": "show",
+     "screen": "09-preview-3"
+    },
+    {
+     "t": 5.2,
+     "do": "show",
+     "screen": "09-preview-4"
+    }
+   ]
+  },
+  {
+   "id": "06-export",
+   "kind": "step",
+   "duration": 9,
+   "chip": "STEP 5 / 5",
+   "title": "Export & download",
+   "key": "download",
+   "videos": [
+    {
+     "rect": [
+      91,
+      277,
+      208,
+      370
+     ],
+     "in_phone": true,
+     "at": 4.9,
+     "duration": 3.9,
+     "media_start": 0.6,
+     "radius": 12
+    }
+   ],
+   "events": [
+    {
+     "t": 0,
+     "do": "show",
+     "screen": "10-export"
+    },
+    {
+     "t": 0.5,
+     "do": "hint",
+     "text": "Tap Export video"
+    },
+    {
+     "t": 1.2,
+     "do": "tap",
+     "screen": "10-export",
+     "target": "export",
+     "hold": 0.9
+    },
+    {
+     "t": 2.2,
+     "do": "show",
+     "screen": "11-exporting"
+    },
+    {
+     "t": 2.4,
+     "do": "hint",
+     "text": "It renders right on your device"
+    },
+    {
+     "t": 4.6,
+     "do": "show",
+     "screen": "12-ready"
+    },
+    {
+     "t": 6.4,
+     "do": "hint",
+     "text": "Then tap Download MP4"
+    },
+    {
+     "t": 6.4,
+     "do": "tap",
+     "screen": "12-ready",
+     "target": "download",
+     "hold": 2.2
+    }
+   ]
+  },
+  {
+   "id": "07-result",
+   "kind": "outro",
+   "duration": 9,
+   "title": "Your logo, hand-drawn.",
+   "key": "hand-drawn.",
+   "card": [
+    190,
+    540,
+    700,
+    700
+   ],
+   "end_at": 4.8,
+   "videos": [
+    {
+     "rect": [
+      190,
+      540,
+      700,
+      700
+     ],
+     "at": 0.1,
+     "duration": 4.5,
+     "media_start": 0.4,
+     "radius": 32
+    }
+   ],
+   "cta": "Create your first video",
+   "cta_note": "Open the Studio at strokeberry.com"
+  }
+ ],
+ "sfx": [
+  [
+   0,
+   "pencil-scratch",
+   0.35
+  ],
+  [
+   7.6,
+   "pop",
+   0.4
+  ],
+  [
+   20.4,
+   "pop",
+   0.4
+  ],
+  [
+   29.8,
+   "pop",
+   0.4
+  ],
+  [
+   31.5,
+   "pop",
+   0.4
+  ],
+  [
+   36.7,
+   "pop",
+   0.4
+  ],
+  [
+   44.4,
+   "pop",
+   0.4
+  ],
+  [
+   47.8,
+   "chime",
+   0.4
+  ],
+  [
+   49.6,
+   "pop",
+   0.4
+  ],
+  [
+   57.0,
+   "chime",
+   0.45
+  ]
+ ]
+}

@@ -1,0 +1,62 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    @font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/BricolageGrotesque.woff2") format("woff2"); font-weight: 200 800; }
+    @font-face { font-family: "Figtree"; src: url("assets/fonts/Figtree.woff2") format("woff2"); font-weight: 300 900; }
+    #root { position: absolute; inset: 0; width: 1080px; height: 1920px; overflow: hidden; font-family: "Figtree", sans-serif; color: #1B1B1B; }
+    .f3-bg { position: absolute; inset: 0; background:
+      radial-gradient(560px 560px at 86% 12%, rgba(236,45,52,.18), transparent 70%),
+      radial-gradient(480px 480px at 8% 92%, rgba(105,182,68,.16), transparent 70%),
+      radial-gradient(420px 420px at 8% 8%, rgba(250,190,58,.26), transparent 70%), #FFF8EC; }
+    #f3-head { position: absolute; left: 0; right: 0; top: 196px; display: flex; align-items: center; justify-content: center; gap: 30px; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 120px; letter-spacing: -.03em; line-height: 1; }
+    #f3-head .f3-w { display: inline-block; }
+    #f3-bolt { width: 86px; height: 120px; }
+    #f3-card { position: absolute; left: 190px; top: 372px; width: 700px; height: 700px; border: 4px solid #1E1E1E; border-radius: 44px; background: #FAF9F6; box-shadow: 12px 12px 0 rgba(26,26,26,.1); }
+    #f3-card img { position: absolute; left: 20px; top: 20px; width: 652px; height: 652px; border-radius: 22px; }
+    #f3-chips { position: absolute; left: 0; right: 0; top: 1100px; display: flex; justify-content: center; gap: 14px; }
+    .f3-chip { width: 184px; height: 76px; border: 4px solid #1E1E1E; border-radius: 9999px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 34px; }
+    #f3-answer { position: absolute; left: 0; right: 0; margin: 0 auto; top: 1216px; width: 560px; height: 150px; border: 4px solid #1E1E1E; border-radius: 9999px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; gap: 22px; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 84px; letter-spacing: -.03em; box-shadow: 10px 10px 0 #EC2D34; }
+    #f3-answer img { width: 104px; height: 108px; object-fit: contain; }
+    #f3-us { position: relative; display: inline-block; isolation: isolate; }
+    #f3-us i { position: absolute; left: -8px; right: -8px; bottom: 6px; height: 34px; border-radius: 10px; background: #FABE3A; transform-origin: 0 50%; }
+    #f3-us b { position: relative; font-weight: 800; }
+  </style>
+  <div data-hf-id="hf-p8t7" id="root" data-composition-id="03-speed-round" data-width="1080" data-height="1920" data-duration="4.6">
+    <div data-hf-id="hf-wju0" id="f3-bg" class="f3-bg clip" data-start="0" data-duration="4.6" data-track-index="0"></div>
+
+    <div data-hf-id="hf-aaon" id="f3-head">
+      <span data-hf-id="hf-j04b" class="f3-w">Speed</span><span data-hf-id="hf-y7fs" class="f3-w">round</span>
+      <svg data-hf-id="hf-ro3w" id="f3-bolt" viewBox="0 0 86 120" aria-hidden="true"><path data-hf-id="hf-afn9" d="M52 4 10 70h28l-10 46 48-70H46z" fill="#FABE3A" stroke="#1E1E1E" stroke-width="6" stroke-linejoin="round" /></svg>
+    </div>
+
+    <div data-hf-id="hf-3l83" id="f3-card"><img data-hf-id="hf-wsic" src="assets/strawberry.jpg" alt=""></div>
+    <!-- approved frame video hoisted by assemble-index -->
+
+    <div data-hf-id="hf-9bta" id="f3-chips">
+      <span data-hf-id="hf-ptai" class="f3-chip" id="f3-c1">Shape</span><span data-hf-id="hf-ns6s" class="f3-chip" id="f3-c2">Outline</span><span data-hf-id="hf-j7zv" class="f3-chip" id="f3-c3">Details</span><span data-hf-id="hf-80zf" class="f3-chip" id="f3-c4">Color</span>
+    </div>
+
+    <div data-hf-id="hf-p1f7" id="f3-answer"><img data-hf-id="hf-wzre" src="assets/strokeberry-mascot.png" alt=""><span data-hf-id="hf-0yym">It's <span data-hf-id="hf-mh6s" id="f3-us"><i data-hf-id="hf-wt6k"></i><b data-hf-id="hf-wg7c">us!</b></span></span></div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // Scene 1 (0–0.4s): "Speed round" slams in; the bolt strikes.
+      tl.fromTo("#f3-head .f3-w", { opacity: 0, scale: 1.35, y: -20 }, { opacity: 1, scale: 1, y: 0, duration: 0.26, ease: "power3.out", stagger: 0.1, transformOrigin: "0% 60%" }, 0.02);
+      tl.fromTo("#f3-bolt", { opacity: 0, scale: 0.2, rotation: 20 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2.6)" }, 0.22);
+      // Scene 2 (0.4–2.8s): stage chips light up in step with the drawing's stages (in-place token cycle).
+      tl.fromTo("#f3-chips", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, 0.05);
+      tl.set(".f3-chip", { opacity: 0.4 }, 0.05);
+      [["#f3-c1", 0.1, "#00BEC8"], ["#f3-c2", 0.71, "#69B644"], ["#f3-c3", 1.66, "#FABE3A"], ["#f3-c4", 3.17, "#EC2D34"]].forEach(([id, t, color]) => {
+        tl.set(id, { opacity: 1, backgroundColor: color, color: id === "#f3-c4" ? "#FFFFFF" : "#1B1B1B" }, t);
+        tl.fromTo(id, { scale: 1.14 }, { scale: 1, duration: 0.3, ease: "power3.out" }, t);
+      });
+      // Scene 3 (2.85–3.5s): the mascot colors in; the answer is the brand.
+      tl.fromTo("#f3-answer", { opacity: 0, scale: 0.2 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.2)" }, 3.4);
+      tl.fromTo("#f3-us i", { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power2.inOut" }, 3.65);
+      // Scene 4 (3.5–4.2s): hold; the card rests at the handoff position (centered x 540, y 722, scale 1).
+      window.__timelines = window.__timelines || {};
+      window.__timelines["03-speed-round"] = tl;
+    })();
+  </script>
+</template>

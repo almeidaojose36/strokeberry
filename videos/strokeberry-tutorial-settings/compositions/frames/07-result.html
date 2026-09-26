@@ -1,0 +1,56 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+@font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/BricolageGrotesque.woff2") format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "Figtree"; src: url("assets/fonts/Figtree.woff2") format("woff2"); font-weight: 300 900; }
+    #root-f7 { position: absolute; inset: 0; width: 1080px; height: 1920px; overflow: hidden; font-family: "Figtree", sans-serif; color: #1B1B1B; }
+    .bg-f7 { position: absolute; inset: 0; background:
+      radial-gradient(520px 520px at 88% 12%, rgba(236,45,52,.12), transparent 70%),
+      radial-gradient(520px 520px at 6% 60%, rgba(250,190,58,.18), transparent 70%),
+      radial-gradient(520px 520px at 94% 88%, rgba(0,190,200,.12), transparent 70%), #FFF8EC; }
+    #f7 .sw { padding: 0 .06em; margin: 0 -.04em; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 30' preserveAspectRatio='none'%3E%3Cpath d='M4 13C48 6 120 3 196 8c1 5-1 10-4 13C130 16 70 18 9 26 3 24 2 17 4 13Z' fill='%23FABE3A'/%3E%3C/svg%3E") no-repeat 0 92%/0% 40%; }
+    #f7-h { position: absolute; left: 70px; right: 90px; top: 210px; text-align: center; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 88px; line-height: 1; letter-spacing: -.03em; }
+    #f7-h .w { display: inline-block; }
+    #f7-card { position: absolute; left: 178px; top: 528px; width: 724px; height: 724px; border-radius: 44px; background: #fff; border: 3px solid #1B1B1B;
+      box-shadow: 14px 14px 0 #EC2D34, 0 40px 80px -30px rgba(27,27,27,.4); }
+    #f7-end { position: absolute; inset: 0; opacity: 0; }
+    #f7-mascot { position: absolute; left: 290px; top: 360px; width: 500px; height: 517px; }
+    #f7-word { position: absolute; left: 0; right: 0; top: 930px; text-align: center; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 150px; letter-spacing: -.025em; line-height: 1; }
+    #f7-tag { position: absolute; left: 0; right: 0; top: 1110px; text-align: center; font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-size: 60px; letter-spacing: -.02em; }
+    #f7-cta { position: absolute; left: 0; right: 0; margin: 0 auto; top: 1250px; width: max-content; padding: 0 56px; height: 130px; border-radius: 9999px; background: #D42630; color: #fff;
+      border: 3px solid #1B1B1B; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 50px; }
+    #f7-note { position: absolute; left: 0; right: 0; top: 1412px; text-align: center; font-weight: 600; font-size: 36px; color: #5B544A; }
+  </style>
+  <div id="f7" data-composition-id="07-result" data-width="1080" data-height="1920">
+    <div id="root-f7">
+      <div id="f7-bg" class="bg-f7 clip" data-start="0" data-duration="9" data-track-index="0"></div>
+      <h1 id="f7-h"><span class="w">Now</span> <span class="w">make</span> <span class="w">it</span> <span class="sw"><span class="w">yours.</span></span></h1>
+      <div id="f7-card"></div>
+      <div id="f7-end">
+        <img id="f7-mascot" src="assets/strokeberry-mascot.png" alt="" />
+        <div id="f7-word">strokeberry</div>
+        <div id="f7-tag">Your images. Drawn to life.</div>
+        <div id="f7-cta">Create your first video</div>
+        <div id="f7-note">Open the Studio at strokeberry.com</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#f7-h .w", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out", stagger: 0.07 }, 0.1);
+      tl.to("#f7 .sw", { backgroundSize: "100% 40%", duration: 0.5, ease: "power2.inOut" }, 0.8);
+      tl.fromTo("#f7-card", { opacity: 0, scale: .94 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 0);
+      tl.to(["#f7-h", "#f7-card"], { opacity: 0, duration: 0.35, ease: "power1.in" }, 4.45);
+      tl.set("#f7-end", { opacity: 1 }, 4.8);
+      tl.fromTo("#f7-mascot", { opacity: 0, y: 60, scale: .8 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "back.out(1.8)" }, 4.8);
+      tl.fromTo("#f7-word", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 5.1);
+      tl.fromTo("#f7-tag", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 5.35);
+      tl.fromTo("#f7-cta", { opacity: 0, scale: .7 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.2)" }, 5.6499999999999995);
+      tl.fromTo("#f7-note", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 5.9);
+      tl.to({}, { duration: 9 }, 0);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["07-result"] = tl;
+    })();
+  </script>
+</template>

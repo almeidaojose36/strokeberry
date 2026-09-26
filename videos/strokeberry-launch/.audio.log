@@ -1,0 +1,7 @@
+· no SCRIPT.md — silent film (BGM only)
+  bgm: assets/bgm/track.mp3 (retrieve "upbeat playful bouncy pop, bright plucks and claps, satisfying, around 120 bpm, no vocals")
+✓ audio engine → /Users/almeidajose/Documents/ChatGPT/Speedpainter/videos/strokeberry-launch/audio_engine_meta.json
+  heygen: yes  ·  ran: tts,bgm
+  voices: 0  ·  bgm: heygen  ·  sfx: 0
+  total voice duration: 0s
+✓ audio generate: 0 voice + 1 bgm → /Users/almeidajose/Documents/ChatGPT/Speedpainter/videos/strokeberry-launch/audio_meta.json

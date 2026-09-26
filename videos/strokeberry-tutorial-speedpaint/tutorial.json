@@ -1,0 +1,470 @@
+{
+ "voiceover": "vo-lines.json",
+ "result_speed": 3,
+ "frames": [
+  {
+   "id": "01-hook",
+   "kind": "intro",
+   "duration": 5,
+   "title": "Turn your illustration into a speedpaint",
+   "key": "speedpaint",
+   "chip": "Step-by-step tutorial",
+   "card": [
+    190,
+    540,
+    700,
+    700
+   ],
+   "videos": [
+    {
+     "rect": [
+      190,
+      540,
+      700,
+      700
+     ],
+     "at": 0.2,
+     "duration": 4.8,
+     "media_start": 0,
+     "radius": 32
+    }
+   ]
+  },
+  {
+   "id": "02-upload",
+   "kind": "step",
+   "duration": 8,
+   "chip": "STEP 1 / 5",
+   "title": "Upload your art",
+   "key": "art",
+   "enter": true,
+   "events": [
+    {
+     "t": 0,
+     "do": "show",
+     "screen": "01-start"
+    },
+    {
+     "t": 0.6,
+     "do": "hint",
+     "text": "Tap Replace and pick your illustration"
+    },
+    {
+     "t": 1.4,
+     "do": "zoom",
+     "screen": "01-start",
+     "target": "replace",
+     "scale": 1.6
+    },
+    {
+     "t": 2.2,
+     "do": "tap",
+     "screen": "01-start",
+     "target": "replace",
+     "hold": 1.0
+    },
+    {
+     "t": 3.2,
+     "do": "unzoom"
+    },
+    {
+     "t": 3.6,
+     "do": "show",
+     "screen": "02-uploaded"
+    },
+    {
+     "t": 4.3,
+     "do": "hint",
+     "text": "Finished art with clean outlines works best"
+    },
+    {
+     "t": 4.5,
+     "do": "zoom",
+     "screen": "02-uploaded",
+     "target": "preview",
+     "scale": 1.4
+    },
+    {
+     "t": 7.2,
+     "do": "unzoom"
+    }
+   ]
+  },
+  {
+   "id": "03-style",
+   "kind": "step",
+   "duration": 11,
+   "chip": "STEP 2 / 5",
+   "title": "Pick Pencil style",
+   "key": "Pencil",
+   "events": [
+    {
+     "t": 0,
+     "do": "show",
+     "screen": "03-settings"
+    },
+    {
+     "t": 0.5,
+     "do": "hint",
+     "text": "Pencil = soft, sketchy strokes (the speedpaint look)"
+    },
+    {
+     "t": 1.0,
+     "do": "zoom",
+     "screen": "03-settings",
+     "target": "pencil",
+     "scale": 1.5
+    },
+    {
+     "t": 1.6,
+     "do": "tap",
+     "screen": "03-settings",
+     "target": "pencil",
+     "hold": 1.6
+    },
+    {
+     "t": 3.6,
+     "do": "unzoom"
+    },
+    {
+     "t": 4.0,
+     "do": "show",
+     "screen": "04-pencil"
+    },
+    {
+     "t": 5.6,
+     "do": "hint",
+     "text": "Show the drawing pencil and bring in the colour"
+    },
+    {
+     "t": 5.8,
+     "do": "ring",
+     "screen": "04-pencil",
+     "target": "pen",
+     "hold": 1.5
+    },
+    {
+     "t": 7.4,
+     "do": "ring",
+     "screen": "04-pencil",
+     "target": "color",
+     "hold": 1.5
+    },
+    {
+     "t": 9.0,
+     "do": "ring",
+     "screen": "04-pencil",
+     "target": "label",
+     "hold": 1.6
+    }
+   ]
+  },
+  {
+   "id": "04-video",
+   "kind": "step",
+   "duration": 8,
+   "chip": "STEP 3 / 5",
+   "title": "Go square for the feed",
+   "key": "square",
+   "events": [
+    {
+     "t": 0,
+     "do": "show",
+     "screen": "04-pencil"
+    },
+    {
+     "t": 0.4,
+     "do": "hint",
+     "text": "Open Video settings"
+    },
+    {
+     "t": 0.8,
+     "do": "tap",
+     "screen": "05-video-tab",
+     "target": "tab",
+     "hold": 0.8
+    },
+    {
+     "t": 1.4,
+     "do": "show",
+     "screen": "05-video-tab"
+    },
+    {
+     "t": 1.9,
+     "do": "zoom",
+     "screen": "05-video-tab",
+     "target": "square",
+     "scale": 1.5
+    },
+    {
+     "t": 2.1,
+     "do": "hint",
+     "text": "1:1 Square for the Instagram feed"
+    },
+    {
+     "t": 2.6,
+     "do": "tap",
+     "screen": "05-video-tab",
+     "target": "square",
+     "hold": 0.9
+    },
+    {
+     "t": 3.2,
+     "do": "show",
+     "screen": "06-video-set"
+    },
+    {
+     "t": 4.1,
+     "do": "unzoom"
+    },
+    {
+     "t": 4.5,
+     "do": "hint",
+     "text": "\u2026and Full HD \u00b7 1080p"
+    },
+    {
+     "t": 4.6,
+     "do": "ring",
+     "screen": "06-video-set",
+     "target": "quality",
+     "hold": 1.5
+    },
+    {
+     "t": 6.2,
+     "do": "ring",
+     "screen": "06-video-set",
+     "target": "summary",
+     "hold": 1.5
+    }
+   ]
+  },
+  {
+   "id": "05-preview",
+   "kind": "step",
+   "duration": 10,
+   "chip": "STEP 4 / 5",
+   "title": "Preview & compare",
+   "key": "compare",
+   "events": [
+    {
+     "t": 0,
+     "do": "show",
+     "screen": "07-preview-1"
+    },
+    {
+     "t": 0.4,
+     "do": "hint",
+     "text": "Press play to watch it draw"
+    },
+    {
+     "t": 0.4,
+     "do": "tap",
+     "screen": "07-preview-1",
+     "target": "play",
+     "hold": 0.9
+    },
+    {
+     "t": 1.2,
+     "do": "zoom",
+     "screen": "07-preview-1",
+     "target": "preview",
+     "scale": 1.2
+    },
+    {
+     "t": 2.2,
+     "do": "show",
+     "screen": "07-preview-2"
+    },
+    {
+     "t": 3.4,
+     "do": "show",
+     "screen": "07-preview-3"
+    },
+    {
+     "t": 4.3,
+     "do": "hint",
+     "text": "Tap View original to compare with your art"
+    },
+    {
+     "t": 4.5,
+     "do": "tap",
+     "screen": "07-preview-4",
+     "target": "original",
+     "hold": 1.0
+    },
+    {
+     "t": 5.3,
+     "do": "show",
+     "screen": "08-original"
+    },
+    {
+     "t": 5.6,
+     "do": "ring",
+     "screen": "08-original",
+     "target": "original",
+     "hold": 2.4
+    },
+    {
+     "t": 9.2,
+     "do": "unzoom"
+    }
+   ]
+  },
+  {
+   "id": "06-export",
+   "kind": "step",
+   "duration": 9,
+   "chip": "STEP 5 / 5",
+   "title": "Export & download",
+   "key": "download",
+   "videos": [
+    {
+     "rect": [
+      41,
+      308,
+      308,
+      308
+     ],
+     "in_phone": true,
+     "at": 4.9,
+     "duration": 3.9,
+     "media_start": 0.4,
+     "radius": 12
+    }
+   ],
+   "events": [
+    {
+     "t": 0,
+     "do": "show",
+     "screen": "09-export"
+    },
+    {
+     "t": 0.5,
+     "do": "hint",
+     "text": "Tap Export video"
+    },
+    {
+     "t": 1.2,
+     "do": "tap",
+     "screen": "09-export",
+     "target": "export",
+     "hold": 0.9
+    },
+    {
+     "t": 2.2,
+     "do": "show",
+     "screen": "10-exporting"
+    },
+    {
+     "t": 2.4,
+     "do": "hint",
+     "text": "It renders right on your device"
+    },
+    {
+     "t": 4.6,
+     "do": "show",
+     "screen": "11-ready"
+    },
+    {
+     "t": 6.4,
+     "do": "hint",
+     "text": "Then tap Download MP4"
+    },
+    {
+     "t": 6.4,
+     "do": "tap",
+     "screen": "11-ready",
+     "target": "download",
+     "hold": 2.2
+    }
+   ]
+  },
+  {
+   "id": "07-result",
+   "kind": "outro",
+   "duration": 9,
+   "title": "Your art, speedpainted.",
+   "key": "speedpainted.",
+   "card": [
+    190,
+    540,
+    700,
+    700
+   ],
+   "end_at": 4.8,
+   "cta": "Create your first video",
+   "cta_note": "Open the Studio at strokeberry.com",
+   "videos": [
+    {
+     "rect": [
+      190,
+      540,
+      700,
+      700
+     ],
+     "at": 0.1,
+     "duration": 4.6,
+     "media_start": 0.3,
+     "radius": 32
+    }
+   ]
+  }
+ ],
+ "sfx": [
+  [
+   0,
+   "pencil-scratch",
+   0.35
+  ],
+  [
+   7.2,
+   "pop",
+   0.4
+  ],
+  [
+   14.6,
+   "pop",
+   0.4
+  ],
+  [
+   24.8,
+   "pop",
+   0.4
+  ],
+  [
+   26.6,
+   "pop",
+   0.4
+  ],
+  [
+   32.4,
+   "pop",
+   0.4
+  ],
+  [
+   36.5,
+   "pop",
+   0.4
+  ],
+  [
+   43.2,
+   "pop",
+   0.4
+  ],
+  [
+   46.6,
+   "chime",
+   0.4
+  ],
+  [
+   48.4,
+   "pop",
+   0.4
+  ],
+  [
+   55.8,
+   "chime",
+   0.45
+  ]
+ ]
+}

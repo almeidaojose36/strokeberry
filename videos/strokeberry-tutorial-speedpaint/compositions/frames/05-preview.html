@@ -1,0 +1,86 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+@font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/BricolageGrotesque.woff2") format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "Figtree"; src: url("assets/fonts/Figtree.woff2") format("woff2"); font-weight: 300 900; }
+    #root-f5 { position: absolute; inset: 0; width: 1080px; height: 1920px; overflow: hidden; font-family: "Figtree", sans-serif; color: #1B1B1B; }
+    .bg-f5 { position: absolute; inset: 0; background:
+      radial-gradient(520px 520px at 88% 12%, rgba(236,45,52,.12), transparent 70%),
+      radial-gradient(520px 520px at 6% 60%, rgba(250,190,58,.18), transparent 70%),
+      radial-gradient(520px 520px at 94% 88%, rgba(0,190,200,.12), transparent 70%), #FFF8EC; }
+    #f5 .sw { padding: 0 .06em; margin: 0 -.04em; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 30' preserveAspectRatio='none'%3E%3Cpath d='M4 13C48 6 120 3 196 8c1 5-1 10-4 13C130 16 70 18 9 26 3 24 2 17 4 13Z' fill='%23FABE3A'/%3E%3C/svg%3E") no-repeat 0 92%/0% 40%; }
+    #f5-chip { position: absolute; left: 80px; top: 196px; height: 58px; padding: 0 26px; border-radius: 9999px; background: #EC2D34; color: #fff;
+      display: flex; align-items: center; font-weight: 800; font-size: 26px; letter-spacing: .12em; border: 2px solid #1B1B1B; }
+    #f5-h { position: absolute; left: 80px; right: 110px; top: 272px; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 76px; line-height: 1.02; letter-spacing: -.025em; }
+    #f5-h .w { display: inline-block; }
+    .f5-hint { position: absolute; left: 80px; right: 110px; top: 360px; margin: 0; font-size: 33px; font-weight: 600; line-height: 1.25; color: #5B544A; }
+    #f5-phone { position: absolute; left: 246px; top: 456px; width: 588px; height: 1240px; border-radius: 76px; background: #1B1B1B;
+      box-shadow: 14px 14px 0 rgba(27,27,27,.08), 0 40px 80px -30px rgba(27,27,27,.45); }
+    #f5-screen { position: absolute; left: 14px; top: 14px; width: 560px; height: 1212px; border-radius: 62px; overflow: hidden; background: #FFF8EC; }
+    #f5-zoom { position: absolute; inset: 0; transform-origin: 50% 50%; }
+    .f5-scr { position: absolute; left: 0; top: 0; width: 560px; height: 1212px; }
+    .f5-ring { position: absolute; border: 4px solid #EC2D34; border-radius: 16px; box-shadow: 0 0 0 6px rgba(236,45,52,.18); opacity: 0; }
+  </style>
+  <div id="f5" data-composition-id="05-preview" data-width="1080" data-height="1920">
+    <div id="root-f5">
+      <div id="f5-bg" class="bg-f5 clip" data-start="0" data-duration="10" data-track-index="0"></div>
+      <div id="f5-chip">STEP 4 / 5</div>
+      <h1 id="f5-h"><span class="w">Preview</span> <span class="w">&amp;</span> <span class="sw"><span class="w">compare</span></span></h1>
+      <p class="f5-hint" id="f5-t0">Press play to watch it draw</p>
+      <p class="f5-hint" id="f5-t1">Tap View original to compare with your art</p>
+      <div id="f5-phone"><div id="f5-screen"><div id="f5-zoom" data-layout-allow-overflow>
+        <img class="f5-scr" id="f5-s0" src="assets/screens/07-preview-1.png" alt="" />
+        <img class="f5-scr" id="f5-s1" src="assets/screens/07-preview-2.png" alt="" />
+        <img class="f5-scr" id="f5-s2" src="assets/screens/07-preview-3.png" alt="" />
+        <img class="f5-scr" id="f5-s3" src="assets/screens/08-original.png" alt="" />
+        <div class="f5-ring" id="f5-r0" style="left:33.0px;top:550.3px;width:68.9px;height:68.9px"></div>
+        <div class="f5-ring" id="f5-r1" style="left:370.5px;top:112.3px;width:156.5px;height:57.4px"></div>
+        <div class="f5-ring" id="f5-r2" style="left:360.6px;top:112.3px;width:166.3px;height:57.4px"></div>
+      </div></div></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#f5-chip", { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.05);
+      tl.fromTo("#f5-h .w", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out", stagger: 0.06 }, 0.12);
+      tl.to("#f5 .sw", { backgroundSize: "100% 40%", duration: 0.5, ease: "power2.inOut" }, 0.75);
+      tl.set(".f5-scr", { opacity: 0 }, 0);
+      tl.set(".f5-hint", { opacity: 0 }, 0);
+      tl.set("#f5-zoom", { scale: 1, x: 0, y: 0, transformOrigin: "0px 0px" }, 0);
+      tl.set(".f5-ring", { opacity: 0, scale: 1, backgroundColor: "rgba(236,45,52,0)" }, 0);
+      tl.set("#f5-s0", { opacity: 1 }, 0);
+      tl.set("#f5-s1", { opacity: 0 }, 0);
+      tl.set("#f5-s2", { opacity: 0 }, 0);
+      tl.set("#f5-s3", { opacity: 0 }, 0);
+      tl.fromTo("#f5-t0", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.4);
+      tl.fromTo("#f5-r0", { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2.4)", immediateRender: false }, 0.4);
+      tl.fromTo("#f5-r0", { backgroundColor: "rgba(236,45,52,0)" }, { backgroundColor: "rgba(236,45,52,.22)", duration: 0.12, yoyo: true, repeat: 1, ease: "power1.inOut", immediateRender: false }, 0.75);
+      tl.to("#f5-r0", { opacity: 0, duration: 0.25, ease: "power1.in" }, 1.3);
+      tl.to("#f5-zoom", { scale: 1.2, x: -56.0, y: 0.0, duration: 0.7, ease: "power3.inOut" }, 1.2);
+      tl.fromTo("#f5-s1", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power1.out" }, 2.2);
+      tl.set("#f5-s0", { opacity: 0 }, 2.45);
+      tl.set("#f5-s2", { opacity: 0 }, 2.45);
+      tl.set("#f5-s3", { opacity: 0 }, 2.45);
+      tl.fromTo("#f5-s2", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power1.out" }, 3.4);
+      tl.set("#f5-s0", { opacity: 0 }, 3.65);
+      tl.set("#f5-s1", { opacity: 0 }, 3.65);
+      tl.set("#f5-s3", { opacity: 0 }, 3.65);
+      tl.fromTo("#f5-t1", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 4.3);
+      tl.to("#f5-t0", { opacity: 0, y: -10, duration: 0.25, ease: "power1.in" }, 4);
+      tl.fromTo("#f5-r1", { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2.4)", immediateRender: false }, 4.5);
+      tl.fromTo("#f5-r1", { backgroundColor: "rgba(236,45,52,0)" }, { backgroundColor: "rgba(236,45,52,.22)", duration: 0.12, yoyo: true, repeat: 1, ease: "power1.inOut", immediateRender: false }, 4.85);
+      tl.to("#f5-r1", { opacity: 0, duration: 0.25, ease: "power1.in" }, 5.5);
+      tl.fromTo("#f5-s3", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power1.out" }, 5.3);
+      tl.set("#f5-s0", { opacity: 0 }, 5.55);
+      tl.set("#f5-s1", { opacity: 0 }, 5.55);
+      tl.set("#f5-s2", { opacity: 0 }, 5.55);
+      tl.fromTo("#f5-r2", { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2.4)", immediateRender: false }, 5.6);
+      tl.to("#f5-r2", { opacity: 0, duration: 0.25, ease: "power1.in" }, 8.0);
+      tl.to("#f5-zoom", { scale: 1, x: 0, y: 0, duration: 0.6, ease: "power3.inOut" }, 9.2);
+      tl.to({}, { duration: 10 }, 0);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["05-preview"] = tl;
+    })();
+  </script>
+</template>

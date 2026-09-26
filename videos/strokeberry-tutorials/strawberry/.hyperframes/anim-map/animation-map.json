@@ -1,0 +1,948 @@
+{
+  "composition": "/Users/almeidajose/Documents/ChatGPT/Speedpainter/videos/strokeberry-tutorials/strawberry",
+  "duration": 24,
+  "totalTweens": 3,
+  "mappedTweens": 3,
+  "skippedMicroTweens": 0,
+  "tweens": [
+    {
+      "index": 1,
+      "selector": "#title",
+      "driver": "target",
+      "targets": 1,
+      "props": [
+        "scale",
+        "opacity"
+      ],
+      "start": 0.006,
+      "end": 0.456,
+      "duration": 0.45,
+      "ease": "power3.out",
+      "bboxes": [
+        {
+          "t": 0.043,
+          "x": 99,
+          "y": 298,
+          "w": 813,
+          "h": 98,
+          "opacity": 0.265,
+          "visible": true
+        },
+        {
+          "t": 0.119,
+          "x": 89,
+          "y": 297,
+          "w": 831,
+          "h": 101,
+          "opacity": 0.634,
+          "visible": true
+        },
+        {
+          "t": 0.194,
+          "x": 84,
+          "y": 296,
+          "w": 842,
+          "h": 102,
+          "opacity": 0.8428,
+          "visible": true
+        },
+        {
+          "t": 0.269,
+          "x": 81,
+          "y": 296,
+          "w": 849,
+          "h": 103,
+          "opacity": 0.9725,
+          "visible": true
+        },
+        {
+          "t": 0.344,
+          "x": 80,
+          "y": 296,
+          "w": 850,
+          "h": 103,
+          "opacity": 0.9955,
+          "visible": true
+        },
+        {
+          "t": 0.418,
+          "x": 80,
+          "y": 296,
+          "w": 850,
+          "h": 103,
+          "opacity": 0.9998,
+          "visible": true
+        }
+      ],
+      "flags": [],
+      "summary": "#title animates scale+opacity over 0.45s (power3.out). moves 19px left. opacity 0.3→1.0. scales. width 813→850px. ends at (80, 296) 850×103px."
+    },
+    {
+      "index": 2,
+      "selector": "#rule",
+      "driver": "target",
+      "targets": 1,
+      "props": [
+        "scaleX",
+        "transformOrigin"
+      ],
+      "start": 0.006,
+      "end": 20.006,
+      "duration": 20,
+      "ease": "none",
+      "bboxes": [
+        {
+          "t": 1.673,
+          "x": 80,
+          "y": 439,
+          "w": 77,
+          "h": 8,
+          "opacity": 1,
+          "visible": true
+        },
+        {
+          "t": 5.006,
+          "x": 80,
+          "y": 439,
+          "w": 230,
+          "h": 8,
+          "opacity": 1,
+          "visible": true
+        },
+        {
+          "t": 8.339,
+          "x": 80,
+          "y": 439,
+          "w": 383,
+          "h": 8,
+          "opacity": 1,
+          "visible": true
+        },
+        {
+          "t": 11.673,
+          "x": 80,
+          "y": 439,
+          "w": 537,
+          "h": 8,
+          "opacity": 1,
+          "visible": true
+        },
+        {
+          "t": 15.006,
+          "x": 80,
+          "y": 439,
+          "w": 690,
+          "h": 8,
+          "opacity": 1,
+          "visible": true
+        },
+        {
+          "t": 18.339,
+          "x": 80,
+          "y": 439,
+          "w": 843,
+          "h": 8,
+          "opacity": 1,
+          "visible": true
+        }
+      ],
+      "flags": [
+        "paced-slow"
+      ],
+      "summary": "#rule animates scaleX+transformOrigin over 20.00s (none). scales. width 77→843px. ends at (80, 439) 843×8px. FLAGS: paced-slow."
+    },
+    {
+      "index": 3,
+      "selector": "#mascot",
+      "driver": "target",
+      "targets": 1,
+      "props": [
+        "scale",
+        "opacity"
+      ],
+      "start": 20.006,
+      "end": 20.606,
+      "duration": 0.6,
+      "ease": "power3.out",
+      "bboxes": [
+        {
+          "t": 20.056,
+          "x": 246,
+          "y": 394,
+          "w": 589,
+          "h": 673,
+          "opacity": 0.2044,
+          "visible": true
+        },
+        {
+          "t": 20.156,
+          "x": 216,
+          "y": 359,
+          "w": 649,
+          "h": 741,
+          "opacity": 0.634,
+          "visible": true
+        },
+        {
+          "t": 20.256,
+          "x": 200,
+          "y": 341,
+          "w": 680,
+          "h": 778,
+          "opacity": 0.8605,
+          "visible": true
+        },
+        {
+          "t": 20.356,
+          "x": 193,
+          "y": 333,
+          "w": 695,
+          "h": 794,
+          "opacity": 0.961,
+          "visible": true
+        },
+        {
+          "t": 20.456,
+          "x": 190,
+          "y": 330,
+          "w": 699,
+          "h": 799,
+          "opacity": 0.994,
+          "visible": true
+        },
+        {
+          "t": 20.556,
+          "x": 190,
+          "y": 330,
+          "w": 700,
+          "h": 800,
+          "opacity": 0.9998,
+          "visible": true
+        }
+      ],
+      "flags": [],
+      "summary": "#mascot animates scale+opacity over 0.60s (power3.out). moves 64px up and 56px left. opacity 0.2→1.0. scales. width 589→700px. height 673→800px. ends at (190, 330) 700×800px."
+    }
+  ],
+  "choreography": "Timeline (24.0s, each char ≈ 0.40s):\n  0s                                                    24s\n  ┼───────────────────────────────────────────────────────────┤\n  ██                                                            #title scale+opacity\n  ███████████████████████████████████████████████████           #rule scaleX+transformOrigin\n                                                    ██          #mascot scale+opacity",
+  "density": [
+    {
+      "t": 0,
+      "activeTweens": 2
+    },
+    {
+      "t": 0.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 1,
+      "activeTweens": 1
+    },
+    {
+      "t": 1.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 2,
+      "activeTweens": 1
+    },
+    {
+      "t": 2.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 3,
+      "activeTweens": 1
+    },
+    {
+      "t": 3.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 4,
+      "activeTweens": 1
+    },
+    {
+      "t": 4.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 5,
+      "activeTweens": 1
+    },
+    {
+      "t": 5.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 6,
+      "activeTweens": 1
+    },
+    {
+      "t": 6.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 7,
+      "activeTweens": 1
+    },
+    {
+      "t": 7.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 8,
+      "activeTweens": 1
+    },
+    {
+      "t": 8.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 9,
+      "activeTweens": 1
+    },
+    {
+      "t": 9.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 10,
+      "activeTweens": 1
+    },
+    {
+      "t": 10.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 11,
+      "activeTweens": 1
+    },
+    {
+      "t": 11.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 12,
+      "activeTweens": 1
+    },
+    {
+      "t": 12.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 13,
+      "activeTweens": 1
+    },
+    {
+      "t": 13.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 14,
+      "activeTweens": 1
+    },
+    {
+      "t": 14.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 15,
+      "activeTweens": 1
+    },
+    {
+      "t": 15.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 16,
+      "activeTweens": 1
+    },
+    {
+      "t": 16.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 17,
+      "activeTweens": 1
+    },
+    {
+      "t": 17.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 18,
+      "activeTweens": 1
+    },
+    {
+      "t": 18.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 19,
+      "activeTweens": 1
+    },
+    {
+      "t": 19.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 20,
+      "activeTweens": 2
+    },
+    {
+      "t": 20.5,
+      "activeTweens": 1
+    },
+    {
+      "t": 21,
+      "activeTweens": 0
+    },
+    {
+      "t": 21.5,
+      "activeTweens": 0
+    },
+    {
+      "t": 22,
+      "activeTweens": 0
+    },
+    {
+      "t": 22.5,
+      "activeTweens": 0
+    },
+    {
+      "t": 23,
+      "activeTweens": 0
+    },
+    {
+      "t": 23.5,
+      "activeTweens": 0
+    }
+  ],
+  "staggers": [],
+  "elements": {
+    "#title": {
+      "firstAppears": 0.006,
+      "lastAnimates": 0.456,
+      "tweenCount": 1,
+      "props": [
+        "scale",
+        "opacity"
+      ],
+      "endsVisible": true,
+      "finalPosition": {
+        "x": 80,
+        "y": 296,
+        "w": 850,
+        "h": 103
+      }
+    },
+    "#rule": {
+      "firstAppears": 0.006,
+      "lastAnimates": 20.006,
+      "tweenCount": 1,
+      "props": [
+        "scaleX",
+        "transformOrigin"
+      ],
+      "endsVisible": true,
+      "finalPosition": {
+        "x": 80,
+        "y": 439,
+        "w": 843,
+        "h": 8
+      }
+    },
+    "#mascot": {
+      "firstAppears": 20.006,
+      "lastAnimates": 20.606,
+      "tweenCount": 1,
+      "props": [
+        "scale",
+        "opacity"
+      ],
+      "endsVisible": true,
+      "finalPosition": {
+        "x": 190,
+        "y": 330,
+        "w": 700,
+        "h": 800
+      }
+    }
+  },
+  "deadZones": [
+    {
+      "start": 21,
+      "end": 24,
+      "duration": 3,
+      "note": "No animation for 3.0s at end. Final hold or missing outro?"
+    }
+  ],
+  "snapshots": [
+    {
+      "t": 0,
+      "visibleElements": 9,
+      "animatingNow": [],
+      "elements": [
+        {
+          "id": "root",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "layer-1",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "drawing",
+          "x": 80,
+          "y": 570,
+          "w": 920,
+          "h": 920,
+          "opacity": 1
+        },
+        {
+          "id": "layer-2",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-3",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-4",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-5",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-6",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "mascot",
+          "x": 190,
+          "y": 330,
+          "w": 700,
+          "h": 800,
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "t": 6,
+      "visibleElements": 11,
+      "animatingNow": [
+        "#rule"
+      ],
+      "elements": [
+        {
+          "id": "root",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "layer-1",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "title",
+          "x": 80,
+          "y": 296,
+          "w": 850,
+          "h": 103,
+          "opacity": 1
+        },
+        {
+          "id": "rule",
+          "x": 80,
+          "y": 439,
+          "w": 276,
+          "h": 8,
+          "opacity": 1
+        },
+        {
+          "id": "drawing",
+          "x": 80,
+          "y": 570,
+          "w": 920,
+          "h": 920,
+          "opacity": 1
+        },
+        {
+          "id": "layer-2",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-3",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-4",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-5",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-6",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "mascot",
+          "x": 190,
+          "y": 330,
+          "w": 700,
+          "h": 800,
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "t": 12,
+      "visibleElements": 11,
+      "animatingNow": [
+        "#rule"
+      ],
+      "elements": [
+        {
+          "id": "root",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "layer-1",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "title",
+          "x": 80,
+          "y": 296,
+          "w": 850,
+          "h": 103,
+          "opacity": 1
+        },
+        {
+          "id": "rule",
+          "x": 80,
+          "y": 439,
+          "w": 552,
+          "h": 8,
+          "opacity": 1
+        },
+        {
+          "id": "drawing",
+          "x": 80,
+          "y": 570,
+          "w": 920,
+          "h": 920,
+          "opacity": 1
+        },
+        {
+          "id": "layer-2",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-3",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-4",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-5",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-6",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "mascot",
+          "x": 190,
+          "y": 330,
+          "w": 700,
+          "h": 800,
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "t": 18,
+      "visibleElements": 11,
+      "animatingNow": [
+        "#rule"
+      ],
+      "elements": [
+        {
+          "id": "root",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "layer-1",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "title",
+          "x": 80,
+          "y": 296,
+          "w": 850,
+          "h": 103,
+          "opacity": 1
+        },
+        {
+          "id": "rule",
+          "x": 80,
+          "y": 439,
+          "w": 828,
+          "h": 8,
+          "opacity": 1
+        },
+        {
+          "id": "drawing",
+          "x": 80,
+          "y": 570,
+          "w": 920,
+          "h": 920,
+          "opacity": 1
+        },
+        {
+          "id": "layer-2",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-3",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-4",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-5",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-6",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "mascot",
+          "x": 190,
+          "y": 330,
+          "w": 700,
+          "h": 800,
+          "opacity": 1
+        }
+      ]
+    },
+    {
+      "t": 23.9,
+      "visibleElements": 11,
+      "animatingNow": [],
+      "elements": [
+        {
+          "id": "root",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "layer-1",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "title",
+          "x": 80,
+          "y": 296,
+          "w": 850,
+          "h": 103,
+          "opacity": 1
+        },
+        {
+          "id": "rule",
+          "x": 80,
+          "y": 439,
+          "w": 920,
+          "h": 8,
+          "opacity": 1
+        },
+        {
+          "id": "drawing",
+          "x": 80,
+          "y": 570,
+          "w": 920,
+          "h": 920,
+          "opacity": 1
+        },
+        {
+          "id": "layer-2",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-3",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-4",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-5",
+          "x": 80,
+          "y": 1560,
+          "w": 920,
+          "h": 97,
+          "opacity": 1
+        },
+        {
+          "id": "layer-6",
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1920,
+          "opacity": 1
+        },
+        {
+          "id": "mascot",
+          "x": 190,
+          "y": 330,
+          "w": 700,
+          "h": 800,
+          "opacity": 1
+        }
+      ]
+    }
+  ]
+}

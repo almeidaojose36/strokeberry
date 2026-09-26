@@ -1,0 +1,1 @@
+Strokeberry studio tutorial: upload an image (Replace / Choose an image), Drawing style (Pencil, Ink), Show drawing pencil, Bring in the color, Duration, Video settings (Format 16:9 / 9:16 / 1:1, Quality HD 720p / Full HD 1080p), Play preview, Export video, Rendering your video, Your video is ready, Download MP4.

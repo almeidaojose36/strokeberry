@@ -9,3 +9,28 @@ __pycache__/
 
 # Local API credentials
 .env.local
+
+# Brand-kit build leftovers and packaged kits (share the zips outside git)
+.brand-render/
+marketing/.brand-kit-build/
+marketing/brand-kit-v1/
+marketing/*.zip
+marketing/social/out/
+videos/*/renders/
+videos/*/snapshots/
+videos/*/node_modules/
+marketing/brand-kit-v1.1/
+marketing/kit-review.html
+
+# Tutorial videos: regenerable captures and media (rebuild with scripts/tutorials/*)
+videos/*/capture/app/
+videos/*/assets/screens/
+videos/*/assets/crops/
+videos/*/assets/result-*x.mp4
+videos/*/assets/bgm/*-loop.mp3
+videos/*/.hyperframes/
+# Finished media and bundles belong in cloud storage, not git
+marketing/**/*.mp4
+marketing/**/*.zip
+marketing/voice/previews/
+marketing/marketing/

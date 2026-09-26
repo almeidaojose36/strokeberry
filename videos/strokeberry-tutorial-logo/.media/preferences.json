@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "preferences": {
+    "flow": {
+      "value": "automation",
+      "confirmed_in": [
+        "strokeberry-tutorial-logo"
+      ],
+      "updated_at": "2026-09-26T10:29:44.756Z"
+    },
+    "destination": {
+      "value": "tiktok-reels-shorts",
+      "confirmed_in": [
+        "strokeberry-tutorial-logo"
+      ],
+      "updated_at": "2026-09-26T10:29:51.780Z"
+    },
+    "aspect": {
+      "value": "1080x1920",
+      "confirmed_in": [
+        "strokeberry-tutorial-logo"
+      ],
+      "updated_at": "2026-09-26T10:29:51.834Z"
+    },
+    "language": {
+      "value": "en",
+      "confirmed_in": [
+        "strokeberry-tutorial-logo"
+      ],
+      "updated_at": "2026-09-26T10:29:51.892Z"
+    },
+    "storyboard": {
+      "value": "no",
+      "confirmed_in": [
+        "strokeberry-tutorial-logo"
+      ],
+      "updated_at": "2026-09-26T10:29:51.948Z"
+    },
+    "style_preset.product-launch-video": {
+      "value": "capsule",
+      "confirmed_in": [
+        "strokeberry-tutorial-logo"
+      ],
+      "updated_at": "2026-09-26T10:33:00.498Z"
+    }
+  },
+  "sightings": {}
+}

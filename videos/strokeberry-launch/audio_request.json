@@ -1,0 +1,34 @@
+{
+  "lines": [
+    {
+      "id": "01",
+      "sfx": [
+        "pencil scratch",
+        "pop"
+      ]
+    },
+    {
+      "id": "02",
+      "sfx": [
+        "pop"
+      ]
+    },
+    {
+      "id": "03",
+      "sfx": [
+        "whoosh",
+        "pop"
+      ]
+    },
+    {
+      "id": "04",
+      "sfx": [
+        "pencil scratch",
+        "chime"
+      ]
+    }
+  ],
+  "bgm": {
+    "mode": "none"
+  }
+}

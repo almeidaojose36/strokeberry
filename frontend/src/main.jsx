@@ -111,7 +111,7 @@ function App(){
    <div className="workspace-label">Studio</div>
    <nav>{[['studio',Sparkles,'Create a video'],['projects',FolderOpen,'Projects'],['exports',Film,'Exports']].map(([id,Icon,label])=><button key={id} className={`nav-item ${view===id?'active':''}`} onClick={()=>{setView(id);setMenu(false);if(id!=='studio')refresh().catch(e=>setError(e.message))}}><Icon size={18}/>{label}{id==='projects'&&<span className="nav-count">{projects.length}</span>}</button>)}</nav>
    <div className="sidebar-note"><div className="note-art"><Leaf size={18}/><span>New here?</span></div><p>Three steps from a still image to a finished drawing video.</p><button onClick={()=>{setHelp(true);setMenu(false)}}>See how it works <ArrowUpRight/></button></div>
-   <div className="sidebar-bottom"><div className="user"><span className="avatar"><BrandMark size={16}/></span><div><strong>Personal studio</strong><small><i/>Private · on this device</small></div></div></div>
+   <div className="sidebar-bottom"><div className="user"><span className="avatar"><BrandMark size={16} compact/></span><div><strong>Personal studio</strong><small><i/>Private · on this device</small></div></div></div>
   </aside>
   {menu&&<div className="sidebar-scrim" onClick={()=>setMenu(false)}/>}
   <main>

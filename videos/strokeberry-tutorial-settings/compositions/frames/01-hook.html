@@ -1,0 +1,40 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+@font-face { font-family: "Bricolage Grotesque"; src: url("assets/fonts/BricolageGrotesque.woff2") format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "Figtree"; src: url("assets/fonts/Figtree.woff2") format("woff2"); font-weight: 300 900; }
+    #root-f1 { position: absolute; inset: 0; width: 1080px; height: 1920px; overflow: hidden; font-family: "Figtree", sans-serif; color: #1B1B1B; }
+    .bg-f1 { position: absolute; inset: 0; background:
+      radial-gradient(520px 520px at 88% 12%, rgba(236,45,52,.12), transparent 70%),
+      radial-gradient(520px 520px at 6% 60%, rgba(250,190,58,.18), transparent 70%),
+      radial-gradient(520px 520px at 94% 88%, rgba(0,190,200,.12), transparent 70%), #FFF8EC; }
+    #f1 .sw { padding: 0 .06em; margin: 0 -.04em; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 30' preserveAspectRatio='none'%3E%3Cpath d='M4 13C48 6 120 3 196 8c1 5-1 10-4 13C130 16 70 18 9 26 3 24 2 17 4 13Z' fill='%23FABE3A'/%3E%3C/svg%3E") no-repeat 0 92%/0% 40%; }
+    #f1-h { position: absolute; left: 70px; right: 90px; top: 210px; text-align: center; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 96px; line-height: 1; letter-spacing: -.03em; }
+    #f1-h .w { display: inline-block; }
+    #f1-card { position: absolute; left: 178px; top: 528px; width: 724px; height: 724px; border-radius: 44px; background: #fff; border: 3px solid #1B1B1B;
+      box-shadow: 14px 14px 0 #EC2D34, 0 40px 80px -30px rgba(27,27,27,.4); }
+    #f1-chip { position: absolute; left: 0; right: 0; margin: 0 auto; top: 1310px; width: max-content; height: 72px; padding: 0 34px; border-radius: 9999px; background: #1B1B1B; color: #fff;
+      display: flex; align-items: center; gap: 14px; font-weight: 700; font-size: 32px; }
+    #f1-chip i { width: 14px; height: 14px; border-radius: 50%; background: #EC2D34; }
+  </style>
+  <div id="f1" data-composition-id="01-hook" data-width="1080" data-height="1920">
+    <div id="root-f1">
+      <div id="f1-bg" class="bg-f1 clip" data-start="0" data-duration="5" data-track-index="0"></div>
+      <h1 id="f1-h"><span class="w">Every</span> <span class="w">setting,</span> <span class="sw"><span class="w">explained</span></span> <span class="w">in</span> <span class="w">a</span> <span class="w">minute</span></h1>
+      <div id="f1-card"></div>
+      <div id="f1-chip"><i></i>Settings deep-dive</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#f1-card", { opacity: 0, y: 90, scale: .94 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power3.out" }, 0);
+      tl.fromTo("#f1-h .w", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out", stagger: 0.07 }, 0.2);
+      tl.to("#f1 .sw", { backgroundSize: "100% 40%", duration: 0.5, ease: "power2.inOut" }, 1.0);
+      tl.fromTo("#f1-chip", { opacity: 0, scale: .6 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2.2)" }, 1.6);
+      tl.to({}, { duration: 5 }, 0);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["01-hook"] = tl;
+    })();
+  </script>
+</template>

@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field, model_validator
 from PIL import UnidentifiedImageError, Image
 from .pipeline import prepare_image, render, load_scene
 from .sample import create_sample
-from .steps import detect_panels, prepare_steps, original_path
+from .steps import detect_panels, prepare_steps, original_path, four_step_reading_order
 from .enhance import clean_background
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -206,11 +206,13 @@ def step_layout(project_id: str):
 @app.post('/api/projects/{project_id}/steps', status_code=201)
 def create_steps(project_id: str, config: StepConfig):
     parent = get_project(project_id)
+    config_data = config.model_dump()
+    config_data['stages'] = four_step_reading_order(config_data['stages'])
     derived_id = uuid.uuid4().hex
     folder = DATA / derived_id
     folder.mkdir()
     try:
-        scene = prepare_steps(DATA / project_id, folder, config.model_dump())
+        scene = prepare_steps(DATA / project_id, folder, config_data)
         with connect() as db:
             db.execute('INSERT INTO projects VALUES (?,?,?,?)',
                        (derived_id, (parent['name'].removesuffix(' · steps') + ' · steps')[:100],

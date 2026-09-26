@@ -73,6 +73,7 @@ export default function StepEditor({project: sourceProject, api, onClose, onCrea
     setStages(defaultsFor(crops));setLayout(value);setActive(0);setDetected(false);
   }
   const total = stages.reduce((sum, stage) => sum + stage.seconds, 0);
+  const fourStepOrder = stages.length === 4;
   async function save() {
     setBusy(true);setError('');
     try {const result = await api(`/api/projects/${project.id}/steps`, {
@@ -97,11 +98,12 @@ export default function StepEditor({project: sourceProject, api, onClose, onCrea
           <small>Drag a crop to move it. Drag its lower-right corner to resize.</small>
         </div>
         <div className="stage-controls"><div className="field-label">ORDER & TIMING <span>{Math.floor(total/60)}:{String(total%60).padStart(2,'0')} total</span></div>
+          {fourStepOrder&&<p className="setting-hint">Fixed reading order: top-left → top-right → bottom-left → bottom-right.</p>}
           <div className="stage-order">{stages.map((stage,i)=><div className={`stage-order-row ${active===i?'active':''}`} key={i}>
             <button className="stage-number" aria-label={`Edit step ${i+1}`} onClick={()=>setActive(i)}>{i+1}</button>
             <input aria-label={`Step ${i+1} name`} maxLength={40} value={stage.label} disabled={busy} onFocus={()=>setActive(i)} onChange={e=>update(i,'label',e.target.value)}/>
             <label><input aria-label={`Step ${i+1} seconds`} type="number" min={1} max={300} value={stage.seconds} disabled={busy} onChange={e=>update(i,'seconds',Math.max(1,Math.min(300,Number(e.target.value)||1)))}/>s</label>
-            <div><button aria-label={`Move step ${i+1} earlier`} disabled={busy||i===0} onClick={()=>reorder(i,-1)}><ArrowUp size={12}/></button><button aria-label={`Move step ${i+1} later`} disabled={busy||i===stages.length-1} onClick={()=>reorder(i,1)}><ArrowDown size={12}/></button></div>
+            <div><button aria-label={`Move step ${i+1} earlier`} disabled={busy||fourStepOrder||i===0} onClick={()=>reorder(i,-1)}><ArrowUp size={12}/></button><button aria-label={`Move step ${i+1} later`} disabled={busy||fourStepOrder||i===stages.length-1} onClick={()=>reorder(i,1)}><ArrowDown size={12}/></button></div>
           </div>)}</div>
           <div className="field-label">STEP {active+1} CROP <span>Percent of uploaded image</span></div>
           <div className="crop-fields">{['x','y','width','height'].map(key=><label key={key}>{({x:'Left',y:'Top',width:'Width',height:'Height'})[key]}<input aria-label={`Crop ${key}`} type="number" min={0} max={100} step={.1} disabled={busy} value={Number((stages[active].crop[key]*100).toFixed(1))} onChange={e=>cropValue(key,Number(e.target.value))}/></label>)}</div>
