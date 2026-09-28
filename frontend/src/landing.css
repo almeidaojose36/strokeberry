@@ -221,6 +221,8 @@ h3{font-size:19px;font-weight:650;letter-spacing:-.015em;margin:0;line-height:1.
 .footer .logo{font-size:20px}
 .footer p{margin:0;color:var(--muted);font-size:14px}
 .footer .copy{margin-left:auto}
+.footer-mail{font-size:14px;font-weight:600;color:var(--ink);text-decoration:underline;text-decoration-color:var(--line-strong, #e2d1b2);text-underline-offset:3px}
+.footer-mail:hover{text-decoration-color:currentColor}
 
 /* Scroll reveal */
 .reveal{opacity:0;transform:translateY(14px);transition:opacity .9s var(--ease),transform .9s var(--ease)}

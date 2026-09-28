@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Eraser, Pencil, Undo2, Redo2, X, LoaderCircle} from 'lucide-react';
+import {authHeaders} from './auth.js';
 
 export default function ImageEditor({project, api, onClose, onSaved}) {
   const canvas = useRef(null), dialog = useRef(null), original = useRef(null), stroke = useRef(null);
@@ -67,7 +68,7 @@ export default function ImageEditor({project, api, onClose, onSaved}) {
       const blob=await new Promise(resolve=>canvas.current.toBlob(resolve,'image/png'));
       if(!blob || blob.size>15*1024*1024)throw new Error('Please use an image smaller than 15 MB.');
       const body=new FormData();body.append('file',blob,'canvas.png');body.append('strength',String(cleanup));
-      const response=await fetch('/api/images/clean-background',{method:'POST',body});
+      const response=await fetch('/api/images/clean-background',{method:'POST',body,headers:await authHeaders()});
       if(!response.ok){let message='Could not clean the background. Please try again.';try{const data=await response.json();if(typeof data.detail==='string')message=data.detail;}catch{}throw new Error(message);}
       const bitmap=await createImageBitmap(await response.blob());
       try {remember();canvas.current.getContext('2d').drawImage(bitmap,0,0);}

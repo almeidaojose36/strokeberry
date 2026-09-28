@@ -13,6 +13,7 @@
     "gallery:render": "node scripts/render-gallery.mjs"
   },
   "dependencies": {
+    "firebase": "^12.19.0",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

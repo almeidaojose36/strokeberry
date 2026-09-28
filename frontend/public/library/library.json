@@ -1,0 +1,74 @@
+{
+  "categories": [
+    {
+      "id": "animals",
+      "name": "Animals"
+    },
+    {
+      "id": "food",
+      "name": "Food & drink"
+    },
+    {
+      "id": "occasion",
+      "name": "Occasions"
+    },
+    {
+      "id": "objects",
+      "name": "Objects"
+    },
+    {
+      "id": "tutorial",
+      "name": "Step-by-step"
+    }
+  ],
+  "items": [
+    {
+      "id": "animals-00-cat",
+      "title": "Cat",
+      "category": "animals",
+      "image": "animals-00-cat.jpg",
+      "thumb": "animals-00-cat-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "food-00-coffee",
+      "title": "Coffee & croissant",
+      "category": "food",
+      "image": "food-00-coffee.jpg",
+      "thumb": "food-00-coffee-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "objects-00-sneaker",
+      "title": "Sneaker",
+      "category": "objects",
+      "image": "objects-00-sneaker.jpg",
+      "thumb": "objects-00-sneaker-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "occasion-00-balloon",
+      "title": "Balloons",
+      "category": "occasion",
+      "image": "occasion-00-balloon.jpg",
+      "thumb": "occasion-00-balloon-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "occasion-00-wreath",
+      "title": "Wreath",
+      "category": "occasion",
+      "image": "occasion-00-wreath.jpg",
+      "thumb": "occasion-00-wreath-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "tutorial-00-owl",
+      "title": "Owl steps",
+      "category": "tutorial",
+      "image": "tutorial-00-owl.jpg",
+      "thumb": "tutorial-00-owl-thumb.webp",
+      "tutorial": true
+    }
+  ]
+}

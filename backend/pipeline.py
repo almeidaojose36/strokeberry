@@ -11,6 +11,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageOps
 
+from . import watermark
 from .artistry import SCENE_VERSION, clean_paths, make_timeline, event_position
 
 _scene_lock = threading.Lock()
@@ -185,6 +186,8 @@ def render(folder: Path, settings, update, output=None):
                     pts = np.array([[x, y], [x + 17*unit, y - 46*unit], [x + 28*unit, y - 40*unit], [x + 5*unit, y + 2*unit]], np.int32)
                     cv2.fillConvexPoly(canvas, pts, (207, 162, 87), cv2.LINE_AA)
                     cv2.circle(canvas, (round(x), round(y)), max(2, round(unit * 2)), ink, -1, cv2.LINE_AA)
+                if settings.get('watermark'):
+                    watermark.apply(canvas)
                 process.stdin.write(canvas.tobytes())
                 if frame % 12 == 0:
                     update(round(5 + progress * 91), stage_label)

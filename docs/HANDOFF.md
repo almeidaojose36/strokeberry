@@ -121,8 +121,9 @@ Check narration by transcribing the render (`npx hyperframes transcribe`).
 
 ## 5. Open issues / before launch
 
-1. **Offer copy isn't backed by the product.** The landing page and video say "3 videos free", "no card required" and "Upgrade for 1080p and no watermark". The app has no accounts, free tier, watermark or billing yet. Don't publish until it does, or change the copy.
-2. **Hosting not done.** Recommended: the owner's Hostinger VPS (FastAPI + FFmpeg need a real server; Firebase Hosting alone can't run the renderer). Register strokeberry.com first.
+1. **Offer copy.** Accounts, the Free plan (3 videos, 720p, watermark) and Pro are now built (§7), but billing only goes live once the Lemon Squeezy store is set up. Until then keep "Upgrade" copy off public pages.
+2. **Hosting not done.** Recommended: the owner's Hostinger VPS (FastAPI + FFmpeg need a real server). strokeberry.com is registered on Cloudflare (expires 2027-09-26).
+2b. **Tutorial narration** says the video "renders right on your device", which stops being true once hosted. Re-record that line before posting.
 3. **Don't post the launch video** until the domain is live and the app is hosted.
 4. **Port mismatch** 8000 vs 8001 (see §2).
 5. **Renderer backlog:** white square around exported images; panel-divider detection on multi-step tutorials.
@@ -133,3 +134,54 @@ Check narration by transcribing the render (`npx hyperframes transcribe`).
 ## 6. Monetisation direction (from earlier discussion; not final)
 
 Freemium: a few free watermarked 720p exports, then a subscription for 1080p, no watermark and more exports. Launch promo idea: 40% off the first 3 months, but only once checkout supports it. Audiences: creators, teachers, Etsy sellers, small brands.
+
+## 7. Accounts, plans, payments and examples (branch `feature/accounts-plans-gallery`)
+
+Config lives in `.env.local` (see `.env.example`). Each part switches on only when its settings are present.
+
+- **Sign-in:** Firebase Auth (Google and email link). The frontend is in `frontend/src/auth.js` and `SignIn.jsx`; the server verifies ID tokens in `backend/accounts.py`.
+  - Without the `VITE_FIREBASE_*` and `FIREBASE_PROJECT_ID` settings, the studio runs as the single local user, as before, and the "on your device" copy stays.
+  - Preview the signed-in UI locally: `STROKEBERRY_AUTH=dev STROKEBERRY_DEV_USER=tester npm run server`.
+- **Per-user data:** projects and jobs carry `user_id`. Other users' items return 404. `<img>` and `<video>` links are HMAC-signed and valid for 24 hours.
+- **Plans** (`accounts.PLANS`):
+  - Free: 3 lifetime exports, 720p, watermark (`backend/watermark.py`, compact mark plus strokeberry.com).
+  - Pro: 200 exports per rolling 30 days, 1080p, no watermark.
+  - Failed renders don't count, and each user can run at most 2 renders at once. A cancelled Pro subscription lapses by itself at `plan_renews`.
+- **Payments:** Lemon Squeezy, the merchant of record (Stripe doesn't support South African payouts). Code is in `backend/billing.py`.
+  - Endpoints: `POST /api/billing/checkout`, `GET /api/billing/portal`, `POST /api/billing/webhook` (X-Signature HMAC).
+  - Register the webhook at `<STROKEBERRY_APP_URL>/api/billing/webhook` with the `subscription_*` events.
+  - Checkout returns to `/studio/?upgraded=1`, and the studio polls until Pro switches on.
+- **Examples gallery:** `GET /api/library`, `POST /api/library/{id}/use`; the UI is `frontend/src/Gallery.jsx`.
+  - Put images named like `animals-01-fox.png` (IDs from `marketing/gallery-prompts.md`) in `marketing/gallery-source/`.
+  - Then run `.venv/bin/python scripts/gallery/ingest.py`, which rebuilds `frontend/public/library/`.
+  - Six starter examples come from `assets/gallery-src/`.
+- **Tests:** `backend/tests/test_accounts.py` and `test_billing.py` (40 tests in the suite in total).
+
+**Contact emails (decided):**
+- **hi@strokeberry.com** is the public address. It's in the landing footer.
+- **support@strokeberry.com** is for help and billing. It's in the studio Guide and should be the Lemon Squeezy store support email.
+- **Mail is hosted on Zoho Mail** (set up 2026-09-28; Cloudflare Email Routing is turned off).
+  - `hi@` is the mailbox and the Zoho super-admin.
+  - `support@` is an alias of it, with the display name "Strokeberry Support".
+- **Cloudflare DNS records:**
+  - MX: `mx.zoho.com` (10), `mx2.zoho.com` (20), `mx3.zoho.com` (50).
+  - SPF: `v=spf1 include:zohomail.com ~all`.
+  - DKIM: `zmail._domainkey`.
+  - DMARC: `_dmarc` set to `p=none`, with reports going to hi@.
+  - Zoho verification TXT.
+  - Zoho has verified MX, SPF and DKIM.
+- **Firebase and Lemon Squeezy:** when you add their sending/DNS records, *merge* their SPF include into the single SPF record. Never add a second SPF record.
+- **Zoho plan:** the account is on a **Mail Premium trial** that renews 12/10/2026. Choose a plan before then.
+
+**Owner to-dos:**
+1. **Firebase project:**
+   - Blaze plan with a $5 budget alert. The free Spark plan sends only 5 sign-in emails a day.
+   - Enable Google and Email link sign-in.
+   - Add strokeberry.com and localhost as authorised domains.
+   - Paste the web config into `.env.local`.
+2. **Lemon Squeezy store (test mode):**
+   - A "Pro" monthly product.
+   - Copy the API key, store ID and variant ID, and set a webhook secret.
+   - Confirm South African payouts.
+3. **Zoho Mail:** choose a plan before the Premium trial ends (12/10/2026).
+4. **Gallery images:** generate them into `marketing/gallery-source/`.

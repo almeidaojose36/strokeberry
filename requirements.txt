@@ -6,3 +6,4 @@ Pillow>=11,<12
 numpy>=2,<3
 pytest>=8,<9
 httpx>=0.28,<1
+PyJWT[crypto]>=2.9,<3
