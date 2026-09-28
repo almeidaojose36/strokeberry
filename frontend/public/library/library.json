@@ -9,12 +9,24 @@
       "name": "Food & drink"
     },
     {
+      "id": "nature",
+      "name": "Nature"
+    },
+    {
       "id": "occasion",
       "name": "Occasions"
     },
     {
       "id": "objects",
       "name": "Objects"
+    },
+    {
+      "id": "travel",
+      "name": "Travel"
+    },
+    {
+      "id": "logo",
+      "name": "Logos"
     },
     {
       "id": "tutorial",
@@ -31,11 +43,219 @@
       "tutorial": false
     },
     {
+      "id": "animals-01-fox",
+      "title": "Fox",
+      "category": "animals",
+      "image": "animals-01-fox.jpg",
+      "thumb": "animals-01-fox-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "animals-02-panda",
+      "title": "Panda",
+      "category": "animals",
+      "image": "animals-02-panda.jpg",
+      "thumb": "animals-02-panda-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "animals-03-whale",
+      "title": "Whale",
+      "category": "animals",
+      "image": "animals-03-whale.jpg",
+      "thumb": "animals-03-whale-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "animals-04-puppy",
+      "title": "Puppy",
+      "category": "animals",
+      "image": "animals-04-puppy.jpg",
+      "thumb": "animals-04-puppy-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "animals-05-bunny",
+      "title": "Bunny",
+      "category": "animals",
+      "image": "animals-05-bunny.jpg",
+      "thumb": "animals-05-bunny-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "animals-06-turtle",
+      "title": "Turtle",
+      "category": "animals",
+      "image": "animals-06-turtle.jpg",
+      "thumb": "animals-06-turtle-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "animals-07-penguin",
+      "title": "Penguin",
+      "category": "animals",
+      "image": "animals-07-penguin.jpg",
+      "thumb": "animals-07-penguin-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "animals-08-butterfly",
+      "title": "Butterfly",
+      "category": "animals",
+      "image": "animals-08-butterfly.jpg",
+      "thumb": "animals-08-butterfly-thumb.webp",
+      "tutorial": false
+    },
+    {
       "id": "food-00-coffee",
       "title": "Coffee & croissant",
       "category": "food",
       "image": "food-00-coffee.jpg",
       "thumb": "food-00-coffee-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "food-01-cupcake",
+      "title": "Cupcake",
+      "category": "food",
+      "image": "food-01-cupcake.jpg",
+      "thumb": "food-01-cupcake-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "food-02-pizza",
+      "title": "Pizza",
+      "category": "food",
+      "image": "food-02-pizza.jpg",
+      "thumb": "food-02-pizza-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "food-03-icecream",
+      "title": "Ice cream",
+      "category": "food",
+      "image": "food-03-icecream.jpg",
+      "thumb": "food-03-icecream-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "food-04-burger",
+      "title": "Burger",
+      "category": "food",
+      "image": "food-04-burger.jpg",
+      "thumb": "food-04-burger-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "food-05-avocado",
+      "title": "Avocado toast",
+      "category": "food",
+      "image": "food-05-avocado.jpg",
+      "thumb": "food-05-avocado-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "food-06-boba",
+      "title": "Bubble tea",
+      "category": "food",
+      "image": "food-06-boba.jpg",
+      "thumb": "food-06-boba-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "food-07-donut",
+      "title": "Donut",
+      "category": "food",
+      "image": "food-07-donut.jpg",
+      "thumb": "food-07-donut-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "logo-01-bakery",
+      "title": "Sunny Loaf Bakery",
+      "category": "logo",
+      "image": "logo-01-bakery.jpg",
+      "thumb": "logo-01-bakery-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "logo-02-plants",
+      "title": "Leafy Corner",
+      "category": "logo",
+      "image": "logo-02-plants.jpg",
+      "thumb": "logo-02-plants-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "logo-03-barber",
+      "title": "Sharp & Co.",
+      "category": "logo",
+      "image": "logo-03-barber.jpg",
+      "thumb": "logo-03-barber-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "logo-04-fitness",
+      "title": "Pulse Fit",
+      "category": "logo",
+      "image": "logo-04-fitness.jpg",
+      "thumb": "logo-04-fitness-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "logo-05-petshop",
+      "title": "Happy Paws",
+      "category": "logo",
+      "image": "logo-05-petshop.jpg",
+      "thumb": "logo-05-petshop-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "nature-01-sunflower",
+      "title": "Sunflower",
+      "category": "nature",
+      "image": "nature-01-sunflower.jpg",
+      "thumb": "nature-01-sunflower-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "nature-02-cactus",
+      "title": "Cactus",
+      "category": "nature",
+      "image": "nature-02-cactus.jpg",
+      "thumb": "nature-02-cactus-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "nature-03-mountain",
+      "title": "Mountain",
+      "category": "nature",
+      "image": "nature-03-mountain.jpg",
+      "thumb": "nature-03-mountain-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "nature-04-monstera",
+      "title": "Monstera",
+      "category": "nature",
+      "image": "nature-04-monstera.jpg",
+      "thumb": "nature-04-monstera-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "nature-05-tree",
+      "title": "Tree",
+      "category": "nature",
+      "image": "nature-05-tree.jpg",
+      "thumb": "nature-05-tree-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "nature-06-rose",
+      "title": "Rose",
+      "category": "nature",
+      "image": "nature-06-rose.jpg",
+      "thumb": "nature-06-rose-thumb.webp",
       "tutorial": false
     },
     {
@@ -47,11 +267,59 @@
       "tutorial": false
     },
     {
-      "id": "occasion-00-balloon",
-      "title": "Balloons",
-      "category": "occasion",
-      "image": "occasion-00-balloon.jpg",
-      "thumb": "occasion-00-balloon-thumb.webp",
+      "id": "objects-01-camera",
+      "title": "Camera",
+      "category": "objects",
+      "image": "objects-01-camera.jpg",
+      "thumb": "objects-01-camera-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "objects-02-guitar",
+      "title": "Guitar",
+      "category": "objects",
+      "image": "objects-02-guitar.jpg",
+      "thumb": "objects-02-guitar-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "objects-03-rocket",
+      "title": "Rocket",
+      "category": "objects",
+      "image": "objects-03-rocket.jpg",
+      "thumb": "objects-03-rocket-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "objects-04-bicycle",
+      "title": "Bicycle",
+      "category": "objects",
+      "image": "objects-04-bicycle.jpg",
+      "thumb": "objects-04-bicycle-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "objects-05-headphones",
+      "title": "Headphones",
+      "category": "objects",
+      "image": "objects-05-headphones.jpg",
+      "thumb": "objects-05-headphones-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "objects-06-plant-books",
+      "title": "Books & plant",
+      "category": "objects",
+      "image": "objects-06-plant-books.jpg",
+      "thumb": "objects-06-plant-books-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "objects-07-coffee-machine",
+      "title": "Coffee machine",
+      "category": "objects",
+      "image": "objects-07-coffee-machine.jpg",
+      "thumb": "objects-07-coffee-machine-thumb.webp",
       "tutorial": false
     },
     {
@@ -63,11 +331,147 @@
       "tutorial": false
     },
     {
+      "id": "occasion-01-birthday-cake",
+      "title": "Birthday cake",
+      "category": "occasion",
+      "image": "occasion-01-birthday-cake.jpg",
+      "thumb": "occasion-01-birthday-cake-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "occasion-02-gift",
+      "title": "Gift",
+      "category": "occasion",
+      "image": "occasion-02-gift.jpg",
+      "thumb": "occasion-02-gift-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "occasion-03-christmas-tree",
+      "title": "Christmas tree",
+      "category": "occasion",
+      "image": "occasion-03-christmas-tree.jpg",
+      "thumb": "occasion-03-christmas-tree-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "occasion-04-pumpkin",
+      "title": "Pumpkin",
+      "category": "occasion",
+      "image": "occasion-04-pumpkin.jpg",
+      "thumb": "occasion-04-pumpkin-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "occasion-05-heart",
+      "title": "Heart balloon",
+      "category": "occasion",
+      "image": "occasion-05-heart.jpg",
+      "thumb": "occasion-05-heart-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "occasion-06-graduation",
+      "title": "Graduation cap",
+      "category": "occasion",
+      "image": "occasion-06-graduation.jpg",
+      "thumb": "occasion-06-graduation-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "occasion-07-wedding",
+      "title": "Wedding rings",
+      "category": "occasion",
+      "image": "occasion-07-wedding.jpg",
+      "thumb": "occasion-07-wedding-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "travel-01-van",
+      "title": "Camper van",
+      "category": "travel",
+      "image": "travel-01-van.jpg",
+      "thumb": "travel-01-van-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "travel-02-hot-air-balloon",
+      "title": "Hot air balloon",
+      "category": "travel",
+      "image": "travel-02-hot-air-balloon.jpg",
+      "thumb": "travel-02-hot-air-balloon-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "travel-03-sailboat",
+      "title": "Sailboat",
+      "category": "travel",
+      "image": "travel-03-sailboat.jpg",
+      "thumb": "travel-03-sailboat-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "travel-04-plane",
+      "title": "Plane",
+      "category": "travel",
+      "image": "travel-04-plane.jpg",
+      "thumb": "travel-04-plane-thumb.webp",
+      "tutorial": false
+    },
+    {
       "id": "tutorial-00-owl",
       "title": "Owl steps",
       "category": "tutorial",
       "image": "tutorial-00-owl.jpg",
       "thumb": "tutorial-00-owl-thumb.webp",
+      "tutorial": true
+    },
+    {
+      "id": "tutorial-01-cat",
+      "title": "Cat steps",
+      "category": "tutorial",
+      "image": "tutorial-01-cat.jpg",
+      "thumb": "tutorial-01-cat-thumb.webp",
+      "tutorial": true
+    },
+    {
+      "id": "tutorial-02-dinosaur",
+      "title": "Dinosaur steps",
+      "category": "tutorial",
+      "image": "tutorial-02-dinosaur.jpg",
+      "thumb": "tutorial-02-dinosaur-thumb.webp",
+      "tutorial": true
+    },
+    {
+      "id": "tutorial-03-unicorn",
+      "title": "Unicorn steps",
+      "category": "tutorial",
+      "image": "tutorial-03-unicorn.jpg",
+      "thumb": "tutorial-03-unicorn-thumb.webp",
+      "tutorial": true
+    },
+    {
+      "id": "tutorial-04-rocket",
+      "title": "Rocket steps",
+      "category": "tutorial",
+      "image": "tutorial-04-rocket.jpg",
+      "thumb": "tutorial-04-rocket-thumb.webp",
+      "tutorial": true
+    },
+    {
+      "id": "tutorial-05-flower",
+      "title": "Flower steps",
+      "category": "tutorial",
+      "image": "tutorial-05-flower.jpg",
+      "thumb": "tutorial-05-flower-thumb.webp",
+      "tutorial": true
+    },
+    {
+      "id": "tutorial-06-fish",
+      "title": "Fish steps",
+      "category": "tutorial",
+      "image": "tutorial-06-fish.jpg",
+      "thumb": "tutorial-06-fish-thumb.webp",
       "tutorial": true
     }
   ]

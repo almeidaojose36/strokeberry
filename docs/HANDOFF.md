@@ -152,9 +152,10 @@ Config lives in `.env.local` (see `.env.example`). Each part switches on only wh
   - Register the webhook at `<STROKEBERRY_APP_URL>/api/billing/webhook` with the `subscription_*` events.
   - Checkout returns to `/studio/?upgraded=1`, and the studio polls until Pro switches on.
 - **Examples gallery:** `GET /api/library`, `POST /api/library/{id}/use`; the UI is `frontend/src/Gallery.jsx`.
-  - Put images named like `animals-01-fox.png` (IDs from `marketing/gallery-prompts.md`) in `marketing/gallery-source/`.
-  - Then run `.venv/bin/python scripts/gallery/ingest.py`, which rebuilds `frontend/public/library/`.
-  - Six starter examples come from `assets/gallery-src/`.
+  - There are 55 examples in 8 categories: the owner's 50 generated images (in `marketing/marketing_gallery-source_/`) plus 5 starter images from `assets/gallery-src/`.
+  - After adding or replacing images (named with an ID from `marketing/gallery-prompts.md`), run `.venv/bin/python scripts/gallery/ingest.py`. It also accepts tool-exported names like `fox.png_<timestamp>.jpg` and pads art that touches the edge.
+  - Step-by-step examples open the steps editor. Rocket and Flower aren't auto-detected, but the default 2×2 layout matches them.
+  - Pizza is cropped at the left edge in the source; regenerate it if you want it complete.
 - **Tests:** `backend/tests/test_accounts.py` and `test_billing.py` (40 tests in the suite in total).
 
 **Contact emails (decided):**

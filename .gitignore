@@ -35,3 +35,6 @@ marketing/**/*.zip
 marketing/voice/previews/
 marketing/marketing/
 marketing/canva-drafts.html
+# Original gallery images (the app uses the processed copies in frontend/public/library/)
+marketing/marketing_gallery-source_/
+marketing/gallery-source/
