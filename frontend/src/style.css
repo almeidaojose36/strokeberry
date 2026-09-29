@@ -424,3 +424,46 @@ select{width:100%;border:1px solid var(--line-strong);border-radius:10px;backgro
   .gallery-grid{grid-template-columns:repeat(2,1fr);gap:10px}
   .sign-in-card{padding:28px 20px}
 }
+
+/* ---------- How it works guide ---------- */
+.guide-modal{width:680px;padding:32px 32px 28px}
+.guide-modal h2{margin-bottom:18px}
+.guide-video{display:flex;justify-content:center;margin:0 auto 22px}
+.guide-video video{height:min(460px,60vh);aspect-ratio:9/16;border-radius:14px;background:var(--stage);display:block}
+.guide-video-start{position:relative;width:100%;height:150px;border-radius:14px;overflow:hidden;background:var(--stage);display:flex;align-items:center;gap:16px;padding:0 20px;text-align:left;color:#fff}
+.guide-video-start img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45}
+.guide-video-start:hover img{opacity:.55}
+.guide-play{position:relative;width:52px;height:52px;border-radius:50%;background:var(--accent-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 8px 22px -8px rgba(0,0,0,.6);padding-left:3px}
+.guide-video-label{position:relative;display:grid;gap:3px}.guide-video-label strong{font-size:17px}.guide-video-label small{font-size:13px;opacity:.85}
+.guide-steps{list-style:none;margin:0 0 16px;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:14px;text-align:left}
+.guide-steps li{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.guide-steps img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-bottom:1px solid var(--line);background:#fff}
+.guide-steps li>div{padding:12px 14px 14px;display:grid;grid-template-columns:auto 1fr;column-gap:9px;align-items:center}
+.guide-steps strong{font-size:14.5px}
+.guide-steps p{grid-column:1/-1;margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
+.guide-number{width:22px;height:22px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.guide-callout{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:12px 14px;margin-bottom:10px;font-size:13.5px;line-height:1.45;color:var(--ink-2)}
+.guide-callout svg{color:var(--teal-ink);flex-shrink:0}
+button.guide-callout:hover{border-color:var(--line-strong);background:#fff}
+.guide-callout strong{color:var(--ink)}
+.guide-steps-icon{font-size:11px;font-weight:700;color:var(--teal-ink);background:var(--teal-soft);border-radius:6px;padding:3px 5px;flex-shrink:0}
+.guide-subhead{font-family:var(--display);font-size:18px;letter-spacing:-.02em;margin:20px 0 12px;text-align:left}
+.guide-tips{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.guide-tips figure{margin:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.guide-tips img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+.guide-tips figcaption{display:flex;gap:7px;align-items:center;justify-content:center;padding:10px;font-size:13px;font-weight:600}
+.guide-tips .good figcaption{background:var(--success-soft);color:var(--success)}
+.guide-tips .bad figcaption{background:var(--danger-soft);color:var(--danger)}
+.guide-plan{font-size:13px;color:var(--muted);margin:0 0 12px}
+@media(max-width:720px){
+  .guide-modal{padding:28px 16px 22px}
+  .guide-steps{grid-template-columns:1fr;gap:12px}
+  .guide-steps li{display:grid;grid-template-columns:120px 1fr}
+  .guide-steps img{height:100%;border-bottom:0;border-right:1px solid var(--line)}
+  .guide-steps li>div{padding:10px 12px}
+  .guide-video-start{height:120px}
+}
+.guide-video-start::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(27,27,27,.94) 0%,rgba(27,27,27,.78) 50%,rgba(27,27,27,.35) 100%)}
+.guide-play,.guide-video-label{z-index:1}
+.no-steps-note{background:var(--sun-soft);border:1px solid #f3dc9a;color:#6b4700;border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.5;margin:0 0 14px}
+.no-steps-note strong{color:#4d3300}

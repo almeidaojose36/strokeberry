@@ -243,9 +243,15 @@ def detect_panels(folder):
                                     round(c['x']*width):round((c['x']+c['width'])*width)]) > width*height*.0003 for c in crops):
             return {'detected': True, 'method': 'whitespace', 'rows': len(ys), 'columns': len(xs),
                     'width': width, 'height': height, 'crops': crops}
-    return {'detected': False, 'method': 'fallback', 'rows': 2, 'columns': 2,
+    return fallback_layout(width, height)
+
+
+def fallback_layout(width, height, columns=1, rows=1):
+    """No panels found: keep the whole image as one step (or use a known grid, e.g. a gallery tutorial sheet)."""
+    return {'detected': False, 'method': 'fallback', 'rows': rows, 'columns': columns,
             'width': width, 'height': height,
-            'crops': [{'x': x/2, 'y': y/2, 'width': .5, 'height': .5} for y in range(2) for x in range(2)]}
+            'crops': [{'x': x/columns, 'y': y/rows, 'width': 1/columns, 'height': 1/rows}
+                      for y in range(rows) for x in range(columns)]}
 
 
 def normalize_paper(rgb):

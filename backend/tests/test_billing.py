@@ -115,3 +115,14 @@ def test_library_examples_become_projects(client):
     assert client.post('/api/library/..%2F..%2Fetc/use', headers=as_user('ana')).status_code in (404, 405)
     assert client.post('/api/library/nope/use', headers=as_user('ana')).status_code == 404
     assert client.post(f"/api/library/{item['id']}/use").status_code == 401
+
+
+def test_undetected_images_default_to_one_step_but_tutorial_examples_keep_their_grid(client):
+    library = {item['id']: item for item in client.get('/api/library').json()['items']}
+    for item_id, expected in (('objects-01-camera', (1, 1)), ('tutorial-04-rocket', (2, 2))):
+        if item_id not in library:
+            continue
+        project = client.post(f'/api/library/{item_id}/use', headers=as_user('ana')).json()
+        layout = client.get(f"/api/projects/{project['id']}/step-layout", headers=as_user('ana')).json()
+        assert (layout['columns'], layout['rows']) == expected
+        assert len(layout['crops']) == expected[0] * expected[1]

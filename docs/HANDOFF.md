@@ -123,7 +123,7 @@ Check narration by transcribing the render (`npx hyperframes transcribe`).
 
 1. **Offer copy.** Accounts, the Free plan (3 videos, 720p, watermark) and Pro are now built (§7), but billing only goes live once the Lemon Squeezy store is set up. Until then keep "Upgrade" copy off public pages.
 2. **Hosting not done.** Recommended: the owner's Hostinger VPS (FastAPI + FFmpeg need a real server). strokeberry.com is registered on Cloudflare (expires 2027-09-26).
-2b. **Tutorial narration** says the video "renders right on your device", which stops being true once hosted. Re-record that line before posting.
+2b. **Tutorial narration:** tutorial 1 (logo) was re-voiced on 2026-09-28 to say "Strokeberry draws it for you". Tutorials 2 and 3 (steps, speedpaint) still say "It renders right on your device" in an on-screen caption (not the narration). Change the caption in `tutorial.json` and re-render before posting. Their app screenshots also show the local-mode footer "Rendered on your device · no watermark".
 3. **Don't post the launch video** until the domain is live and the app is hosted.
 4. **Port mismatch** 8000 vs 8001 (see §2).
 5. **Renderer backlog:** white square around exported images; panel-divider detection on multi-step tutorials.
@@ -156,6 +156,11 @@ Config lives in `.env.local` (see `.env.example`). Each part switches on only wh
   - After adding or replacing images (named with an ID from `marketing/gallery-prompts.md`), run `.venv/bin/python scripts/gallery/ingest.py`. It also accepts tool-exported names like `fox.png_<timestamp>.jpg` and pads art that touches the edge.
   - Step-by-step examples open the steps editor. Rocket and Flower aren't auto-detected, but the default 2×2 layout matches them.
   - Pizza is cropped at the left edge in the source; regenerate it if you want it complete.
+- **How it works guide** (`frontend/src/Guide.jsx`):
+  - A 1-minute tutorial plays inline (`frontend/public/guide/tutorial.mp4`, a 540p copy of tutorial 1 with narration).
+  - Four step cards use real studio screenshots.
+  - Callouts cover Examples and Set up steps, and a "What works best" pair compares a good and a bad image.
+  - Rebuild the pictures with `.venv/bin/python scripts/gallery/guide_images.py`.
 - **Tests:** `backend/tests/test_accounts.py` and `test_billing.py` (40 tests in the suite in total).
 
 **Contact emails (decided):**

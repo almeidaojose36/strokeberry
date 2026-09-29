@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field, model_validator
 from PIL import UnidentifiedImageError, Image
 from .pipeline import prepare_image, render, load_scene
 from .sample import create_sample
-from .steps import detect_panels, prepare_steps, original_path, four_step_reading_order
+from .steps import detect_panels, fallback_layout, prepare_steps, original_path, four_step_reading_order
 from .enhance import clean_background
 from . import accounts, billing, gallery
 
@@ -118,6 +118,8 @@ def use_library_item(item_id: str, user=Depends(current_user)):
     item, path = gallery.find(item_id)
     project = add_project(path, item['title'], user)
     project['tutorial'] = bool(item.get('tutorial'))
+    if project['tutorial']:  # step-by-step examples are 2×2 sheets, even when the panels can't be detected
+        (DATA / project['id'] / 'layout-hint.json').write_text(json.dumps({'columns': 2, 'rows': 2}))
     return project
 
 
@@ -278,7 +280,12 @@ def detail(project_id: str, user=Depends(current_user)):
 @app.get('/api/projects/{project_id}/step-layout')
 def step_layout(project_id: str, user=Depends(current_user)):
     project = project_detail(project_id, user)
-    return dict(detect_panels(DATA / project_id), config=project.get('config'))
+    layout = detect_panels(DATA / project_id)
+    hint = DATA / project_id / 'layout-hint.json'
+    if not layout['detected'] and hint.exists():  # a gallery tutorial sheet whose grid we already know
+        grid = json.loads(hint.read_text())
+        layout = fallback_layout(layout['width'], layout['height'], grid['columns'], grid['rows'])
+    return dict(layout, config=project.get('config'))
 
 
 @app.post('/api/projects/{project_id}/steps', status_code=201)

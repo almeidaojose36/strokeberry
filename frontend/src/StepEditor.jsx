@@ -8,7 +8,9 @@ export default function StepEditor({project: sourceProject, api, onClose, onCrea
   const [align, setAlign] = useState(true), [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true), [error, setError] = useState('');
   const [detected, setDetected] = useState(false), [layout, setLayout] = useState('2x2'), [suggested, setSuggested] = useState(null);
-  const defaultsFor = crops => crops.map((crop,i)=>({crop,label:crops.length===4?['Basic guides','Main outlines','Details & shading','Color'][i]:`Step ${i+1}`,seconds:Math.floor(120/crops.length)+(i===crops.length-1?120%crops.length:0),offset_x:0,offset_y:0,scale:1}));
+  // One step (a whole image) defaults to 30 seconds; a multi-panel sheet shares 2 minutes between its panels.
+  const defaultsFor = crops => {const total=crops.length===1?30:120;return crops.map((crop,i)=>({crop,label:crops.length===1?'Whole drawing':crops.length===4?['Basic guides','Main outlines','Details & shading','Color'][i]:`Step ${i+1}`,seconds:Math.floor(total/crops.length)+(i===crops.length-1?total%crops.length:0),offset_x:0,offset_y:0,scale:1}))};
+  const duration = seconds => seconds < 60 ? `${seconds} sec` : `${Math.floor(seconds/60)} min${seconds%60?` ${seconds%60} sec`:''}`;
   const sheet = useRef(null), drag = useRef(null), dialog = useRef(null);
   useEffect(() => {
     let alive = true;
@@ -84,10 +86,11 @@ export default function StepEditor({project: sourceProject, api, onClose, onCrea
     <header><div><div className="eyebrow">ONE DRAWING, ONE STEP AT A TIME</div><h2 id="steps-title">Build your drawing sequence</h2></div><button className="icon-button" aria-label="Close step editor" disabled={busy} onClick={onClose}><X size={20}/></button></header>
     {error && <p role="alert" className="failure-text">{error}</p>}
     {loading ? <div className="steps-loading"><LoaderCircle className="spin"/>Finding your panels…</div> : stages.length > 0 && <>
-      <div className="image-tools"><button className="button secondary" disabled={busy} onClick={()=>setEditingImage(true)}>Edit image · eraser & brush</button><button className="button secondary" disabled={busy} aria-pressed={stages.length===1} onClick={()=>changeLayout('1x1')}>1 step · keep whole image</button></div>
-      <p className="setting-hint">Choose 1 step to draw the full sheet with each panel in its original position. Choose multiple crops to combine them into one evolving drawing.</p>
+      {suggested&&!suggested.detected&&!suggested.config&&stages.length===1&&<div className="no-steps-note"><strong>No drawing steps found in this image.</strong> For a single illustration or logo you don’t need this screen — close it and use the studio as normal (it adds the colour reveal too). If this is a how-to-draw sheet, choose its grid under Panel layout.</div>}
+      <div className="image-tools"><button className="button secondary" disabled={busy} onClick={()=>setEditingImage(true)}>Edit image · eraser & brush</button></div>
+      <p className="setting-hint">Split a how-to-draw sheet into its panels to turn them into one evolving drawing — or keep the whole image as 1 step.</p>
       <div className="step-editor-grid">
-        <div className="crop-workspace"><p>{detected ? `${suggested?.crops.length} panels found · ${stages.length} stages configured. Review the crops.` : 'Review the grid and adjust it to your panels.'}</p><label className="layout-picker">Panel layout<select aria-label="Panel layout" value={layout} disabled={busy} onChange={e=>changeLayout(e.target.value)}>{layout==='custom'&&<option value="custom">Saved custom crops</option>}{[['1x1','1 step · keep whole image'],['2x1','2 columns × 1 row'],['3x1','3 columns × 1 row'],['4x1','4 columns × 1 row'],['2x2','2 columns × 2 rows'],['3x2','3 columns × 2 rows'],['2x3','2 columns × 3 rows'],['4x2','4 columns × 2 rows'],['2x4','2 columns × 4 rows'],['1x2','1 column × 2 rows'],['1x3','1 column × 3 rows'],['1x4','1 column × 4 rows']].map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>{suggested?.detected&&<button className="button secondary detect-layout" disabled={busy} onClick={()=>{setStages(defaultsFor(suggested.crops));setActive(0);setLayout(`${suggested.columns}x${suggested.rows}`);setDetected(true)}}>Use detected {suggested.columns} × {suggested.rows} layout</button>}
+        <div className="crop-workspace"><p>{detected ? `${suggested?.crops.length} panels found · ${stages.length} stages configured. Review the crops.` : stages.length===1?'Pick the layout that matches your panels.':'Review the grid and adjust it to your panels.'}</p><label className="layout-picker">Panel layout<select aria-label="Panel layout" value={layout} disabled={busy} onChange={e=>changeLayout(e.target.value)}>{layout==='custom'&&<option value="custom">Saved custom crops</option>}{[['1x1','1 step · keep whole image'],['2x1','2 columns × 1 row'],['3x1','3 columns × 1 row'],['4x1','4 columns × 1 row'],['2x2','2 columns × 2 rows'],['3x2','3 columns × 2 rows'],['2x3','2 columns × 3 rows'],['4x2','4 columns × 2 rows'],['2x4','2 columns × 4 rows'],['1x2','1 column × 2 rows'],['1x3','1 column × 3 rows'],['1x4','1 column × 4 rows']].map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>{suggested?.detected&&<button className="button secondary detect-layout" disabled={busy} onClick={()=>{setStages(defaultsFor(suggested.crops));setActive(0);setLayout(`${suggested.columns}x${suggested.rows}`);setDetected(true)}}>Use detected {suggested.columns} × {suggested.rows} layout</button>}
           <div className="crop-sheet" ref={sheet}><img src={project.original || project.source} alt="Uploaded drawing tutorial with editable panel crops"/>
             {stages.map((stage,i) => <div key={i} role="button" tabIndex={0} aria-label={`Select crop for step ${i+1}`} onKeyDown={e=>{if(e.key==='Enter'||e.key===' ')setActive(i)}}
               className={`crop-box ${active===i?'active':''}`} style={{left:`${stage.crop.x*100}%`,top:`${stage.crop.y*100}%`,width:`${stage.crop.width*100}%`,height:`${stage.crop.height*100}%`}}
@@ -97,12 +100,12 @@ export default function StepEditor({project: sourceProject, api, onClose, onCrea
           </div>
           <small>Drag a crop to move it. Drag its lower-right corner to resize.</small>
         </div>
-        <div className="stage-controls"><div className="field-label">ORDER & TIMING <span>{Math.floor(total/60)}:{String(total%60).padStart(2,'0')} total</span></div>
+        <div className="stage-controls"><div className="field-label">{stages.length===1?'TIMING':'ORDER & TIMING'} <span>{duration(total)} total</span></div>
           {fourStepOrder&&<p className="setting-hint">Fixed reading order: top-left → top-right → bottom-left → bottom-right.</p>}
           <div className="stage-order">{stages.map((stage,i)=><div className={`stage-order-row ${active===i?'active':''}`} key={i}>
             <button className="stage-number" aria-label={`Edit step ${i+1}`} onClick={()=>setActive(i)}>{i+1}</button>
             <input aria-label={`Step ${i+1} name`} maxLength={40} value={stage.label} disabled={busy} onFocus={()=>setActive(i)} onChange={e=>update(i,'label',e.target.value)}/>
-            <label><input aria-label={`Step ${i+1} seconds`} type="number" min={1} max={300} value={stage.seconds} disabled={busy} onChange={e=>update(i,'seconds',Math.max(1,Math.min(300,Number(e.target.value)||1)))}/>s</label>
+            <label><input aria-label={`Step ${i+1} seconds`} type="number" min={1} max={300} value={stage.seconds} disabled={busy} onChange={e=>update(i,'seconds',Math.max(1,Math.min(300,Number(e.target.value)||1)))}/>sec</label>
             <div><button aria-label={`Move step ${i+1} earlier`} disabled={busy||fourStepOrder||i===0} onClick={()=>reorder(i,-1)}><ArrowUp size={12}/></button><button aria-label={`Move step ${i+1} later`} disabled={busy||fourStepOrder||i===stages.length-1} onClick={()=>reorder(i,1)}><ArrowDown size={12}/></button></div>
           </div>)}</div>
           <div className="field-label">STEP {active+1} CROP <span>Percent of uploaded image</span></div>
@@ -113,8 +116,8 @@ export default function StepEditor({project: sourceProject, api, onClose, onCrea
           </div><p className="setting-hint">Offsets are percentages of the drawing canvas. Preview the aligned stages after saving; use Edit steps to make corrections.</p></>}
         </div>
       </div>
-      <footer><div><strong>{stages.length===1?'1 step · original layout preserved':`${stages.length} stages · one continuous drawing`}</strong><small>{stages.length===1?'All panels stay separate on the same sheet.':'New marks appear progressively. Changed guides fade away.'}</small></div><button className="button primary" disabled={busy||total>300||total<5||stages.some(s=>!s.label.trim())} onClick={save}>{busy?<LoaderCircle className="spin" size={17}/>:<ScanLine size={17}/>} {busy?'Preparing your drawing…':'Prepare drawing steps'}</button></footer>
-      {total>300&&<p role="alert" className="failure-text">Shorten the stages to a total of five minutes or less.</p>}
+      <footer><div><strong>{stages.length===1?`1 step · ${duration(total)}`:`${stages.length} steps · ${duration(total)} · one continuous drawing`}</strong><small>{stages.length===1?'The whole image is drawn in one go, exactly as it looks.':'New marks appear progressively. Changed guides fade away.'}</small></div><button className="button primary" disabled={busy||total>300||total<5||stages.some(s=>!s.label.trim())} onClick={save}>{busy?<LoaderCircle className="spin" size={17}/>:<ScanLine size={17}/>} {busy?'Preparing your drawing…':stages.length===1?'Prepare drawing':'Prepare drawing steps'}</button></footer>
+      {total>300&&<p role="alert" className="failure-text">Shorten the steps to a total of 5 minutes or less.</p>}
     </>}
   </section>{editingImage&&<ImageEditor project={{...project,config:undefined}} api={api} onClose={()=>setEditingImage(false)} onSaved={result=>{setProject(result);setEditingImage(false);}}/>}</div>;
 }
