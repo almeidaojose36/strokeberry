@@ -4,6 +4,13 @@ Configure with environment variables (keep the secret ones in .env.local, never 
   LEMONSQUEEZY_API_KEY          API key (Settings → API). Test-mode keys work with test-mode stores.
   LEMONSQUEEZY_STORE_ID         numeric store id
   LEMONSQUEEZY_PRO_VARIANT_ID   numeric variant id of the "Pro" monthly product
+  LEMONSQUEEZY_PRO_YEARLY_VARIANT_ID  (optional) variant id of the yearly price; the yearly option shows only when set
+  STROKEBERRY_FOUNDER_CODE      (optional) turns on the "Founding member" offer. In Lemon Squeezy create a discount with this
+                                code: 30% off, duration "forever", limited to 100 redemptions, applying to the monthly variant
+                                only. It is applied automatically to monthly checkouts and shown on the site.
+  STROKEBERRY_FOUNDER_PRICE / STROKEBERRY_FOUNDER_LIMIT   display values, default "$7" and 100
+  STROKEBERRY_PRICE_MONTH / STROKEBERRY_PRICE_YEAR  the prices shown to visitors, e.g. "$10" and "$84" (display only;
+                                the amount charged is whatever the Lemon Squeezy variant says)
   LEMONSQUEEZY_WEBHOOK_SECRET   the signing secret you set on the webhook (Settings → Webhooks)
   STROKEBERRY_APP_URL           public site address, e.g. https://strokeberry.com (checkout returns here)
 
@@ -14,6 +21,7 @@ import hashlib
 import hmac
 import json
 import os
+import time
 from datetime import datetime, timezone
 
 import httpx
@@ -24,8 +32,56 @@ API = 'https://api.lemonsqueezy.com/v1'
 ACTIVE = {'on_trial', 'active', 'past_due'}
 
 
-def configured():
-    return all(os.environ.get(k) for k in ('LEMONSQUEEZY_API_KEY', 'LEMONSQUEEZY_STORE_ID', 'LEMONSQUEEZY_PRO_VARIANT_ID'))
+def configured(interval='month'):
+    variant = 'LEMONSQUEEZY_PRO_YEARLY_VARIANT_ID' if interval == 'year' else 'LEMONSQUEEZY_PRO_VARIANT_ID'
+    return all(os.environ.get(k) for k in ('LEMONSQUEEZY_API_KEY', 'LEMONSQUEEZY_STORE_ID', variant))
+
+
+def price(interval='month'):
+    return os.environ.get('STROKEBERRY_PRICE_YEAR', '$84') if interval == 'year' else os.environ.get('STROKEBERRY_PRICE_MONTH', '$10')
+
+
+_offer_cache = {'at': 0.0, 'value': None}
+
+
+def founder_offer():
+    """The Founding member offer (or None when it isn't switched on or has sold out).
+
+    {'price', 'limit', 'left'}; `left` is None when Lemon Squeezy can't be asked, in which case the offer is still shown
+    without a counter. Cached for five minutes."""
+    code = os.environ.get('STROKEBERRY_FOUNDER_CODE', '').strip()
+    if not code or not configured():
+        return None
+    if time.time() - _offer_cache['at'] < 300 and _offer_cache.get('code') == code:
+        return _offer_cache['value']
+    limit = int(os.environ.get('STROKEBERRY_FOUNDER_LIMIT', '100') or 100)
+    left = None
+    try:
+        found = httpx.get(f'{API}/discounts', headers=_headers(), timeout=10,
+                          params={'filter[store_id]': os.environ['LEMONSQUEEZY_STORE_ID'], 'page[size]': 100})
+        found.raise_for_status()
+        discount = next((d for d in found.json()['data'] if d['attributes'].get('code', '').lower() == code.lower()), None)
+        if discount:
+            limit = int(discount['attributes'].get('max_redemptions') or limit)
+            used = httpx.get(f'{API}/discount-redemptions', headers=_headers(), timeout=10,
+                             params={'filter[discount_id]': discount['id'], 'page[size]': 1})
+            used.raise_for_status()
+            left = max(0, limit - int(used.json()['meta']['page']['total']))
+    except (httpx.HTTPError, KeyError, ValueError, TypeError):
+        left = None
+    offer = None if left == 0 else {'price': os.environ.get('STROKEBERRY_FOUNDER_PRICE', '$7'), 'limit': limit, 'left': left}
+    _offer_cache.update(at=time.time(), value=offer, code=code)
+    return offer
+
+
+def yearly_saving():
+    """How much cheaper the yearly plan is than twelve monthly payments, as a whole percentage."""
+    try:
+        monthly = float(price('month').lstrip('$'))
+        yearly = float(price('year').lstrip('$'))
+        return max(0, round((1 - yearly / (monthly * 12)) * 100))
+    except ValueError:
+        return 0
 
 
 def _headers():
@@ -33,12 +89,14 @@ def _headers():
             'Authorization': f"Bearer {os.environ['LEMONSQUEEZY_API_KEY']}"}
 
 
-def create_checkout(user):
-    """Return a hosted checkout URL for the Pro plan, tagged with our user id."""
-    if not configured():
+def create_checkout(user, interval='month'):
+    """Return a hosted checkout URL for the Pro plan (monthly or yearly), tagged with our user id."""
+    if not configured(interval):
         raise HTTPException(503, 'Payments are not set up yet. Please check back soon.')
     app_url = os.environ.get('STROKEBERRY_APP_URL', 'http://127.0.0.1:8001').rstrip('/')
     checkout_data = {'custom': {'user_id': user['id']}}
+    if interval == 'month' and founder_offer():  # the yearly plan is already discounted, so the code isn't stacked on it
+        checkout_data['discount_code'] = os.environ['STROKEBERRY_FOUNDER_CODE'].strip()
     if user.get('email'):
         checkout_data['email'] = user['email']
     body = {'data': {
@@ -50,7 +108,8 @@ def create_checkout(user):
         },
         'relationships': {
             'store': {'data': {'type': 'stores', 'id': str(os.environ['LEMONSQUEEZY_STORE_ID'])}},
-            'variant': {'data': {'type': 'variants', 'id': str(os.environ['LEMONSQUEEZY_PRO_VARIANT_ID'])}},
+            'variant': {'data': {'type': 'variants', 'id': str(os.environ[
+                'LEMONSQUEEZY_PRO_YEARLY_VARIANT_ID' if interval == 'year' else 'LEMONSQUEEZY_PRO_VARIANT_ID'])}},
         },
     }}
     try:

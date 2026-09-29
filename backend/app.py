@@ -71,12 +71,12 @@ app = FastAPI(title='Strokeberry', lifespan=lifespan)
 
 def current_user(request: Request):
     """The signed-in user (created on first visit). See accounts.py for the sign-in modes."""
-    user_id, email, name = accounts.identify(request)
+    user_id, email, name, guest = accounts.identify(request)
     if DB not in _initialised:  # tables exist even when the app starts without its lifespan (tests)
         init_db()
         _initialised.add(DB)
     with connect() as db:
-        return accounts.ensure_user(db, user_id, email, name)
+        return accounts.ensure_user(db, user_id, email, name, guest)
 
 
 def signed(path):
@@ -89,9 +89,21 @@ def me(user=Depends(current_user)):
         return accounts.account_summary(db, user)
 
 
+class CheckoutRequest(BaseModel):
+    interval: Literal['month', 'year'] = 'month'
+
+
 @app.post('/api/billing/checkout')
-def checkout(user=Depends(current_user)):
-    return {'url': billing.create_checkout(user)}
+def checkout(body: CheckoutRequest = CheckoutRequest(), user=Depends(current_user)):
+    if accounts.plan_id(user) == 'guest':
+        raise HTTPException(401, 'Create a free account first, then upgrade.')
+    return {'url': billing.create_checkout(user, body.interval)}
+
+
+@app.get('/api/offer')
+def offer():
+    """Public: the Founding member offer for the landing page (null when it isn't running)."""
+    return {'founder': billing.founder_offer(), 'monthly': billing.price('month'), 'yearly': billing.price('year')}
 
 
 @app.get('/api/billing/portal')
@@ -125,6 +137,8 @@ def use_library_item(item_id: str, user=Depends(current_user)):
 
 @app.post('/api/images/clean-background')
 def enhance_image(file: UploadFile, strength: int = Form(default=50, ge=0, le=100), user=Depends(current_user)):
+    if accounts.plan_id(user) == 'guest':
+        raise HTTPException(401, 'Create a free account to use image cleanup.')
     raw=file.file.read(15*1024*1024+1)
     if len(raw)>15*1024*1024:
         raise HTTPException(413,'Please choose an image smaller than 15 MB.')
@@ -221,6 +235,11 @@ def project_detail(project_id, user=None):
 
 
 def add_project(raw, name, user):
+    if accounts.plan_id(user) == 'guest':
+        with connect() as db:
+            made = db.execute('SELECT count(*) FROM projects WHERE user_id=?', (user['id'],)).fetchone()[0]
+        if made >= accounts.GUEST_PROJECT_LIMIT:
+            raise HTTPException(401, 'Create a free account to keep making projects.')
     project_id = uuid.uuid4().hex
     folder = DATA / project_id
     folder.mkdir()

@@ -29,7 +29,11 @@ FIREBASE_JWKS = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@
 LOCAL_USER = 'local'
 
 # What each plan includes. Free exports count for the lifetime of the account; Pro exports reset every 30 days.
+# "guest" is a visitor who hasn't signed in yet (a Firebase anonymous user): they can try the studio and preview
+# drawings, but exporting needs a real account.
+GUEST_PROJECT_LIMIT = 3
 PLANS = {
+    'guest': {'name': 'Guest', 'exports': 0, 'period_days': None, 'max_resolution': '720p', 'watermark': True},
     'free': {'name': 'Free', 'exports': 3, 'period_days': None, 'max_resolution': '720p', 'watermark': True},
     'pro': {'name': 'Pro', 'exports': 200, 'period_days': 30, 'max_resolution': '1080p', 'watermark': False},
 }
@@ -88,30 +92,36 @@ def verify_firebase_token(token):
 
 
 def identify(request: Request):
-    """Return (user_id, email, name) for the caller, or raise 401."""
+    """Return (user_id, email, name, guest) for the caller, or raise 401."""
     mode = auth_mode()
     if mode == 'local':
-        return LOCAL_USER, None, 'Local studio'
+        return LOCAL_USER, None, 'Local studio', False
     if mode == 'dev':
         # STROKEBERRY_DEV_USER lets a browser try the signed-in studio locally without Firebase.
         user = (request.headers.get('X-Dev-User') or os.environ.get('STROKEBERRY_DEV_USER', '')).strip()
         if not user:
             raise HTTPException(401, 'Please sign in to continue.')
-        return user[:128], f'{user[:64]}@example.test', user[:64]
+        guest = bool(request.headers.get('X-Dev-Guest') or os.environ.get('STROKEBERRY_DEV_GUEST'))
+        return user[:128], None if guest else f'{user[:64]}@example.test', user[:64], guest
     header = request.headers.get('Authorization', '')
     if not header.startswith('Bearer '):
         raise HTTPException(401, 'Please sign in to continue.')
     claims = verify_firebase_token(header[7:])
-    return claims['sub'], claims.get('email'), claims.get('name')
+    guest = (claims.get('firebase') or {}).get('sign_in_provider') == 'anonymous'
+    return claims['sub'], claims.get('email'), claims.get('name'), guest
 
 
 # ------------------------------------------------------------------------------------ users
 
-def ensure_user(db, user_id, email=None, name=None):
+def ensure_user(db, user_id, email=None, name=None, guest=False):
     row = db.execute('SELECT * FROM users WHERE id=?', (user_id,)).fetchone()
+    if row is not None and row['plan'] == 'guest' and not guest:
+        # The visitor signed in (their anonymous account was linked to Google or an email): same id, keeps their work.
+        db.execute("UPDATE users SET plan='free' WHERE id=?", (user_id,))
+        row = db.execute('SELECT * FROM users WHERE id=?', (user_id,)).fetchone()
     if row is None:
-        # The local single-user studio keeps full features; real accounts start on Free.
-        plan = os.environ.get('STROKEBERRY_LOCAL_PLAN', 'pro') if user_id == LOCAL_USER else 'free'
+        # The local single-user studio keeps full features; real accounts start on Free, visitors as guests.
+        plan = 'guest' if guest else os.environ.get('STROKEBERRY_LOCAL_PLAN', 'pro') if user_id == LOCAL_USER else 'free'
         db.execute('INSERT INTO users (id, email, name, plan, created) VALUES (?,?,?,?,?)',
                    (user_id, email, name, plan if plan in PLANS else 'free', now()))
         row = db.execute('SELECT * FROM users WHERE id=?', (user_id,)).fetchone()
@@ -161,20 +171,23 @@ def account_summary(db, user):
         'plan': {'id': plan_id(user), **plan},
         'usage': usage(db, user),
         'billing': {'status': user.get('billing_status'), 'renews': user.get('plan_renews'),
-                    'can_manage': bool(user.get('billing_subscription')),
-                    'enabled': billing_enabled(), 'price': os.environ.get('STROKEBERRY_PRO_PRICE', '$9 / month')},
+                    'can_manage': bool(user.get('billing_subscription')), **billing_info()},
         'auth': auth_mode(),
     }
 
 
-def billing_enabled():
-    from .billing import configured
-    return configured()
+def billing_info():
+    from . import billing
+    return {'enabled': billing.configured(), 'monthly': billing.price('month'), 'yearly': billing.price('year'),
+            'yearly_enabled': billing.configured('year'), 'yearly_saving': billing.yearly_saving(),
+            'founder': billing.founder_offer()}
 
 
 def check_export_allowed(db, user, settings):
     """Raise 402/403 with a friendly message when the plan doesn't allow this export."""
     plan = plan_of(user)
+    if plan_id(user) == 'guest':
+        raise HTTPException(401, 'Create a free account to export your video. It takes a few seconds.')
     if settings['resolution'] == '1080p' and plan['max_resolution'] != '1080p':
         raise HTTPException(403, 'Full HD 1080p is part of Strokeberry Pro. Choose 720p or upgrade.')
     if usage(db, user)['remaining'] <= 0:

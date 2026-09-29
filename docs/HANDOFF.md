@@ -121,7 +121,7 @@ Check narration by transcribing the render (`npx hyperframes transcribe`).
 
 ## 5. Open issues / before launch
 
-1. **Offer copy.** Accounts, the Free plan (3 videos, 720p, watermark) and Pro are now built (§7), but billing only goes live once the Lemon Squeezy store is set up. Until then keep "Upgrade" copy off public pages.
+1. **Launch gate.** Launch only once everything in §7's checklist is done (Firebase, Lemon Squeezy, hosting, legal review). The landing page shows the Founding member offer only when `STROKEBERRY_FOUNDER_CODE` is set and billing is configured, so nothing is promised before then.
 2. **Hosting not done.** Recommended: the owner's Hostinger VPS (FastAPI + FFmpeg need a real server). strokeberry.com is registered on Cloudflare (expires 2027-09-26).
 2b. **Tutorial narration:** tutorial 1 (logo) was re-voiced on 2026-09-28 to say "Strokeberry draws it for you". Tutorials 2 and 3 (steps, speedpaint) still say "It renders right on your device" in an on-screen caption (not the narration). Change the caption in `tutorial.json` and re-render before posting. Their app screenshots also show the local-mode footer "Rendered on your device · no watermark".
 3. **Don't post the launch video** until the domain is live and the app is hosted.
@@ -191,3 +191,16 @@ Config lives in `.env.local` (see `.env.example`). Each part switches on only wh
    - Confirm South African payouts.
 3. **Zoho Mail:** choose a plan before the Premium trial ends (12/10/2026).
 4. **Gallery images:** generate them into `marketing/gallery-source/`.
+
+## 8. Pricing, guests and the landing page (2026-09-29)
+
+**Decisions (owner):** Free (3 videos, 720p, watermark) and one paid plan, **Pro: $10/month or $84/year** (30% off, about $7/month). Launch offer: **Founding member, $7/month locked for as long as the subscription stays active, first 100 customers, monthly plan only.**
+
+- **Founding offer, how it works:** a Lemon Squeezy discount code. Create it: 30% off, duration **forever**, max **100 redemptions**, limited to the monthly variant. Set `STROKEBERRY_FOUNDER_CODE` to the code. The server then applies it to monthly checkouts, `GET /api/offer` feeds the landing page banner and the upgrade dialog, and the spots-left counter reads the redemption count from Lemon Squeezy (cached 5 minutes). It disappears by itself when the 100 are used or the code is unset. `billing.founder_offer()`.
+- **Yearly plan:** create a second variant ($84/year) and set `LEMONSQUEEZY_PRO_YEARLY_VARIANT_ID`.
+- **Guests:** visitors get a Firebase anonymous account and can preview, use examples and create up to 3 projects; exporting, image cleanup and checkout need a real account (401 `Create a free account...`). Signing in with Google or an email link **links** the guest account, so projects carry over (`auth.js`). Firebase console: Authentication -> Sign-in method -> enable **Anonymous**.
+  - Guests can be created without limit, so add rate limiting (Cloudflare rules) or Firebase App Check before launch.
+- **Landing page** (`frontend/index.html`): removed the scroll-to-draw section and the bento features; order is Hero -> Examples -> How it works -> Who it's for -> Pricing (Free vs Pro, monthly/yearly toggle) -> FAQ. "Get Pro" links to `/studio/?upgrade=1`. Fixed the missing icon sprite. New pages: `/terms/`, `/privacy/`, `/refunds/`.
+- **Legal pages are drafts.** Have them reviewed. Decisions in them for the owner to confirm: 14-day refund on the first payment, governing law South Africa, the founding-rate clause, privacy wording about deleting data on request, and no legal entity name or address yet (add one when you have it).
+
+**Launch checklist:** (1) Firebase: Anonymous + Google + Email link, authorised domains strokeberry.com and localhost, Blaze plan with a $5 budget alert, config into `.env.local`; (2) Lemon Squeezy: store, monthly and yearly variants, the founder discount, webhook -> `/api/billing/webhook`, South African payout details, test-mode purchase end to end; (3) host the app on the VPS with HTTPS and set `STROKEBERRY_APP_URL` and `STROKEBERRY_SECRET`; (4) review the legal pages; (5) re-check the tutorials' captions (see 2b); (6) rate-limit guest creation.

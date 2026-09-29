@@ -35,16 +35,38 @@ export function watchUser(callback) {
   return () => { alive = false; stop(); };
 }
 
+// Visitors start as guests (Firebase anonymous accounts) so they can try the studio before signing up.
+export async function startGuest() {
+  const {auth, instance} = await firebase();
+  if (!instance.currentUser) await auth.signInAnonymously(instance);
+}
+
+// After a guest signs in, the server needs a fresh token that says they are no longer anonymous.
+async function refreshToken(instance) { await instance.currentUser?.getIdToken(true); }
+
 export async function signInWithGoogle() {
   const {auth, instance} = await firebase();
   const provider = new auth.GoogleAuthProvider();
   provider.setCustomParameters({prompt: 'select_account'});
-  try { await auth.signInWithPopup(instance, provider); }
-  catch (error) {
+  const guest = instance.currentUser?.isAnonymous ? instance.currentUser : null;
+  try {
+    // A guest is upgraded in place, so their projects come with them.
+    if (guest) await auth.linkWithPopup(guest, provider); else await auth.signInWithPopup(instance, provider);
+    await refreshToken(instance);
+    return true;
+  } catch (error) {
+    // This Google account already exists: sign into it (the guest's projects stay behind).
+    if (error.code === 'auth/credential-already-in-use') {
+      const credential = auth.GoogleAuthProvider.credentialFromError(error);
+      if (credential) { await auth.signInWithCredential(instance, credential); return true; }
+    }
     // Popups are blocked in some in-app browsers (Instagram, TikTok); fall back to a full-page redirect.
-    if (['auth/popup-blocked', 'auth/operation-not-supported-in-this-environment'].includes(error.code))
-      return auth.signInWithRedirect(instance, provider);
+    if (['auth/popup-blocked', 'auth/operation-not-supported-in-this-environment'].includes(error.code)) {
+      if (guest) await auth.linkWithRedirect(guest, provider); else await auth.signInWithRedirect(instance, provider);
+      return false;
+    }
     if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') throw friendly(error);
+    return false;
   }
 }
 
@@ -66,7 +88,16 @@ export async function completeEmailLink(askEmail) {
   try { email = localStorage.getItem(EMAIL_KEY); } catch {}
   email ||= await askEmail();
   if (!email) return false;
-  try { await auth.signInWithEmailLink(instance, email, location.href); }
+  try {
+    const guest = instance.currentUser?.isAnonymous ? instance.currentUser : null;
+    let linked = false;
+    if (guest) {
+      try { await auth.linkWithCredential(guest, auth.EmailAuthProvider.credentialWithLink(email, location.href)); linked = true; }
+      catch (error) { if (error.code !== 'auth/email-already-in-use' && error.code !== 'auth/credential-already-in-use') throw error; }
+    }
+    if (!linked) await auth.signInWithEmailLink(instance, email, location.href);
+    await refreshToken(instance);
+  }
   catch (error) { throw friendly(error); }
   finally { history.replaceState(null, '', location.pathname); }
   try { localStorage.removeItem(EMAIL_KEY); } catch {}

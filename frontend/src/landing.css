@@ -288,3 +288,55 @@ h3{font-size:19px;font-weight:650;letter-spacing:-.015em;margin:0;line-height:1.
   *,*:before,*:after{animation:none!important;transition:none!important}
   .reveal{opacity:1;transform:none}
 }
+
+/* ---------- Pricing (Free vs Pro) ---------- */
+.section-head-center{margin-left:auto;margin-right:auto;text-align:center;margin-bottom:36px}
+.section-head-center .section-sub{margin:18px auto 0;max-width:560px}
+.billing-toggle{display:flex;width:max-content;margin:0 auto 36px;background:var(--sunken);border-radius:999px;padding:5px;gap:2px}
+.billing-toggle button{border:0;background:transparent;font:inherit;font-size:15px;font-weight:600;color:var(--ink-2);height:42px;padding:0 20px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.billing-toggle button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(27,27,27,.12)}
+.billing-toggle em{font-style:normal;font-size:12px;font-weight:700;background:#e3f3da;color:#2f6b12;padding:2px 8px;border-radius:99px}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:860px;margin:0 auto}
+.plan-card{position:relative;background:var(--surface);border-radius:var(--radius);padding:36px;box-shadow:inset 0 0 0 1px var(--line);display:flex;flex-direction:column;gap:14px}
+.plan-pro{box-shadow:0 0 0 2px var(--ink),var(--shadow)}
+.plan-flag{position:absolute;top:-13px;left:32px;background:var(--ink);color:#fff;font-size:12px;font-weight:700;letter-spacing:.03em;padding:5px 12px;border-radius:999px}
+.plan-card .plan-name{margin:0;font-weight:700;font-size:18px;color:var(--ink)}
+.plan-card .plan-price{margin:0;font-family:var(--display);font-weight:700;font-size:64px;letter-spacing:-.04em;line-height:1}
+.plan-card .plan-price .per{font-size:18px;letter-spacing:0;font-weight:500;color:var(--muted)}
+.plan-card .plan-sub{margin:0 0 6px;color:var(--body);font-size:15px}
+.plan-card .btn{width:100%}
+.plan-card ul{list-style:none;padding:22px 0 0;margin:8px 0 0;border-top:1px solid var(--line);display:grid;gap:12px;font-size:15.5px}
+.plan-card li{display:flex;gap:10px;align-items:flex-start;line-height:1.4}
+.plan-card li svg{color:var(--leaf);flex-shrink:0;margin-top:1px}
+.pricing-note{text-align:center;color:var(--muted);font-size:14px;margin:28px auto 0;max-width:640px}
+.pricing-note a{text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- Use cases feature strip, footer links, legal pages ---------- */
+.feature-strip{list-style:none;margin:56px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px 12px;justify-content:center}
+.feature-strip li{font-size:15px;font-weight:600;color:var(--ink-2);background:var(--surface);padding:9px 16px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line)}
+.footer-links{display:flex;gap:6px 22px;flex-wrap:wrap;align-items:center;font-size:14px;color:var(--muted)}
+.footer-links a:hover{color:var(--ink)}
+.doc{max-width:760px;margin:0 auto;padding:56px 28px 96px}
+.doc h1{font-size:clamp(38px,5vw,56px);margin-bottom:10px}
+.doc .doc-meta{color:var(--muted);font-size:15px;margin:0 0 40px}
+.doc h2{font-size:26px;letter-spacing:-.02em;margin:40px 0 10px;line-height:1.2}
+.doc p,.doc li{color:var(--body);font-size:17px;line-height:1.7}
+.doc ul{padding-left:22px;margin:10px 0}
+.doc a{text-decoration:underline;text-underline-offset:3px}
+@media(max-width:720px){
+  .plans{grid-template-columns:1fr}
+  .plan-card{padding:28px 24px}
+  .plan-card .plan-price{font-size:54px}
+  .hero{padding:28px 0 16px}
+  .hero h1{font-size:clamp(38px,11.4vw,52px)}
+  .kicker{margin-bottom:16px}
+  .lede{font-size:16px;margin-top:16px}
+  .cta-row{margin-top:20px;gap:10px}
+  .cta-row .btn-lg{height:50px}
+  .fineprint{margin-top:14px}
+  .window{margin-top:28px}
+  .billing-toggle button{padding:0 14px}
+}
+.founder-banner{max-width:640px;margin:26px auto 0;text-align:center;background:#e3f3da;color:#2f6b12;border-radius:14px;padding:12px 18px;font-size:15px;line-height:1.5}
+.founder-banner[hidden]{display:none}
+.plan-price s{font-size:.5em;color:var(--muted);font-weight:500;margin-right:6px}

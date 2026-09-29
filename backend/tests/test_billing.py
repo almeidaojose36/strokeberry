@@ -126,3 +126,88 @@ def test_undetected_images_default_to_one_step_but_tutorial_examples_keep_their_
         layout = client.get(f"/api/projects/{project['id']}/step-layout", headers=as_user('ana')).json()
         assert (layout['columns'], layout['rows']) == expected
         assert len(layout['crops']) == expected[0] * expected[1]
+
+
+def test_yearly_checkout_uses_the_yearly_variant(client, monkeypatch):
+    monkeypatch.setenv('LEMONSQUEEZY_API_KEY', 'test-key')
+    monkeypatch.setenv('LEMONSQUEEZY_STORE_ID', '1')
+    monkeypatch.setenv('LEMONSQUEEZY_PRO_VARIANT_ID', '2')
+    monkeypatch.delenv('LEMONSQUEEZY_PRO_YEARLY_VARIANT_ID', raising=False)
+    sent = {}
+
+    class Reply:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {'data': {'attributes': {'url': 'https://example.lemonsqueezy.com/checkout/yearly'}}}
+
+    monkeypatch.setattr(module.billing.httpx, 'post', lambda url, headers, json, timeout: sent.update(body=json) or Reply())
+    me = client.get('/api/me', headers=as_user('ana')).json()['billing']
+    assert me['monthly'] == '$10' and me['yearly'] == '$84' and me['yearly_saving'] == 30 and not me['yearly_enabled']
+    assert client.post('/api/billing/checkout', headers=as_user('ana'), json={'interval': 'year'}).status_code == 503
+    monkeypatch.setenv('LEMONSQUEEZY_PRO_YEARLY_VARIANT_ID', '3')
+    assert client.get('/api/me', headers=as_user('ana')).json()['billing']['yearly_enabled']
+    assert client.post('/api/billing/checkout', headers=as_user('ana'), json={'interval': 'year'}).status_code == 200
+    assert sent['body']['data']['relationships']['variant']['data']['id'] == '3'
+    assert client.post('/api/billing/checkout', headers=as_user('ana'), json={'interval': 'weekly'}).status_code == 422
+
+
+def test_guests_can_try_but_not_export(client):
+    guest = {'X-Dev-User': 'visitor', 'X-Dev-Guest': '1'}
+    assert client.get('/api/me', headers=guest).json()['plan']['id'] == 'guest'
+    made = [client.post('/api/library/animals-01-fox/use', headers=guest) for _ in range(4)]
+    assert [r.status_code for r in made] == [201, 201, 201, 401]
+    project = made[0].json()
+    exported = client.post(f"/api/projects/{project['id']}/jobs", headers=guest, json={})
+    assert exported.status_code == 401 and 'free account' in exported.json()['detail']
+    assert client.post('/api/billing/checkout', headers=guest).status_code == 401
+    assert client.post('/api/images/clean-background', headers=guest, files={'file': ('a.png', b'x', 'image/png')}).status_code == 401
+    # Signing in (same id, no longer anonymous) turns the guest into a Free user and keeps their projects.
+    signed_in = {'X-Dev-User': 'visitor'}
+    assert client.get('/api/me', headers=signed_in).json()['plan']['id'] == 'free'
+    assert len(client.get('/api/projects', headers=signed_in).json()) == 3
+    assert client.post(f"/api/projects/{project['id']}/jobs", headers=signed_in, json={}).status_code == 202
+
+
+def test_founding_member_offer(client, monkeypatch):
+    for key, value in (('LEMONSQUEEZY_API_KEY', 'k'), ('LEMONSQUEEZY_STORE_ID', '1'), ('LEMONSQUEEZY_PRO_VARIANT_ID', '2'),
+                       ('LEMONSQUEEZY_PRO_YEARLY_VARIANT_ID', '3')):
+        monkeypatch.setenv(key, value)
+    monkeypatch.delenv('STROKEBERRY_FOUNDER_CODE', raising=False)
+    module.billing._offer_cache.update(at=0.0, value=None)
+    assert client.get('/api/offer').json()['founder'] is None  # not switched on: nothing is shown or applied
+    monkeypatch.setenv('STROKEBERRY_FOUNDER_CODE', 'FOUNDER')
+    redeemed = {'total': 37}
+
+    class Reply:
+        def __init__(self, body):
+            self.body = body
+
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return self.body
+
+    def fake_get(url, headers, timeout, params):
+        if url.endswith('/discounts'):
+            return Reply({'data': [{'id': '9', 'attributes': {'code': 'founder', 'max_redemptions': 100}}]})
+        return Reply({'meta': {'page': {'total': redeemed['total']}}})
+
+    sent = []
+    monkeypatch.setattr(module.billing.httpx, 'get', fake_get)
+    monkeypatch.setattr(module.billing.httpx, 'post', lambda url, headers, json, timeout: sent.append(json) or Reply(
+        {'data': {'attributes': {'url': 'https://example.lemonsqueezy.com/checkout/x'}}}))
+    module.billing._offer_cache.update(at=0.0, value=None)
+    assert client.get('/api/offer').json()['founder'] == {'price': '$7', 'limit': 100, 'left': 63}
+    assert client.get('/api/me', headers=as_user('ana')).json()['billing']['founder']['left'] == 63
+    client.post('/api/billing/checkout', headers=as_user('ana'), json={'interval': 'month'})
+    client.post('/api/billing/checkout', headers=as_user('ana'), json={'interval': 'year'})
+    assert sent[0]['data']['attributes']['checkout_data']['discount_code'] == 'FOUNDER'
+    assert 'discount_code' not in sent[1]['data']['attributes']['checkout_data']  # yearly is already discounted
+    redeemed['total'] = 100  # sold out: the offer disappears and the code is no longer sent
+    module.billing._offer_cache.update(at=0.0, value=None)
+    assert client.get('/api/offer').json()['founder'] is None
+    client.post('/api/billing/checkout', headers=as_user('ana'), json={'interval': 'month'})
+    assert 'discount_code' not in sent[2]['data']['attributes']['checkout_data']

@@ -14,14 +14,19 @@
 <link rel="stylesheet" href="/src/landing.css"/>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></symbol>
+</defs></svg>
 
 <header class="nav" id="top">
   <div class="wrap nav-inner">
     <a class="logo" href="#top" aria-label="Strokeberry home"><img src="/brand/strokeberry-mascot.png" srcset="/brand/strokeberry-mascot@2x.png 2x" width="43" height="44" alt=""/>Strokeberry</a>
     <nav class="nav-links" aria-label="Primary">
-      <a href="#how">How it works</a><a href="#gallery">Gallery</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a>
+      <a href="#gallery">Examples</a><a href="#how">How it works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a>
     </nav>
-    <a class="btn btn-primary btn-sm" href="/studio/">Open studio</a>
+    <a class="btn btn-primary btn-sm" href="/studio/">Try free</a>
   </div>
 </header>
 
@@ -29,14 +34,14 @@
   <!-- Hero -->
   <section class="hero">
     <div class="wrap hero-copy">
-      <p class="kicker"><span class="kicker-dot"></span>Launch offer · 3 videos free</p>
+      <p class="kicker"><span class="kicker-dot"></span>3 videos free · no card needed</p>
       <h1>Turn any image into a <em>hand&#8209;drawn</em> video.</h1>
       <p class="lede">Upload artwork, a logo, or a drawing tutorial. Strokeberry draws it stroke by stroke, brings in the color, and exports a video ready for Reels, TikTok, and Shorts.</p>
       <div class="cta-row">
-        <a class="btn btn-primary btn-lg" href="/studio/">Make your first video <svg width="18" height="18"><use href="#arrow"/></svg></a>
-        <a class="btn btn-quiet btn-lg" href="#watch"><svg width="16" height="16"><use href="#play"/></svg>See it draw</a>
+        <a class="btn btn-primary btn-lg" href="/studio/">Try it free <svg width="18" height="18"><use href="#arrow"/></svg></a>
+        <a class="btn btn-quiet btn-lg" href="#gallery"><svg width="16" height="16"><use href="#play"/></svg>See examples</a>
       </div>
-      <p class="fineprint">No card required · Upgrade for 1080p and no watermark</p>
+      <p class="fineprint">No sign-up to try it · Your first 3 videos are free</p>
     </div>
 
     <div class="wrap">
@@ -73,26 +78,21 @@
     </div>
   </section>
 
-  <!-- Scroll to draw -->
-  <section class="scrolldraw" id="watch" aria-label="Watch a drawing come to life as you scroll">
-    <div class="scrolldraw-sticky">
-      <div class="wrap scrolldraw-grid">
-        <div class="scrolldraw-copy">
-          <p class="eyebrow eyebrow-light">Scroll to draw</p>
-          <h2>Watch a still image <em>come alive.</em></h2>
-          <ol class="sd-steps">
-            <li data-at="0"><strong>Outlines trace in</strong><span>Strokes follow the lines of your image, slowing on curves like a real hand.</span></li>
-            <li data-at="0.4"><strong>The pencil lifts and moves</strong><span>It travels between shapes naturally instead of jumping around.</span></li>
-            <li data-at="0.68"><strong>Color floods in</strong><span>The original colors sweep in, group by group, for the finish.</span></li>
-          </ol>
-          <div class="sd-progress" aria-hidden="true"><i></i></div>
-        </div>
-        <div class="scrolldraw-stage">
-          <div class="sd-frame">
-            <video class="sd-video" src="/gallery/scroll-draw.mp4" poster="/gallery/cat.jpg" muted playsinline preload="auto" aria-label="A cartoon cat drawn in pencil, then colored in"></video>
-          </div>
-          <p class="sd-hint">Real Strokeberry export · pencil style</p>
-        </div>
+  <!-- Gallery -->
+  <section class="section section-tint" id="gallery">
+    <div class="wrap">
+      <div class="section-head section-head-row reveal">
+        <div><p class="eyebrow">Examples</p><h2>Real videos, made in Strokeberry</h2></div>
+        <p class="section-sub">Unedited exports, including complete four-step drawing tutorials from first guide to final colour.</p>
+      </div>
+      <div class="gallery">
+        <figure class="g-card g-card-tutorial reveal"><div class="g-media"><video muted loop playsinline preload="none" poster="/gallery/strawberry.jpg" data-src="/gallery/strawberry.mp4" aria-label="Complete four-step strawberry drawing from guide shapes to final color"></video><span class="g-badge">Full 4-step video</span></div><figcaption><strong>How to draw a strawberry</strong><span>Tutorial mode · 4 steps</span></figcaption></figure>
+        <figure class="g-card g-card-tutorial reveal"><div class="g-media"><video muted loop playsinline preload="none" poster="/gallery/owl.jpg" data-src="/gallery/owl.mp4" aria-label="Complete four-step owl drawing from guide shapes to final color"></video><span class="g-badge">Full 4-step video</span></div><figcaption><strong>How to draw an owl</strong><span>Tutorial mode · 4 steps</span></figcaption></figure>
+        <figure class="g-card reveal"><video muted loop playsinline preload="none" poster="/gallery/cat.jpg" data-src="/gallery/cat.mp4" aria-label="Cartoon cat drawn in pencil"></video><figcaption><strong>Curled-up cat</strong><span>Pencil</span></figcaption></figure>
+        <figure class="g-card reveal"><video muted loop playsinline preload="none" poster="/gallery/sneaker.jpg" data-src="/gallery/sneaker.mp4" aria-label="High-top sneaker drawn in ink"></video><figcaption><strong>Product sketch</strong><span>Ink</span></figcaption></figure>
+        <figure class="g-card reveal"><video muted loop playsinline preload="none" poster="/gallery/coffee.jpg" data-src="/gallery/coffee.mp4" aria-label="Coffee cup and croissant drawn in ink"></video><figcaption><strong>Café menu art</strong><span>Ink</span></figcaption></figure>
+        <figure class="g-card reveal"><video muted loop playsinline preload="none" poster="/gallery/wreath.jpg" data-src="/gallery/wreath.mp4" aria-label="Floral wreath drawn in pencil"></video><figcaption><strong>Floral wreath</strong><span>Pencil</span></figcaption></figure>
+        <figure class="g-card reveal"><video muted loop playsinline preload="none" poster="/gallery/balloon.jpg" data-src="/gallery/balloon.mp4" aria-label="Hot-air balloon drawn in ink"></video><figcaption><strong>Hot-air balloon</strong><span>Ink</span></figcaption></figure>
       </div>
     </div>
   </section>
@@ -112,92 +112,7 @@
     </div>
   </section>
 
-  <!-- Gallery -->
-  <section class="section section-tint" id="gallery">
-    <div class="wrap">
-      <div class="section-head section-head-row reveal">
-        <div><p class="eyebrow">Gallery</p><h2>See every step come to life</h2></div>
-        <p class="section-sub">Real, unedited exports—including complete four-step drawing tutorials from first guide to final color.</p>
-      </div>
-      <div class="gallery">
-        <figure class="g-card g-card-tutorial reveal"><div class="g-media"><video muted loop playsinline preload="none" poster="/gallery/strawberry.jpg" data-src="/gallery/strawberry.mp4" aria-label="Complete four-step strawberry drawing from guide shapes to final color"></video><span class="g-badge">Full 4-step video</span></div><figcaption><strong>How to draw a strawberry</strong><span>Tutorial mode · 4 steps</span></figcaption></figure>
-        <figure class="g-card g-card-tutorial reveal"><div class="g-media"><video muted loop playsinline preload="none" poster="/gallery/owl.jpg" data-src="/gallery/owl.mp4" aria-label="Complete four-step owl drawing from guide shapes to final color"></video><span class="g-badge">Full 4-step video</span></div><figcaption><strong>How to draw an owl</strong><span>Tutorial mode · 4 steps</span></figcaption></figure>
-        <figure class="g-card reveal"><video muted loop playsinline preload="none" poster="/gallery/cat.jpg" data-src="/gallery/cat.mp4" aria-label="Cartoon cat drawn in pencil"></video><figcaption><strong>Curled-up cat</strong><span>Pencil</span></figcaption></figure>
-        <figure class="g-card reveal"><video muted loop playsinline preload="none" poster="/gallery/sneaker.jpg" data-src="/gallery/sneaker.mp4" aria-label="High-top sneaker drawn in ink"></video><figcaption><strong>Product sketch</strong><span>Ink</span></figcaption></figure>
-        <figure class="g-card reveal"><video muted loop playsinline preload="none" poster="/gallery/coffee.jpg" data-src="/gallery/coffee.mp4" aria-label="Coffee cup and croissant drawn in ink"></video><figcaption><strong>Café menu art</strong><span>Ink</span></figcaption></figure>
-        <figure class="g-card reveal"><video muted loop playsinline preload="none" poster="/gallery/wreath.jpg" data-src="/gallery/wreath.mp4" aria-label="Floral wreath drawn in pencil"></video><figcaption><strong>Floral wreath</strong><span>Pencil</span></figcaption></figure>
-        <figure class="g-card reveal"><video muted loop playsinline preload="none" poster="/gallery/balloon.jpg" data-src="/gallery/balloon.mp4" aria-label="Hot-air balloon drawn in ink"></video><figcaption><strong>Hot-air balloon</strong><span>Ink</span></figcaption></figure>
-      </div>
-    </div>
-  </section>
-
-  <!-- Features -->
-  <section class="section" id="features">
-    <div class="wrap">
-      <div class="section-head reveal">
-        <p class="eyebrow">Features</p>
-        <h2>Small tool. Serious craft.</h2>
-      </div>
-      <div class="bento">
-        <article class="tile tile-wide reveal">
-          <div class="tile-text">
-            <p class="eyebrow">A signature feature</p>
-            <h3>Turn four drawing steps into one satisfying video</h3>
-            <p>Upload a “how to draw” sheet. Strokeberry follows every stage in order—guide shapes, outlines, details, then color—and turns the complete lesson into one continuous drawing.</p>
-            <a class="text-link" href="#gallery">Watch the full tutorials <svg width="16" height="16" aria-hidden="true"><use href="#arrow"/></svg></a>
-          </div>
-          <div class="tile-media tutorial-builder" aria-label="Strokeberry detecting and ordering a four-panel strawberry drawing tutorial">
-            <div class="builder-window">
-              <div class="builder-head"><span>Build your drawing sequence</span><b>2 × 2 detected</b></div>
-              <div class="builder-body">
-                <div class="builder-sheet">
-                  <img src="/showcase/strawberry-sheet.jpg" alt="A four-panel strawberry character drawing tutorial" loading="lazy" width="640" height="640"/>
-                  <i class="crop-one">1</i><i class="crop-two">2</i><i class="crop-three">3</i><i class="crop-four">4</i>
-                </div>
-                <div class="builder-order">
-                  <small>ORDER &amp; TIMING</small>
-                  <p>Top-left → top-right → bottom-left → bottom-right</p>
-                  <ol><li><b>1</b><span>Basic guides</span><em>30s</em></li><li><b>2</b><span>Main outlines</span><em>30s</em></li><li><b>3</b><span>Details</span><em>30s</em></li><li><b>4</b><span>Color</span><em>30s</em></li></ol>
-                </div>
-              </div>
-              <div class="builder-foot"><span><strong>4 stages</strong> · one continuous drawing</span><b>Prepare drawing steps</b></div>
-            </div>
-          </div>
-        </article>
-        <article class="tile reveal">
-          <div class="tile-media split">
-            <figure><img src="/showcase/cat-pencil.jpg" alt="Cat drawn in soft pencil" loading="lazy" width="640" height="640"/><figcaption>Pencil</figcaption></figure>
-            <figure><img src="/showcase/sneaker-ink.jpg" alt="Sneaker drawn in bold ink" loading="lazy" width="640" height="640"/><figcaption>Ink</figcaption></figure>
-          </div>
-          <div class="tile-text"><h3>Pencil or ink</h3><p>Pressure‑varied strokes that slow on curves and lift between shapes, like a real hand.</p></div>
-        </article>
-        <article class="tile reveal">
-          <div class="tile-media split">
-            <figure><img src="/showcase/wreath-lines.jpg" alt="Wreath as line drawing" loading="lazy" width="640" height="640"/><figcaption>Sketch</figcaption></figure>
-            <figure><img src="/showcase/wreath-color.jpg" alt="Wreath after the color reveal" loading="lazy" width="640" height="640"/><figcaption>Color reveal</figcaption></figure>
-          </div>
-          <div class="tile-text"><h3>Color reveal</h3><p>After the sketch, the original colors sweep in group by group for a satisfying finish.</p></div>
-        </article>
-        <article class="tile reveal">
-          <div class="tile-media formats" aria-hidden="true">
-            <span class="fmt fmt-169"><img src="/showcase/balloon-final.jpg" alt="" loading="lazy"/><b>16:9</b></span>
-            <span class="fmt fmt-916"><img src="/showcase/balloon-final.jpg" alt="" loading="lazy"/><b>9:16</b></span>
-            <span class="fmt fmt-11"><img src="/showcase/balloon-final.jpg" alt="" loading="lazy"/><b>1:1</b></span>
-          </div>
-          <div class="tile-text"><h3>Every format</h3><p>Landscape, portrait, or square, in 720p or 1080p. Your image is fitted, never cropped.</p></div>
-        </article>
-        <article class="tile tile-list reveal">
-          <ul>
-            <li><strong>Built‑in cleanup</strong><span>Erase marks, paint touch‑ups, and remove paper grain from photographed drawings.</span></li>
-            <li><strong>Preview before export</strong><span>Play and scrub the drawing in the studio before you render.</span></li>
-            <li><strong>Private by design</strong><span>Your artwork is never sent to a third‑party AI service or used to train models.</span></li>
-          </ul>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- Use cases -->
+  <!-- Who it's for + what you get -->
   <section class="section section-tint" id="use-cases">
     <div class="wrap">
       <div class="section-head reveal">
@@ -210,31 +125,55 @@
         <article class="case reveal"><img src="/showcase/cat-original.jpg" alt="" loading="lazy" width="640" height="640"/><h3>Content creators</h3><p>Post satisfying drawing videos without spending hours filming your hands.</p></article>
         <article class="case reveal"><img src="/showcase/sneaker-original.jpg" alt="" loading="lazy" width="640" height="640"/><h3>Small brands</h3><p>Animate a logo or product illustration into an intro, story, or launch post.</p></article>
       </div>
+      <ul class="feature-strip reveal">
+        <li>Pencil or ink</li><li>Colour reveal</li><li>Drawing-tutorial mode</li><li>16:9, 9:16 and 1:1</li><li>Built-in image cleanup</li><li>Never sent to an AI service</li>
+      </ul>
     </div>
   </section>
 
   <!-- Pricing -->
   <section class="section" id="pricing">
-    <div class="wrap pricing">
-      <div class="section-head reveal">
+    <div class="wrap">
+      <div class="section-head section-head-center reveal">
         <p class="eyebrow">Pricing</p>
-        <h2>Start free. Save 40% when you’re ready.</h2>
-        <p class="section-sub">Create your first 3 videos free—no card required. Upgrade during launch and get 40% off your first 3 months.</p>
+        <h2>Try it free. Upgrade when you love it.</h2>
+        <p class="section-sub">Make your first 3 videos free, no card needed. Go Pro for full HD and clean, watermark-free videos.</p>
       </div>
-      <article class="plan reveal">
-        <div class="plan-top">
-          <div><p class="plan-name">Launch special</p><p class="price">40% off</p><p class="price-note">your first 3 months</p></div>
-          <a class="btn btn-primary btn-lg" href="/studio/">Try 3 videos free <svg width="18" height="18"><use href="#arrow"/></svg></a>
-        </div>
-        <ul>
-          <li><svg width="18" height="18"><use href="#check"/></svg>3 free 720p trial exports</li>
-          <li><svg width="18" height="18"><use href="#check"/></svg>Pencil, ink &amp; color reveal</li>
-          <li><svg width="18" height="18"><use href="#check"/></svg>Step‑by‑step tutorial mode</li>
-          <li><svg width="18" height="18"><use href="#check"/></svg>1080p exports after upgrade</li>
-          <li><svg width="18" height="18"><use href="#check"/></svg>No watermark after upgrade</li>
-          <li><svg width="18" height="18"><use href="#check"/></svg>Longer videos &amp; image enhancement</li>
-        </ul>
-      </article>
+      <div class="billing-toggle reveal" role="tablist" aria-label="Billing period">
+        <button role="tab" aria-selected="false" data-period="month">Monthly</button>
+        <button role="tab" aria-selected="true" data-period="year" class="on">Yearly <em>Save 30%</em></button>
+      </div>
+      <div class="plans reveal">
+        <article class="plan-card">
+          <p class="plan-name">Free</p>
+          <p class="plan-price"><span class="amount">$0</span></p>
+          <p class="plan-sub">Try everything, no card needed.</p>
+          <a class="btn btn-quiet btn-lg" href="/studio/">Start free <svg width="18" height="18"><use href="#arrow"/></svg></a>
+          <ul>
+            <li><svg width="18" height="18"><use href="#check"/></svg>3 videos to try it</li>
+            <li><svg width="18" height="18"><use href="#check"/></svg>720p HD export</li>
+            <li><svg width="18" height="18"><use href="#check"/></svg>Pencil, ink &amp; colour reveal</li>
+            <li><svg width="18" height="18"><use href="#check"/></svg>Drawing-tutorial mode</li>
+            <li><svg width="18" height="18"><use href="#check"/></svg>Small Strokeberry watermark</li>
+          </ul>
+        </article>
+        <article class="plan-card plan-pro">
+          <span class="plan-flag">Best for creators</span>
+          <p class="plan-name">Pro</p>
+          <p class="plan-price" data-month="$10" data-year="$84"><span class="amount">$84</span><span class="per"> / year</span></p>
+          <p class="plan-sub" data-month="Billed monthly. Cancel anytime." data-year="That’s $7 a month. Cancel anytime.">That’s $7 a month. Cancel anytime.</p>
+          <a class="btn btn-primary btn-lg" href="/studio/?upgrade=1">Get Pro <svg width="18" height="18"><use href="#arrow"/></svg></a>
+          <ul>
+            <li><svg width="18" height="18"><use href="#check"/></svg>Everything in Free</li>
+            <li><svg width="18" height="18"><use href="#check"/></svg>200 videos every month</li>
+            <li><svg width="18" height="18"><use href="#check"/></svg>Full HD 1080p export</li>
+            <li><svg width="18" height="18"><use href="#check"/></svg>No watermark, post anywhere</li>
+            <li><svg width="18" height="18"><use href="#check"/></svg>Email support</li>
+          </ul>
+        </article>
+      </div>
+      <p class="founder-banner" hidden><strong>Founding member offer</strong> — <span class="fb-price"></span> a month, locked in for as long as you stay subscribed. <span class="fb-left"></span></p>
+      <p class="pricing-note">Prices in US dollars. Secure checkout by Lemon Squeezy, and any local tax is added at checkout. <a href="/refunds/">Refund policy</a></p>
     </div>
   </section>
 
@@ -249,7 +188,9 @@
       <div class="faq">
         <details><summary>What kinds of images work best?</summary><p>Illustrations, line art, logos, and drawing tutorials with clear outlines on a plain background give the cleanest strokes. Photos work too, but produce busier drawings. The built‑in cleanup tool helps with photographed paper.</p></details>
         <details><summary>Is this AI?</summary><p>No generative AI is involved in making your video. Strokeberry uses computer‑vision techniques to find the lines in your image and plan a natural drawing order. Your artwork is never sent to an AI service.</p></details>
-        <details><summary>Do exported videos have a watermark?</summary><p>Free trial exports include a small Strokeberry watermark. Upgrade to export clean 1080p MP4 files you can post anywhere.</p></details>
+        <details><summary>Do I need an account to try it?</summary><p>No. Open the studio, pick one of our examples or upload your own image, and watch it draw. You only create a free account when you want to export a video, and it takes a few seconds with Google or an email link.</p></details>
+        <details><summary>What happens after my 3 free videos?</summary><p>You can keep your projects and preview as much as you like. To export more videos, upgrade to Pro: $10 a month, or $84 a year (about $7 a month). Free exports include a small watermark and are 720p; Pro removes the watermark and unlocks 1080p.</p></details>
+        <details><summary>Can I cancel anytime?</summary><p>Yes. Cancel from the billing link in the studio and you keep Pro until the end of the period you paid for. See the <a href="/refunds/">refund policy</a> for the details.</p></details>
         <details><summary>How long can a video be?</summary><p>Anywhere from 5 seconds to 5 minutes. In step‑by‑step mode you set the time for each stage, and it scales with the total duration.</p></details>
         <details><summary>Does it add audio?</summary><p>Not yet. Videos are exported silent so you can add a trending sound or voiceover in Instagram, TikTok, or your editor.</p></details>
         <details><summary>What does the drawing hand look like?</summary><p>An optional stylized pencil follows every stroke and lifts between shapes. You can switch it off for a clean, self‑drawing look.</p></details>
@@ -262,8 +203,8 @@
     <div class="wrap">
       <div class="final-inner reveal">
         <h2>Your next post is already drawn.<br/>Let’s animate it.</h2>
-        <a class="btn btn-primary btn-lg" href="/studio/">Open Strokeberry <svg width="18" height="18"><use href="#arrow"/></svg></a>
-        <p>Try 3 videos free · Save 40% for your first 3 months</p>
+        <a class="btn btn-primary btn-lg" href="/studio/">Try it free <svg width="18" height="18"><use href="#arrow"/></svg></a>
+        <p>3 free videos · No card required</p>
       </div>
     </div>
   </section>
@@ -273,7 +214,7 @@
   <div class="wrap footer-inner">
     <a class="logo" href="#top"><img src="/brand/strokeberry-mascot.png" srcset="/brand/strokeberry-mascot@2x.png 2x" width="35" height="36" alt=""/>Strokeberry</a>
     <p>Your images. Drawn to life.</p>
-    <a class="footer-mail" href="mailto:hi@strokeberry.com">hi@strokeberry.com</a>
+    <nav class="footer-links" aria-label="Legal"><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/refunds/">Refunds</a><a class="footer-mail" href="mailto:hi@strokeberry.com">hi@strokeberry.com</a></nav>
     <p class="copy">© <span id="year">2026</span> Strokeberry</p>
   </div>
 </footer>
@@ -301,6 +242,36 @@
     requestAnimationFrame(syncWindow);
   })();
 
+  // Founding member offer: shown only while the server says it is running (see /api/offer).
+  let founder = null, showFounder = false;
+  const renderPrice = () => {
+    const amount = document.querySelector('.plan-pro .plan-price .amount'), price = document.querySelector('.plan-pro .plan-price');
+    if (!founder || !showFounder) return;
+    amount.innerHTML = `<s>${price.dataset.month}</s> ${founder.price}`;
+  };
+  fetch('/api/offer').then(r => r.ok ? r.json() : null).then(data => {
+    if (!data || !data.founder) return;
+    founder = data.founder;
+    const banner = document.querySelector('.founder-banner');
+    banner.querySelector('.fb-price').textContent = founder.price;
+    banner.querySelector('.fb-left').textContent = founder.left != null ? `Limited to the first ${founder.limit} customers — ${founder.left} left.` : `Limited to the first ${founder.limit} customers.`;
+    banner.hidden = false;
+  }).catch(() => {});
+
+  // Pricing: switch the Pro card between monthly and yearly.
+  const toggle = document.querySelector('.billing-toggle');
+  toggle.addEventListener('click', e => {
+    const button = e.target.closest('button'); if (!button) return;
+    const yearly = button.dataset.period === 'year';
+    toggle.querySelectorAll('button').forEach(b => { const on = b === button; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+    const price = document.querySelector('.plan-pro .plan-price'), sub = document.querySelector('.plan-pro .plan-sub');
+    showFounder = !yearly; renderPrice();
+    price.querySelector('.amount').textContent = yearly ? price.dataset.year : price.dataset.month;
+    renderPrice();
+    price.querySelector('.per').textContent = yearly ? ' / year' : ' / month';
+    sub.textContent = yearly ? sub.dataset.year : sub.dataset.month;
+  });
+
   // Gallery: load and play clips only while they are on screen.
   const clips = document.querySelectorAll('.g-card video');
   if ('IntersectionObserver' in window) {
@@ -311,27 +282,6 @@
     clips.forEach(v => gio.observe(v));
   }
   clips.forEach(v => v.closest('.g-card').addEventListener('click', () => { if (!v.src) v.src = v.dataset.src; v.paused ? v.play() : v.pause(); }));
-
-  // Scroll to draw: map the section's scroll progress to the video's time.
-  const sd = document.querySelector('.scrolldraw'), sdVideo = sd.querySelector('.sd-video');
-  const sdSteps = [...sd.querySelectorAll('.sd-steps li')], sdBar = sd.querySelector('.sd-progress i');
-  if (reduced) { sd.classList.add('static'); sdVideo.loop = true; sdVideo.controls = true; }
-  else {
-    let target = 0, shown = 0, ticking = false;
-    const progress = () => { const r = sd.getBoundingClientRect(); return Math.min(1, Math.max(0, -r.top / (r.height - innerHeight))); };
-    const paint = () => {
-      shown += (target - shown) * .18;
-      if (Math.abs(target - shown) < .001) shown = target;
-      if (sdVideo.duration) sdVideo.currentTime = shown * (sdVideo.duration - .05);
-      sdBar.style.transform = `scaleX(${shown})`;
-      sdSteps.forEach((li, i) => li.classList.toggle('on', shown >= +li.dataset.at && (i === sdSteps.length - 1 || shown < +sdSteps[i + 1].dataset.at)));
-      if (shown !== target) requestAnimationFrame(paint); else ticking = false;
-    };
-    const onScroll = () => { target = progress(); if (!ticking) { ticking = true; requestAnimationFrame(paint); } };
-    addEventListener('scroll', onScroll, {passive: true});
-    sdVideo.addEventListener('loadedmetadata', onScroll);
-    onScroll();
-  }
 </script>
 </body>
 </html>
