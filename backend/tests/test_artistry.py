@@ -90,3 +90,72 @@ def test_browser_and_encoder_have_identical_pen_positions():
         point, lift = event_position(sample['event'], sample['fraction'])
         assert actual['point'] == pytest.approx(point)
         assert actual['lift'] == pytest.approx(lift)
+
+
+def loop(cx, cy, w, h):
+    """A closed rectangular stroke centred on (cx, cy)."""
+    x0, x1, y0, y1 = cx - w / 2, cx + w / 2, cy - h / 2, cy + h / 2
+    return [[x0, y0], [x1, y0], [x1, y1], [x0, y1], [x0, y0]]
+
+
+def thin_line(x, y0, y1):
+    """The traced loop around a straight line, like a guitar string."""
+    return [[x, y0], [x + 1, y0], [x + 1, y1], [x, y1], [x, y0]]
+
+
+def test_strokes_are_ordered_big_shapes_first_then_details_then_thin_lines():
+    from backend.artistry import order_strokes
+    big = loop(200, 250, 300, 380)            # the silhouette
+    medium = loop(200, 150, 90, 70)           # a feature
+    tiny = [loop(120 + 20 * i, 300, 8, 8) for i in range(4)]  # sprinkles
+    string = thin_line(200, 100, 400)         # a long straight line
+    ordered = order_strokes([*tiny, string, medium, big], 400, 500)
+    spans = [max(p[0] for p in s) - min(p[0] for p in s) + max(p[1] for p in s) - min(p[1] for p in s) for s in ordered]
+    assert len(ordered) == 7
+    assert spans[0] == 680                     # the silhouette (300 wide + 380 tall) is drawn first
+    assert spans[1] == 160                     # then the medium feature (90 + 70)
+    assert sorted(spans[2:]) == [16] * 4 + [301]  # the sprinkles and the long straight line are the final details
+
+
+def test_strokes_of_the_same_size_go_from_the_top_of_the_picture_downwards():
+    from backend.artistry import order_strokes
+    rows = [loop(200, y, 120, 60) for y in (400, 100, 250, 550)]
+    ordered = order_strokes(rows, 400, 700)
+    tops = [min(p[1] for p in stroke) for stroke in ordered]
+    assert tops == sorted(tops)
+
+
+def test_each_stroke_begins_where_the_pen_already_is():
+    from backend.artistry import order_strokes
+    ordered = order_strokes([loop(100, 100, 100, 100), loop(300, 100, 100, 100)], 400, 300)
+    first_end, second_start = ordered[0][-1], ordered[1][0]
+    assert tuple(first_end) == tuple(ordered[0][0])                    # closed strokes finish where they began
+    assert abs(second_start[0] - 250) < 1 and abs(second_start[1] - 50) < 60  # next one starts on its nearest side
+    assert order_strokes([], 400, 300) == []
+
+
+def test_ordering_keeps_every_stroke_intact():
+    import numpy as np
+    from backend.artistry import order_strokes
+    strokes = [loop(100 + 40 * i, 60 + 70 * i, 50 + 10 * i, 30) for i in range(6)]
+    ordered = order_strokes(strokes, 500, 500)
+    key = lambda s: sorted(map(tuple, np.round(np.asarray(s)[:-1], 3)))
+    assert sorted(map(key, ordered)) == sorted(map(key, strokes))
+    assert all(tuple(s[0]) == tuple(s[-1]) for s in ordered)
+
+
+def test_prepared_images_are_drawn_outline_first(tmp_path):
+    import numpy as np
+    from PIL import Image, ImageDraw
+    image = Image.new('RGB', (400, 400), 'white')
+    draw = ImageDraw.Draw(image)
+    draw.ellipse((60, 60, 340, 340), outline=(20, 20, 20), width=6, fill=(240, 200, 60))
+    for x in (140, 200, 260):
+        draw.ellipse((x - 10, 190, x + 10, 210), fill=(30, 30, 30))  # small marks inside
+    folder = tmp_path / 'p'
+    folder.mkdir()
+    src = tmp_path / 'in.png'
+    image.save(src)
+    scene = prepare_image(src, folder)
+    extent = lambda s: np.ptp(np.asarray(s)[:, 0]) + np.ptp(np.asarray(s)[:, 1])
+    assert extent(scene['paths'][0]) > 3 * extent(scene['paths'][-1])

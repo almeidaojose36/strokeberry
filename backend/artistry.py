@@ -4,7 +4,7 @@ import math
 import cv2
 import numpy as np
 
-SCENE_VERSION = 3  # 3: white backgrounds are blended into the paper colour
+SCENE_VERSION = 4  # 4: strokes are ordered like a person draws (big shapes first); 3: white backgrounds blend into the paper
 
 
 def resample(points, step=3.0):
@@ -116,3 +116,60 @@ def event_position(event, fraction):
         lift = math.sin(math.pi * fraction)
     point = [event['a'][k] + (event['b'][k] - event['a'][k]) * fraction for k in range(2)]
     return point, lift
+
+
+# ------------------------------------------------------------------------------ drawing order
+
+TIER_BANDS = (.20, .16, .10)  # how far down the picture the pen may reach for its next stroke, per tier (fraction of height)
+
+
+def stroke_tier(points, drawing_diagonal):
+    """0 = major shapes, 1 = medium details, 2 = thin lines and tiny marks. Sizes are relative to the whole drawing.
+
+    Size decides the tier. A long, straight line (a guitar string, a whisker) is a detail however long it is, so it is moved
+    to the last tier: people draw the structure first and add those at the end."""
+    points = np.asarray(points, np.float32)
+    span = float(np.hypot(*(points.max(axis=0) - points.min(axis=0)))) / drawing_diagonal
+    hull = cv2.convexHull(points.reshape(-1, 1, 2))
+    hull_length = max(1e-6, float(cv2.arcLength(hull, True)))
+    # How much room the stroke takes up around itself: ~0 for a straight line, higher for a curving outline or a closed shape.
+    curviness = 4 * math.pi * float(cv2.contourArea(hull)) / (hull_length * hull_length)
+    if curviness < .06 and span >= .12:
+        return 2
+    return 0 if span >= .30 else 1 if span >= .10 else 2
+
+
+def start_at(points, pen):
+    """Rotate a closed stroke so it begins at the vertex nearest to the pen, which keeps pen travel short."""
+    body = np.asarray(points, float)[:-1]
+    index = int(np.argmin(((body - pen) ** 2).sum(axis=1)))
+    return np.vstack([np.roll(body, -index, axis=0), body[index]])
+
+
+def order_strokes(paths, width, height):
+    """Order strokes the way a person builds a drawing.
+
+    1. Major shapes first, then medium details, then thin lines and tiny marks (coarse to fine).
+    2. Within each group work from the top of the picture downwards; the next stroke is the nearest one inside a moving
+       band, so the pen doesn't leap across the page.
+    3. Every closed stroke starts where the pen already is."""
+    if not len(paths):
+        return []
+    everything = np.vstack([np.asarray(p, float) for p in paths])
+    diagonal = max(1.0, float(np.hypot(*(everything.max(axis=0) - everything.min(axis=0)))))  # the drawing, not the canvas
+    tiers = {0: [], 1: [], 2: []}
+    for path in paths:
+        points = np.asarray(path, float)
+        tiers[stroke_tier(points, diagonal)].append(points)
+    ordered, pen = [], np.array([width / 2, 0.0])
+    for tier in (0, 1, 2):
+        pool = sorted(tiers[tier], key=lambda p: float(p[:, 1].min()))
+        band = TIER_BANDS[tier] * height
+        while pool:
+            reach = float(pool[0][:, 1].min()) + band
+            candidates = [k for k, p in enumerate(pool) if float(p[:, 1].min()) <= reach]
+            best = min(candidates, key=lambda k: float(((pool[k] - pen) ** 2).sum(axis=1).min()))
+            stroke = start_at(pool.pop(best), pen)
+            ordered.append(stroke)
+            pen = stroke[-1]
+    return ordered

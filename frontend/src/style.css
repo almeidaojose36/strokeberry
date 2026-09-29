@@ -614,3 +614,6 @@ button.guide-callout:hover{border-color:var(--line-strong);background:#fff}
 .expanded-controls input[type=range]{flex:1;min-width:0;height:6px;background:linear-gradient(to right,var(--accent) var(--progress),rgba(255,255,255,.22) var(--progress))}
 .expanded-controls .button{height:36px;padding:0 12px;flex-shrink:0}
 @media(max-width:720px){.preview-stage.expanded{padding:52px 8px 92px}.expanded-controls .button{display:none}}
+
+.nav-website{margin-top:10px;border-top:1px solid var(--line);border-radius:0 0 10px 10px;padding-top:2px;height:44px}
+.nav-website svg:last-child{margin-left:auto;width:13px;height:13px;color:var(--faint)}

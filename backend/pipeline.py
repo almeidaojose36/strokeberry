@@ -13,7 +13,7 @@ from PIL import Image, ImageOps
 
 from . import watermark
 from .brand import hex_to_rgb
-from .artistry import SCENE_VERSION, clean_paths, make_timeline, event_position
+from .artistry import SCENE_VERSION, clean_paths, make_timeline, event_position, order_strokes
 
 _scene_lock = threading.Lock()
 
@@ -59,17 +59,8 @@ def prepare_image(raw, folder: Path):
     contours, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     contours = sorted(contours, key=lambda c: cv2.arcLength(c, False), reverse=True)
     paths = clean_paths(contours, gray.shape)
-    # Greedy endpoint traversal reduces pen lifts, preserving each individual contour.
-    ordered, current = [], np.array([0, 0])
-    while paths:
-        endpoints = np.array([[p[0], p[-1]] for p in paths])
-        distances = ((endpoints - current) ** 2).sum(axis=2)
-        index, end = np.unravel_index(distances.argmin(), distances.shape)
-        points = paths.pop(index)
-        if end:
-            points = points[::-1]
-        ordered.append(points.tolist())
-        current = points[-1]
+    # Strokes are ordered like a person draws: major shapes first, then details, top to bottom (see artistry.order_strokes).
+    ordered = [p.tolist() for p in order_strokes(paths, gray.shape[1], gray.shape[0])]
     # Deterministic color segmentation: median-cut palette, then region-by-region reveal.
     indexed = image.quantize(colors=9, method=Image.Quantize.MEDIANCUT)
     labels = np.array(indexed)
