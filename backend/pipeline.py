@@ -12,11 +12,31 @@ import numpy as np
 from PIL import Image, ImageOps
 
 from . import watermark
+from .brand import hex_to_rgb
 from .artistry import SCENE_VERSION, clean_paths, make_timeline, event_position
 
 _scene_lock = threading.Lock()
 
 PAPER = (250, 249, 246)
+
+
+def blend_white_background(rgb):
+    """Turn a plain white background into the paper colour so the colour reveal blends into the canvas.
+
+    Only near-white areas connected to the image border are changed, so whites inside the artwork (a panda's belly, the
+    white of an eye) stay white. The edge is feathered a little so there is no halo around the drawing."""
+    lightest = rgb.min(axis=2)
+    count, labels = cv2.connectedComponents(np.uint8(lightest >= 238))
+    if count < 2:
+        return rgb
+    border = np.unique(np.concatenate([labels[0], labels[-1], labels[:, 0], labels[:, -1]]))
+    background = np.isin(labels, border[border > 0]).astype(np.uint8)
+    if not background.any():
+        return rgb
+    reach = cv2.dilate(background, np.ones((5, 5), np.uint8)).astype(bool)
+    weight = np.clip((lightest.astype(np.float32) - 215) / 35, 0, 1) * reach
+    paper = np.array(PAPER, np.float32)
+    return np.uint8(rgb * (1 - weight[..., None]) + paper * weight[..., None])
 
 
 def prepare_image(raw, folder: Path):
@@ -30,6 +50,7 @@ def prepare_image(raw, folder: Path):
         image = image.convert('RGB')
         if not (folder / 'original.png').exists():
             image.save(folder / 'original.png')
+        image = Image.fromarray(blend_white_background(np.array(image)))  # the original.png above stays untouched
         image.thumbnail((900, 900))
         image.save(folder / 'source.png')
     rgb = np.array(image)
@@ -85,11 +106,11 @@ def load_scene(folder):
         return scene
 
 
-def draw_mark(canvas, a, b, pressure, style, unit):
+def draw_mark(canvas, a, b, pressure, style, unit, tint=None):
     """Subpixel strokes preserve pressure changes at every export resolution."""
     pencil = style == 'pencil'
     opacity = (.35 + .45 * pressure) if pencil else (.65 + .3 * pressure)
-    ink = (60, 65, 59) if pencil else (29, 44, 36)
+    ink = tint or ((60, 65, 59) if pencil else (29, 44, 36))
     color = tuple(round(PAPER[k] * (1 - opacity) + ink[k] * opacity) for k in range(3))
     radius = unit * ((.5 + .95 * pressure) if pencil else (.7 + 1.5 * pressure)) / 2
     a, b = np.array(a), np.array(b)
@@ -132,7 +153,8 @@ def render(folder: Path, settings, update, output=None):
     source = cv2.resize(rgb, size, interpolation=cv2.INTER_AREA)
     reveal = cv2.resize(np.array(Image.open(folder / 'reveal.png')), size)
     paper = np.full((height, width, 3), PAPER, np.uint8)
-    ink = (60, 65, 59) if settings['style'] == 'pencil' else (29, 44, 36)
+    tint = hex_to_rgb(settings['ink_color']) if settings.get('ink_color') else None  # the brand kit's drawing colour
+    ink = tint or ((60, 65, 59) if settings['style'] == 'pencil' else (29, 44, 36))
     final = Path(output) if output else folder / 'output.mp4'
     temporary = final.with_suffix('.partial.mp4')
     fps = 24
@@ -152,7 +174,7 @@ def render(folder: Path, settings, update, output=None):
                 while index < len(events) and events[index]['end'] <= draw_progress:
                     event = events[index]
                     if event['kind'] == 'draw':
-                        draw_mark(paper, screen(event['a']), screen(event['b']), event['pressure'], settings['style'], unit)
+                        draw_mark(paper, screen(event['a']), screen(event['b']), event['pressure'], settings['style'], unit, tint)
                     index += 1
                 canvas = paper.copy()
                 tip, lift = None, 0
@@ -162,7 +184,7 @@ def render(folder: Path, settings, update, output=None):
                     position, lift = event_position(event, fraction)
                     tip = screen(position)
                     if event['kind'] == 'draw':
-                        draw_mark(canvas, screen(event['a']), tip, event['pressure'], settings['style'], unit)
+                        draw_mark(canvas, screen(event['a']), tip, event['pressure'], settings['style'], unit, tint)
                 if settings['color'] and progress > line_end:
                     amount = min(1, (progress - line_end) / .27)
                     mask = np.clip((amount * 270 - reveal.astype(np.float32)) / 20, 0, 1)[..., None]
@@ -188,6 +210,8 @@ def render(folder: Path, settings, update, output=None):
                     cv2.circle(canvas, (round(x), round(y)), max(2, round(unit * 2)), ink, -1, cv2.LINE_AA)
                 if settings.get('watermark'):
                     watermark.apply(canvas)
+                elif settings.get('logo'):
+                    watermark.apply_logo(canvas, settings['logo'], settings.get('logo_corner', 'bottom-right'))
                 process.stdin.write(canvas.tobytes())
                 if frame % 12 == 0:
                     update(round(5 + progress * 91), stage_label)

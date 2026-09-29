@@ -32,6 +32,8 @@ LOCAL_USER = 'local'
 # "guest" is a visitor who hasn't signed in yet (a Firebase anonymous user): they can try the studio and preview
 # drawings, but exporting needs a real account.
 GUEST_PROJECT_LIMIT = 3
+FREE_PRESET_LIMIT, PRO_PRESET_LIMIT = 1, 20
+ACTIVE_RENDERS = {'free': 2, 'pro': 9}  # queued + rendering exports per person
 PLANS = {
     'guest': {'name': 'Guest', 'exports': 0, 'period_days': None, 'max_resolution': '720p', 'watermark': True},
     'free': {'name': 'Free', 'exports': 3, 'period_days': None, 'max_resolution': '720p', 'watermark': True},
@@ -54,6 +56,12 @@ def init_accounts(db):
     db.executescript('''CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY, email TEXT, name TEXT, plan TEXT NOT NULL DEFAULT 'free', created TEXT,
         billing_customer TEXT, billing_subscription TEXT, billing_status TEXT, plan_renews TEXT, billing_portal TEXT);''')
+    db.executescript('''CREATE TABLE IF NOT EXISTS presets (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, name TEXT NOT NULL,
+        settings TEXT NOT NULL, created TEXT);
+        CREATE TABLE IF NOT EXISTS brand_kits (user_id TEXT PRIMARY KEY, name TEXT, ink_color TEXT, logo_corner TEXT DEFAULT 'bottom-right',
+        has_logo INTEGER DEFAULT 0, enabled INTEGER DEFAULT 1);''')
+    if 'notices' not in {row[1] for row in db.execute('PRAGMA table_info(users)')}:
+        db.execute("ALTER TABLE users ADD COLUMN notices TEXT NOT NULL DEFAULT '[]'")
     for table in ('projects', 'jobs'):
         columns = {row[1] for row in db.execute(f'PRAGMA table_info({table})')}
         if 'user_id' not in columns:
@@ -122,7 +130,8 @@ def ensure_user(db, user_id, email=None, name=None, guest=False):
     if row is None:
         # The local single-user studio keeps full features; real accounts start on Free, visitors as guests.
         plan = 'guest' if guest else os.environ.get('STROKEBERRY_LOCAL_PLAN', 'pro') if user_id == LOCAL_USER else 'free'
-        db.execute('INSERT INTO users (id, email, name, plan, created) VALUES (?,?,?,?,?)',
+        # A new visitor's page fires several requests at once, so creating the row must tolerate a twin arriving first.
+        db.execute('INSERT OR IGNORE INTO users (id, email, name, plan, created) VALUES (?,?,?,?,?)',
                    (user_id, email, name, plan if plan in PLANS else 'free', now()))
         row = db.execute('SELECT * FROM users WHERE id=?', (user_id,)).fetchone()
     elif (email and email != row['email']) or (name and name != row['name']):

@@ -14,10 +14,14 @@ export function eventPosition(event, fraction) {
   };
 }
 
-export function drawMark(ctx, a, b, pressure, style, unit) {
+export function hexToRgb(hex) {
+  return hex && /^#[0-9a-f]{6}$/i.test(hex) ? [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)) : null;
+}
+
+export function drawMark(ctx, a, b, pressure, style, unit, tint) {
   const pencil = style === 'pencil';
   const opacity = pencil ? .35 + .45 * pressure : .65 + .3 * pressure;
-  const paper = [250, 249, 246], ink = pencil ? [60, 65, 59] : [29, 44, 36];
+  const paper = [250, 249, 246], ink = tint || (pencil ? [60, 65, 59] : [29, 44, 36]);
   const color = paper.map((value, k) => Math.round(value * (1 - opacity) + ink[k] * opacity));
   ctx.strokeStyle = `rgb(${color.join(',')})`;
   ctx.lineWidth = unit * (pencil ? .5 + .95 * pressure : .7 + 1.5 * pressure);
@@ -28,7 +32,7 @@ export function drawMark(ctx, a, b, pressure, style, unit) {
   ctx.stroke();
 }
 
-export function drawTimeline(ctx, events, progress, style, unit, cache) {
+export function drawTimeline(ctx, events, progress, style, unit, cache, tint) {
   if (cache) {
     // Accumulate completed marks once during playback; rewind rebuilds them.
     if (!cache.initialized || progress < cache.progress) {
@@ -42,7 +46,7 @@ export function drawTimeline(ctx, events, progress, style, unit, cache) {
     }
     while (cache.index < events.length && events[cache.index].end <= progress) {
       const event = events[cache.index++];
-      if (event.kind === 'draw') drawMark(cache.ctx, event.a, event.b, event.pressure, style, unit);
+      if (event.kind === 'draw') drawMark(cache.ctx, event.a, event.b, event.pressure, style, unit, tint);
     }
     cache.progress = progress;
     ctx.save();
@@ -52,7 +56,7 @@ export function drawTimeline(ctx, events, progress, style, unit, cache) {
     const event = events[cache.index];
     if (!event || event.start > progress) return {tip: null, lift: 0};
     const position = eventPosition(event, (progress - event.start) / (event.end - event.start));
-    if (event.kind === 'draw') drawMark(ctx, event.a, position.point, event.pressure, style, unit);
+    if (event.kind === 'draw') drawMark(ctx, event.a, position.point, event.pressure, style, unit, tint);
     return {tip: position.point, lift: position.lift};
   }
   let tip = null, lift = 0;
@@ -60,7 +64,7 @@ export function drawTimeline(ctx, events, progress, style, unit, cache) {
     if (event.start > progress) break;
     const fraction = Math.min(1, (progress - event.start) / (event.end - event.start));
     const position = eventPosition(event, fraction);
-    if (event.kind === 'draw') drawMark(ctx, event.a, position.point, event.pressure, style, unit);
+    if (event.kind === 'draw') drawMark(ctx, event.a, position.point, event.pressure, style, unit, tint);
     if (fraction < 1) {
       tip = position.point;
       lift = position.lift;

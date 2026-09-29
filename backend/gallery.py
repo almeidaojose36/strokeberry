@@ -38,3 +38,24 @@ def find(item_id):
             if path.is_file():
                 return item, path
     raise HTTPException(404, 'That example is no longer available.')
+
+
+TIPS = [('ink', '9:16', 'Ink lines look bold on a phone screen — make it a Reel.'),
+        ('pencil', '1:1', 'Soft pencil in a square is perfect for a feed post.'),
+        ('ink', '16:9', 'A widescreen ink drawing makes a great YouTube intro.'),
+        ('pencil', '9:16', 'Pencil with the colour reveal is very satisfying to watch.')]
+
+
+def ideas(week, count=3):
+    """A few example suggestions that change every week (deterministic, so everyone sees the same ones)."""
+    pool = [item for item in manifest().get('items', []) if not item.get('tutorial')]
+    if not pool:
+        return []
+    chosen = [pool[(week * count + i * 7) % len(pool)] for i in range(count)]
+    picked = []
+    for i, item in enumerate(chosen):
+        if item in picked:
+            continue
+        style, ratio, tip = TIPS[(week + i) % len(TIPS)]
+        picked.append(item)
+        yield dict(item, image=f"/library/{item['image']}", thumb=f"/library/{item['thumb']}", style=style, ratio=ratio, tip=tip)

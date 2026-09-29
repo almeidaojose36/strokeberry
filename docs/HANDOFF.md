@@ -204,3 +204,23 @@ Config lives in `.env.local` (see `.env.example`). Each part switches on only wh
 - **Legal pages are drafts.** Have them reviewed. Decisions in them for the owner to confirm: 14-day refund on the first payment, governing law South Africa, the founding-rate clause, privacy wording about deleting data on request, and no legal entity name or address yet (add one when you have it).
 
 **Launch checklist:** (1) Firebase: Anonymous + Google + Email link, authorised domains strokeberry.com and localhost, Blaze plan with a $5 budget alert, config into `.env.local`; (2) Lemon Squeezy: store, monthly and yearly variants, the founder discount, webhook -> `/api/billing/webhook`, South African payout details, test-mode purchase end to end; (3) host the app on the VPS with HTTPS and set `STROKEBERRY_APP_URL` and `STROKEBERRY_SECRET`; (4) review the legal pages; (5) re-check the tutorials' captions (see 2b); (6) rate-limit guest creation.
+
+## 9. Usability and retention features (2026-09-30)
+
+Built on the same branch. Backend in `backend/app.py` (+ `brand.py`, `mailer.py`, `prune.py`), interface in `frontend/src/` (`ProjectsView`, `ExportsView`, `ExportResult`, `BrandKit`, `Presets`, `Ideas`, `Dialogs`).
+
+- **First run:** the drawing plays by itself the first time (and whenever you upload or pick an example). On phones a fixed **Export** bar stays at the bottom.
+- **Projects:** rename, duplicate, delete (also removes that project's videos), search once there are more than 8, and multi-select for batch export.
+- **Exports:** thumbnails, Play, Download, Delete, live progress. Deleting a project or export removes its files.
+- **"Your video is ready":** Download, Share (on phones, via the system share sheet), one-click re-export as another format or the other style, a watermark upsell for Free, "All 3 formats" for Pro.
+- **Ideas this week:** three examples that change every Monday (`GET /api/ideas`), each with a suggested style and format.
+- **Saved styles:** Free 1, Pro 20 (`/api/presets`). Guests are asked to create an account.
+- **Batch export (Pro):** `POST /api/batch` exports up to 6 projects x 3 formats (max 9 at once). Every video counts toward the 200/month. Free and guests are asked to upgrade or sign in.
+- **Brand kit (Pro):** drawing colour and a corner logo applied to every export (`/api/brand`); the live preview uses the colour too. The logo is stored under `data/brand/`. On 9:16 the logo moves to the top. Free users see the screen locked.
+- **Emails** (`backend/mailer.py`, off until `SMTP_*` are set, see `.env.example`): a welcome email on first sign-in, then "1 free video left" and "used your 3 free videos", each sent once. Use an **app password** for the Zoho mailbox, not the login password. Firebase's own sign-in emails are separate.
+- **Guest cleanup:** `.venv/bin/python -m backend.prune` deletes guest accounts older than 30 days with their files (Firebase auto clean-up removes the accounts on its side). Run it daily from cron on the server.
+- **Preview colours:** `frontend/src/drawing.js` and `backend/pipeline.py` both apply the brand colour, so preview and export match.
+
+**Firebase status (2026-09-30):** project `strokeberry-514b7` (owner: the Grupo Angbu Google account). Enabled: Email link, Anonymous (auto clean-up on). Authorised domains: localhost, strokeberry.com, www.strokeberry.com. Web config is in `.env.local`, so the local server now uses guests and real sign-in. **Google sign-in is not enabled yet:** Firebase requires a public "support email" that can only be an address of a project member; add the address you want as a project Owner (Users and permissions), then enable Google. To go back to the old single-user local studio, comment out the `VITE_FIREBASE_*` and `FIREBASE_PROJECT_ID` lines in `.env.local` and run `npm run build`.
+
+- **First-run defaults:** new visitors start with the **Sweet cupcake** starter drawn in **Ink** (`defaults` in `frontend/src/main.jsx`, `SAMPLE_*` in `backend/app.py`). Returning users keep the style they saved in their browser. White backgrounds are blended into the paper colour in `prepare_image` (`SCENE_VERSION` 3), so older projects are refreshed when opened.

@@ -57,3 +57,29 @@ def apply(canvas):
     area = canvas[y:y + rgb.shape[0], x:x + rgb.shape[1]]
     area[:] = np.uint8(area * (1 - alpha) + rgb * alpha)
     return canvas
+
+
+@lru_cache(maxsize=16)
+def _logo_overlay(path, mtime, width, height, corner):
+    logo = Image.open(path).convert('RGBA')
+    logo = logo.crop(logo.getchannel('A').getbbox() or (0, 0, logo.width, logo.height))
+    unit = min(width, height)
+    box_h, box_w = round(unit * .13), round(width * .22)
+    scale = min(box_h / logo.height, box_w / logo.width)
+    logo = logo.resize((max(1, round(logo.width * scale)), max(1, round(logo.height * scale))), Image.LANCZOS)
+    margin = round(unit * .03)
+    if height > width and corner.startswith('bottom'):  # keep clear of the app buttons on 9:16
+        corner = 'top-' + corner.split('-')[1]
+    x = margin if corner.endswith('left') else width - logo.width - margin
+    y = margin if corner.startswith('top') else height - logo.height - margin
+    array = np.asarray(logo).astype(np.float32)
+    return x, y, array[..., :3], array[..., 3:] / 255.0
+
+
+def apply_logo(canvas, path, corner='bottom-right'):
+    """Blend a brand logo (Pro) into one corner of an RGB frame (H×W×3 uint8) in place."""
+    height, width = canvas.shape[:2]
+    x, y, rgb, alpha = _logo_overlay(str(path), Path(path).stat().st_mtime, width, height, corner)
+    area = canvas[y:y + rgb.shape[0], x:x + rgb.shape[1]]
+    area[:] = np.uint8(area * (1 - alpha) + rgb * alpha)
+    return canvas

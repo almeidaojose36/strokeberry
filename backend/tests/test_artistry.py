@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 
 from backend.artistry import clean_paths, event_position, make_timeline, smooth_path
+from backend.artistry import SCENE_VERSION
 from backend.pipeline import PAPER, draw_mark, load_scene, prepare_image
 from .test_pipeline import illustration
 
@@ -69,7 +70,7 @@ def test_old_projects_upgrade_once_without_losing_exports(tmp_path):
     export = tmp_path / 'previous.mp4'
     export.write_bytes(b'existing export')
     updated = load_scene(tmp_path)
-    assert updated['version'] == 2 and updated['timeline']
+    assert updated['version'] == SCENE_VERSION and updated['timeline']
     timestamp = (tmp_path / 'scene.json').stat().st_mtime_ns
     assert load_scene(tmp_path) == updated
     assert (tmp_path / 'scene.json').stat().st_mtime_ns == timestamp

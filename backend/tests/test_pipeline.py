@@ -77,3 +77,22 @@ def test_api_upload_validation_and_file_isolation(tmp_path, monkeypatch):
     assert client.get('/api/projects/unknown').status_code == 404
     assert client.post(f"/api/projects/{project['id']}/jobs", json={'duration': 1000}).status_code == 422
     assert client.get('/api/projects').json()[0]['id'] == project['id']
+
+
+def test_white_backgrounds_become_paper_but_inner_whites_and_the_original_stay(tmp_path):
+    import numpy as np
+    from PIL import Image, ImageDraw
+    from backend.pipeline import PAPER, prepare_image
+    image = Image.new('RGB', (300, 300), 'white')
+    draw = ImageDraw.Draw(image)
+    draw.ellipse((60, 60, 240, 240), fill=(236, 45, 52), outline=(30, 30, 30), width=5)
+    draw.ellipse((120, 120, 180, 180), fill='white', outline=(30, 30, 30), width=4)  # a white "eye" inside the artwork
+    original = tmp_path / 'in.png'
+    image.save(original)
+    folder = tmp_path / 'project'
+    folder.mkdir()
+    prepare_image(original, folder)
+    source = np.array(Image.open(folder / 'source.png').convert('RGB'))
+    assert tuple(source[5, 5]) == PAPER and tuple(source[-5, -5]) == PAPER  # the outside is paper now
+    assert tuple(source[150, 150]) == (255, 255, 255)                      # the eye is still white
+    assert tuple(np.array(Image.open(folder / 'original.png'))[5, 5]) == (255, 255, 255)  # original untouched

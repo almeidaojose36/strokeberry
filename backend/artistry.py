@@ -4,7 +4,7 @@ import math
 import cv2
 import numpy as np
 
-SCENE_VERSION = 2
+SCENE_VERSION = 3  # 3: white backgrounds are blended into the paper colour
 
 
 def resample(points, step=3.0):

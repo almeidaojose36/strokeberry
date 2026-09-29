@@ -1,12 +1,13 @@
 import io
 import json
 import logging
+import shutil
 import sqlite3
 import threading
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Literal
 
@@ -19,7 +20,7 @@ from .pipeline import prepare_image, render, load_scene
 from .sample import create_sample
 from .steps import detect_panels, fallback_layout, prepare_steps, original_path, four_step_reading_order
 from .enhance import clean_background
-from . import accounts, billing, gallery
+from . import accounts, billing, brand, gallery, mailer
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / 'data'
@@ -76,7 +77,24 @@ def current_user(request: Request):
         init_db()
         _initialised.add(DB)
     with connect() as db:
-        return accounts.ensure_user(db, user_id, email, name, guest)
+        user = accounts.ensure_user(db, user_id, email, name, guest)
+        if not guest and user.get('email') and mark_notice(db, user, 'welcome'):
+            mailer.welcome(user['email'], user.get('name'))
+        return user
+
+
+def mark_notice(db, user, key):
+    """Remember that an email was sent so it's never sent twice. Returns True only for the request that recorded it."""
+    before = user.get('notices') or '[]'
+    seen = json.loads(before)
+    if key in seen:
+        return False
+    after = json.dumps(seen + [key])
+    # Compare-and-swap: if a simultaneous request recorded a notice first, this update matches nothing and we don't send.
+    if not db.execute('UPDATE users SET notices=? WHERE id=? AND notices=?', (after, user['id'], before)).rowcount:
+        return False
+    user['notices'] = after
+    return True
 
 
 def signed(path):
@@ -278,17 +296,27 @@ def upload(file: UploadFile, user=Depends(current_user)):
     return add_project(io.BytesIO(raw), Path(file.filename or 'Untitled').stem, user)
 
 
+SAMPLE_NAME = 'Sweet cupcake'
+SAMPLE_LIBRARY_ID = 'food-01-cupcake'
+OLD_SAMPLE_NAME = 'A little bit of sunshine'  # the previous starter project, still recognised for existing users
+
+
 @app.post('/api/sample')
 def sample(user=Depends(current_user)):
+    """The starter project a new visitor sees: a bold, colourful cupcake from the example library."""
     with connect() as db:
-        row = db.execute("SELECT id FROM projects WHERE name='A little bit of sunshine' AND user_id=? LIMIT 1",
-                         (user['id'],)).fetchone()
+        row = db.execute('SELECT id FROM projects WHERE name IN (?, ?) AND user_id=? ORDER BY created LIMIT 1',
+                         (SAMPLE_NAME, OLD_SAMPLE_NAME, user['id'])).fetchone()
     if row:
         return project_detail(row['id'], user)
-    sample_path = DATA / 'botanical.png'
-    if not sample_path.exists():
-        create_sample(sample_path)
-    return add_project(sample_path, 'A little bit of sunshine', user)
+    try:
+        _, path = gallery.find(SAMPLE_LIBRARY_ID)
+        return add_project(path, SAMPLE_NAME, user)
+    except HTTPException:  # the example library isn't installed: fall back to the drawn botanical starter
+        sample_path = DATA / 'botanical.png'
+        if not sample_path.exists():
+            create_sample(sample_path)
+        return add_project(sample_path, OLD_SAMPLE_NAME, user)
 
 
 @app.get('/api/projects/{project_id}')
@@ -329,6 +357,22 @@ def create_steps(project_id: str, config: StepConfig, user=Depends(current_user)
     return project_detail(derived_id, user)
 
 
+def notify_allowance(job_id):
+    """After a Free user's export finishes, tell them when they are down to one video and when they've used all three."""
+    try:
+        with connect() as db:
+            row = db.execute('SELECT user_id FROM jobs WHERE id=?', (job_id,)).fetchone()
+            user = row and db.execute('SELECT * FROM users WHERE id=?', (row['user_id'],)).fetchone()
+            if not user or not user['email'] or accounts.plan_id(dict(user)) != 'free':
+                return
+            user = dict(user)
+            remaining = accounts.usage(db, user)['remaining']
+            if remaining <= 1 and mark_notice(db, user, 'allowance-%d' % remaining):
+                mailer.allowance(user['email'], remaining)
+    except Exception:
+        logging.exception('Allowance notice failed')
+
+
 def run_job(job_id, project_id, settings):
     def update(progress, stage):
         with connect() as db:
@@ -337,10 +381,49 @@ def run_job(job_id, project_id, settings):
     try:
         update(2, 'Preparing your canvas')
         render(DATA / project_id, settings, update, DATA / project_id / f'{job_id}.mp4')
+        notify_allowance(job_id)
     except Exception:
         logging.exception('Render failed: %s', job_id)
         with connect() as db:
             db.execute("UPDATE jobs SET status='failed', error=? WHERE id=?", ('Rendering failed. Check the server log and confirm FFmpeg is installed, then try again.', job_id))
+
+
+def check_capacity(db, user, extra=1):
+    """Cap how many exports one person can have waiting or rendering (Free 2, Pro 9), and the whole queue."""
+    limit = accounts.ACTIVE_RENDERS['pro' if accounts.plan_id(user) == 'pro' else 'free']
+    mine = db.execute("SELECT count(*) FROM jobs WHERE status IN ('queued','rendering') AND user_id=?", (user['id'],)).fetchone()[0]
+    if mine + extra > limit:
+        raise HTTPException(429, 'You already have %s rendering. Please wait for one to finish.' % ('two videos' if limit == 2 else 'the maximum number of videos'))
+    count = db.execute("SELECT count(*) FROM jobs WHERE status IN ('queued','rendering')").fetchone()[0]
+    if count + extra > 30:
+        raise HTTPException(429, 'The render queue is full. Please wait for an export to finish.')
+
+
+def brand_for_export(db, user):
+    """A Pro member's brand kit, as extra render settings (empty for everyone else)."""
+    row = db.execute('SELECT * FROM brand_kits WHERE user_id=?', (user['id'],)).fetchone()
+    if not row or not row['enabled'] or accounts.plan_id(user) != 'pro':
+        return {}
+    extra = {}
+    if row['ink_color']:
+        extra['ink_color'] = row['ink_color']
+    path = brand.logo_path(DATA, user['id'])
+    if row['has_logo'] and path.exists():
+        extra.update(logo=str(path), logo_corner=row['logo_corner'] or 'bottom-right')
+    return extra
+
+
+def enqueue(db, user, plan, project_id, settings):
+    """Insert an export job and hand it to the renderer. The caller has already checked the plan and capacity."""
+    job_id = uuid.uuid4().hex
+    # The watermark and brand kit are decided by the server from the plan, never by the request.
+    job_settings = dict(settings, watermark=plan['watermark'], **brand_for_export(db, user))
+    db.execute('INSERT INTO jobs (id, project_id, status, progress, stage, settings, created, error, user_id) VALUES (?,?,?,?,?,?,?,?,?)',
+               (job_id, project_id, 'queued', 0, 'Waiting in the render queue', json.dumps(job_settings),
+                datetime.now(timezone.utc).isoformat(), None, user['id']))
+    db.commit()
+    executor.submit(run_job, job_id, project_id, job_settings)
+    return job_id
 
 
 @app.post('/api/projects/{project_id}/jobs', status_code=202)
@@ -348,21 +431,49 @@ def export(project_id: str, settings: Settings, user=Depends(current_user)):
     get_project(project_id, user)
     with queue_lock, connect() as db:
         plan = accounts.check_export_allowed(db, user, settings.model_dump())
-        mine = db.execute("SELECT count(*) FROM jobs WHERE status IN ('queued','rendering') AND user_id=?", (user['id'],)).fetchone()[0]
-        if mine >= 2:
-            raise HTTPException(429, 'You already have two videos rendering. Please wait for one to finish.')
-        count = db.execute("SELECT count(*) FROM jobs WHERE status IN ('queued','rendering')").fetchone()[0]
-        if count >= 8:
-            raise HTTPException(429, 'The render queue is full. Please wait for an export to finish.')
-        job_id = uuid.uuid4().hex
-        # The watermark is decided by the server from the plan, never by the request.
-        job_settings = dict(settings.model_dump(), watermark=plan['watermark'])
-        db.execute('INSERT INTO jobs (id, project_id, status, progress, stage, settings, created, error, user_id) VALUES (?,?,?,?,?,?,?,?,?)',
-                   (job_id, project_id, 'queued', 0, 'Waiting in the render queue', json.dumps(job_settings),
-                    datetime.now(timezone.utc).isoformat(), None, user['id']))
-        db.commit()
-        executor.submit(run_job, job_id, project_id, job_settings)
+        check_capacity(db, user)
+        job_id = enqueue(db, user, plan, project_id, settings.model_dump())
     return job(job_id, user)
+
+
+class BatchRequest(BaseModel):
+    project_ids: list[str] = Field(min_length=1, max_length=6)
+    ratios: list[Literal['16:9', '9:16', '1:1']] = Field(min_length=1, max_length=3)
+    settings: Settings = Settings()
+
+
+@app.post('/api/batch', status_code=202)
+def batch_export(body: BatchRequest, user=Depends(current_user)):
+    """Pro: export several projects and/or several formats in one go."""
+    if accounts.plan_id(user) == 'guest':
+        raise HTTPException(401, 'Create a free account to export your video. It takes a few seconds.')
+    if accounts.plan_id(user) != 'pro':
+        raise HTTPException(402, 'Batch export is part of Pro.')
+    ids, ratios = list(dict.fromkeys(body.project_ids)), list(dict.fromkeys(body.ratios))
+    for project_id in ids:
+        get_project(project_id, user)
+    total = len(ids) * len(ratios)
+    with queue_lock, connect() as db:
+        plan = accounts.check_export_allowed(db, user, body.settings.model_dump())
+        if accounts.usage(db, user)['remaining'] < total:
+            raise HTTPException(429, 'That would go over this month’s export limit. Choose fewer videos or formats.')
+        check_capacity(db, user, total)
+        made = [enqueue(db, user, plan, project_id, dict(body.settings.model_dump(), ratio=ratio))
+                for project_id in ids for ratio in ratios]
+    return [job(job_id, user) for job_id in made]
+
+
+@app.delete('/api/jobs/{job_id}', status_code=204)
+def delete_job(job_id: str, user=Depends(current_user)):
+    with connect() as db:
+        row = db.execute('SELECT * FROM jobs WHERE id=? AND user_id=?', (job_id, user['id'])).fetchone()
+        if not row:
+            raise HTTPException(404, 'Export not found.')
+        if row['status'] in ('queued', 'rendering'):
+            raise HTTPException(409, 'This video is still rendering.')
+        db.execute('DELETE FROM jobs WHERE id=?', (job_id,))
+    for suffix in ('.mp4', '.log', '.partial.mp4'):
+        (DATA / row['project_id'] / f'{job_id}{suffix}').unlink(missing_ok=True)
 
 
 @app.get('/api/jobs/{job_id}')
@@ -373,7 +484,7 @@ def job(job_id: str, user=Depends(current_user)):
         raise HTTPException(404, 'Export not found.')
     item = dict(row)
     item.pop('user_id', None)
-    item['settings'] = json.loads(item['settings'])
+    item['settings'] = {k: v for k, v in json.loads(item['settings']).items() if k not in ('logo', 'logo_corner')}
     if item['status'] == 'completed':
         item['url'] = signed(f"/api/jobs/{job_id}/download")
     return item
@@ -397,6 +508,178 @@ def download(job_id: str, e: str = None, s: str = None):
     if row['status'] != 'completed':
         raise HTTPException(409, 'Your video is not ready yet.')
     return FileResponse(DATA / row['project_id'] / f'{job_id}.mp4', media_type='video/mp4', filename=f'strokeberry-{job_id[:8]}.mp4')
+
+
+class ProjectName(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+
+
+@app.patch('/api/projects/{project_id}')
+def rename_project(project_id: str, body: ProjectName, user=Depends(current_user)):
+    get_project(project_id, user)
+    with connect() as db:
+        db.execute('UPDATE projects SET name=? WHERE id=?', (body.name.strip() or 'Untitled', project_id))
+    return project_detail(project_id, user)
+
+
+@app.post('/api/projects/{project_id}/duplicate', status_code=201)
+def duplicate_project(project_id: str, user=Depends(current_user)):
+    original = get_project(project_id, user)
+    if accounts.plan_id(user) == 'guest':
+        with connect() as db:
+            made = db.execute('SELECT count(*) FROM projects WHERE user_id=?', (user['id'],)).fetchone()[0]
+        if made >= accounts.GUEST_PROJECT_LIMIT:
+            raise HTTPException(401, 'Create a free account to keep making projects.')
+    new_id = uuid.uuid4().hex
+    shutil.copytree(DATA / project_id, DATA / new_id, ignore=shutil.ignore_patterns('*.mp4', '*.log'))
+    with connect() as db:
+        db.execute('INSERT INTO projects (id, name, created, strokes, user_id) VALUES (?,?,?,?,?)',
+                   (new_id, f"{original['name']} copy"[:100], datetime.now(timezone.utc).isoformat(), original['strokes'], user['id']))
+    return project_detail(new_id, user)
+
+
+@app.delete('/api/projects/{project_id}', status_code=204)
+def delete_project(project_id: str, user=Depends(current_user)):
+    get_project(project_id, user)
+    with connect() as db:
+        busy = db.execute("SELECT count(*) FROM jobs WHERE project_id=? AND status IN ('queued','rendering')", (project_id,)).fetchone()[0]
+        if busy:
+            raise HTTPException(409, 'A video from this project is still rendering. Try again in a moment.')
+        db.execute('DELETE FROM jobs WHERE project_id=?', (project_id,))
+        db.execute('DELETE FROM projects WHERE id=?', (project_id,))
+    shutil.rmtree(DATA / project_id, ignore_errors=True)
+
+
+# ------------------------------------------------------------------------------ saved styles (presets)
+
+class PresetBody(BaseModel):
+    name: str = Field(min_length=1, max_length=40)
+    settings: Settings
+
+
+@app.get('/api/presets')
+def list_presets(user=Depends(current_user)):
+    with connect() as db:
+        rows = db.execute('SELECT id, name, settings FROM presets WHERE user_id=? ORDER BY created', (user['id'],)).fetchall()
+    return [{'id': row['id'], 'name': row['name'], 'settings': json.loads(row['settings'])} for row in rows]
+
+
+@app.post('/api/presets', status_code=201)
+def save_preset(body: PresetBody, user=Depends(current_user)):
+    if accounts.plan_id(user) == 'guest':
+        raise HTTPException(401, 'Create a free account to save your styles.')
+    pro = accounts.plan_id(user) == 'pro'
+    limit = accounts.PRO_PRESET_LIMIT if pro else accounts.FREE_PRESET_LIMIT
+    name = body.name.strip()
+    with connect() as db:
+        existing = db.execute('SELECT id FROM presets WHERE user_id=? AND lower(name)=lower(?)', (user['id'], name)).fetchone()
+        count = db.execute('SELECT count(*) FROM presets WHERE user_id=?', (user['id'],)).fetchone()[0]
+        if not existing and count >= limit:
+            raise HTTPException(402, f'You can save up to {limit} style{"s" if limit > 1 else ""}. ' +
+                                ('Delete one to save another.' if pro else 'Pro lets you save up to 20.'))
+        preset_id = existing['id'] if existing else uuid.uuid4().hex
+        db.execute('INSERT OR REPLACE INTO presets (id, user_id, name, settings, created) VALUES (?,?,?,?,COALESCE((SELECT created FROM presets WHERE id=?),?))',
+                   (preset_id, user['id'], name, body.settings.model_dump_json(), preset_id, datetime.now(timezone.utc).isoformat()))
+    return {'id': preset_id, 'name': name, 'settings': body.settings.model_dump()}
+
+
+@app.delete('/api/presets/{preset_id}', status_code=204)
+def delete_preset(preset_id: str, user=Depends(current_user)):
+    with connect() as db:
+        gone = db.execute('DELETE FROM presets WHERE id=? AND user_id=?', (preset_id, user['id'])).rowcount
+    if not gone:
+        raise HTTPException(404, 'Style not found.')
+
+
+# ------------------------------------------------------------------------------ brand kit (Pro)
+
+class BrandBody(BaseModel):
+    name: str = Field(default='', max_length=60)
+    ink_color: str = ''
+    logo_corner: Literal['bottom-right', 'bottom-left', 'top-right', 'top-left'] = 'bottom-right'
+    enabled: bool = True
+
+    @model_validator(mode='after')
+    def colour(self):
+        if self.ink_color and not brand.HEX.match(self.ink_color):
+            raise ValueError('Choose a colour like #1b2c24.')
+        return self
+
+
+def brand_view(user):
+    with connect() as db:
+        row = db.execute('SELECT * FROM brand_kits WHERE user_id=?', (user['id'],)).fetchone()
+    kit = {'name': '', 'ink_color': '', 'logo_corner': 'bottom-right', 'enabled': True, 'logo': None}
+    if row:
+        kit.update(name=row['name'] or '', ink_color=row['ink_color'] or '', logo_corner=row['logo_corner'] or 'bottom-right',
+                   enabled=bool(row['enabled']))
+        if row['has_logo'] and brand.logo_path(DATA, user['id']).exists():
+            kit['logo'] = signed(f"/api/brand/logo/{user['id']}")
+    kit['allowed'] = accounts.plan_id(user) == 'pro'
+    return kit
+
+
+def require_pro(user):
+    if accounts.plan_id(user) == 'guest':
+        raise HTTPException(401, 'Create a free account first.')
+    if accounts.plan_id(user) != 'pro':
+        raise HTTPException(402, 'The brand kit is part of Pro.')
+
+
+@app.get('/api/brand')
+def get_brand(user=Depends(current_user)):
+    return brand_view(user)
+
+
+@app.put('/api/brand')
+def save_brand(body: BrandBody, user=Depends(current_user)):
+    require_pro(user)
+    with connect() as db:
+        db.execute("""INSERT INTO brand_kits (user_id, name, ink_color, logo_corner, enabled) VALUES (?,?,?,?,?)
+                      ON CONFLICT(user_id) DO UPDATE SET name=excluded.name, ink_color=excluded.ink_color,
+                      logo_corner=excluded.logo_corner, enabled=excluded.enabled""",
+                   (user['id'], body.name.strip(), body.ink_color, body.logo_corner, int(body.enabled)))
+    return brand_view(user)
+
+
+@app.post('/api/brand/logo')
+def upload_logo(file: UploadFile, user=Depends(current_user)):
+    require_pro(user)
+    raw = file.file.read(5 * 1024 * 1024 + 1)
+    if len(raw) > 5 * 1024 * 1024:
+        raise HTTPException(413, 'Please choose a logo smaller than 5 MB.')
+    try:
+        brand.save_logo(DATA, user['id'], raw)
+    except ValueError as error:
+        raise HTTPException(400, str(error))
+    with connect() as db:
+        db.execute('INSERT INTO brand_kits (user_id, has_logo) VALUES (?, 1) ON CONFLICT(user_id) DO UPDATE SET has_logo=1', (user['id'],))
+    return brand_view(user)
+
+
+@app.delete('/api/brand/logo')
+def remove_logo(user=Depends(current_user)):
+    require_pro(user)
+    brand.logo_path(DATA, user['id']).unlink(missing_ok=True)
+    with connect() as db:
+        db.execute('UPDATE brand_kits SET has_logo=0 WHERE user_id=?', (user['id'],))
+    return brand_view(user)
+
+
+@app.get('/api/brand/logo/{owner}')
+def logo_file(owner: str, e: str = None, s: str = None):
+    accounts.verify_signature(DATA, f'/api/brand/logo/{owner}', e, s)
+    path = brand.logo_path(DATA, owner)
+    if not path.exists():
+        raise HTTPException(404, 'No logo.')
+    return FileResponse(path, media_type='image/png')
+
+
+@app.get('/api/ideas')
+def ideas():
+    """Three example suggestions that change every week, for the studio home."""
+    year, week, _ = date.today().isocalendar()
+    return list(gallery.ideas(year * 53 + week))
 
 
 if (ROOT / 'dist').exists():
