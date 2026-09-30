@@ -617,3 +617,5 @@ button.guide-callout:hover{border-color:var(--line-strong);background:#fff}
 
 .nav-website{margin-top:10px;border-top:1px solid var(--line);border-radius:0 0 10px 10px;padding-top:2px;height:44px}
 .nav-website svg:last-child{margin-left:auto;width:13px;height:13px;color:var(--faint)}
+
+.upgrade-reset{margin:-10px 0 18px;color:var(--ink-2);font-size:14.5px;line-height:1.5}

@@ -2,14 +2,14 @@ import React, {useEffect, useRef, useState} from 'react';
 import {ArrowDown, ArrowUp, LoaderCircle, ScanLine, X} from 'lucide-react';
 import ImageEditor from './ImageEditor.jsx';
 
-export default function StepEditor({project: sourceProject, api, onClose, onCreated}) {
+export default function StepEditor({project: sourceProject, api, onClose, onCreated, maxTotal = 300, onUpgrade}) {
   const [project, setProject] = useState(sourceProject), [editingImage, setEditingImage] = useState(false);
   const [stages, setStages] = useState([]), [active, setActive] = useState(0);
   const [align, setAlign] = useState(true), [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true), [error, setError] = useState('');
   const [detected, setDetected] = useState(false), [layout, setLayout] = useState('2x2'), [suggested, setSuggested] = useState(null);
   // One step (a whole image) defaults to 30 seconds; a multi-panel sheet shares 2 minutes between its panels.
-  const defaultsFor = crops => {const total=crops.length===1?30:120;return crops.map((crop,i)=>({crop,label:crops.length===1?'Whole drawing':crops.length===4?['Basic guides','Main outlines','Details & shading','Color'][i]:`Step ${i+1}`,seconds:Math.floor(total/crops.length)+(i===crops.length-1?total%crops.length:0),offset_x:0,offset_y:0,scale:1}))};
+  const defaultsFor = crops => {const total=crops.length===1?Math.min(30,maxTotal):Math.min(120,maxTotal);return crops.map((crop,i)=>({crop,label:crops.length===1?'Whole drawing':crops.length===4?['Basic guides','Main outlines','Details & shading','Color'][i]:`Step ${i+1}`,seconds:Math.floor(total/crops.length)+(i===crops.length-1?total%crops.length:0),offset_x:0,offset_y:0,scale:1}))};
   const duration = seconds => seconds < 60 ? `${seconds} sec` : `${Math.floor(seconds/60)} min${seconds%60?` ${seconds%60} sec`:''}`;
   const sheet = useRef(null), drag = useRef(null), dialog = useRef(null);
   useEffect(() => {
@@ -105,7 +105,7 @@ export default function StepEditor({project: sourceProject, api, onClose, onCrea
           <div className="stage-order">{stages.map((stage,i)=><div className={`stage-order-row ${active===i?'active':''}`} key={i}>
             <button className="stage-number" aria-label={`Edit step ${i+1}`} onClick={()=>setActive(i)}>{i+1}</button>
             <input aria-label={`Step ${i+1} name`} maxLength={40} value={stage.label} disabled={busy} onFocus={()=>setActive(i)} onChange={e=>update(i,'label',e.target.value)}/>
-            <label><input aria-label={`Step ${i+1} seconds`} type="number" min={1} max={300} value={stage.seconds} disabled={busy} onChange={e=>update(i,'seconds',Math.max(1,Math.min(300,Number(e.target.value)||1)))}/>sec</label>
+            <label><input aria-label={`Step ${i+1} seconds`} type="number" min={1} max={maxTotal} value={stage.seconds} disabled={busy} onChange={e=>update(i,'seconds',Math.max(1,Math.min(maxTotal,Number(e.target.value)||1)))}/>sec</label>
             <div><button aria-label={`Move step ${i+1} earlier`} disabled={busy||fourStepOrder||i===0} onClick={()=>reorder(i,-1)}><ArrowUp size={12}/></button><button aria-label={`Move step ${i+1} later`} disabled={busy||fourStepOrder||i===stages.length-1} onClick={()=>reorder(i,1)}><ArrowDown size={12}/></button></div>
           </div>)}</div>
           <div className="field-label">STEP {active+1} CROP <span>Percent of uploaded image</span></div>
@@ -116,8 +116,8 @@ export default function StepEditor({project: sourceProject, api, onClose, onCrea
           </div><p className="setting-hint">Offsets are percentages of the drawing canvas. Preview the aligned stages after saving; use Edit steps to make corrections.</p></>}
         </div>
       </div>
-      <footer><div><strong>{stages.length===1?`1 step · ${duration(total)}`:`${stages.length} steps · ${duration(total)} · one continuous drawing`}</strong><small>{stages.length===1?'The whole image is drawn in one go, exactly as it looks.':'New marks appear progressively. Changed guides fade away.'}</small></div><button className="button primary" disabled={busy||total>300||total<5||stages.some(s=>!s.label.trim())} onClick={save}>{busy?<LoaderCircle className="spin" size={17}/>:<ScanLine size={17}/>} {busy?'Preparing your drawing…':stages.length===1?'Prepare drawing':'Prepare drawing steps'}</button></footer>
-      {total>300&&<p role="alert" className="failure-text">Shorten the steps to a total of 5 minutes or less.</p>}
+      <footer><div><strong>{stages.length===1?`1 step · ${duration(total)}`:`${stages.length} steps · ${duration(total)} · one continuous drawing`}</strong><small>{stages.length===1?'The whole image is drawn in one go, exactly as it looks.':'New marks appear progressively. Changed guides fade away.'}</small></div><button className="button primary" disabled={busy||total>maxTotal||total<5||stages.some(s=>!s.label.trim())} onClick={save}>{busy?<LoaderCircle className="spin" size={17}/>:<ScanLine size={17}/>} {busy?'Preparing your drawing…':stages.length===1?'Prepare drawing':'Prepare drawing steps'}</button></footer>
+      {total>maxTotal&&<p role="alert" className="failure-text">Shorten the steps to a total of {maxTotal>=300?'5 minutes':'1 minute'} or less.{maxTotal<300&&<> Longer videos, up to 5 minutes, are part of <button className="inline-link" onClick={onUpgrade}>Pro</button>.</>}</p>}
     </>}
   </section>{editingImage&&<ImageEditor project={{...project,config:undefined}} api={api} onClose={()=>setEditingImage(false)} onSaved={result=>{setProject(result);setEditingImage(false);}}/>}</div>;
 }

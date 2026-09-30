@@ -118,6 +118,23 @@ def event_position(event, fraction):
     return point, lift
 
 
+# ------------------------------------------------------------------------------ timing
+
+def phase_bounds(duration, color):
+    """(line_end, reveal): the line-work ends at line_end (a fraction of the video), then the colour takes `reveal` of it.
+
+    The finished picture is held for a couple of seconds at most, so a 5-minute video doesn't sit on a still image for
+    24 seconds while the clock keeps running. Short videos keep the classic 8% hold (65% drawing, 27% colour reveal)."""
+    hold = min(.08, 2.0 / max(1, duration))
+    reveal = .27 if color else 0
+    return 1 - hold - reveal, reveal
+
+
+def stage_hold(stage_seconds):
+    """Fraction of one step-by-step stage spent holding its finished drawing (10%, but never more than ~1.5 s)."""
+    return min(.1, 1.5 / max(.1, stage_seconds))
+
+
 # ------------------------------------------------------------------------------ drawing order
 
 TIER_BANDS = (.20, .16, .10)  # how far down the picture the pen may reach for its next stroke, per tier (fraction of height)

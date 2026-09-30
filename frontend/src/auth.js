@@ -111,7 +111,12 @@ export async function signOut() {
 }
 
 function friendly(error) {
+  console.warn('Sign-in error:', error.code, error.message);  // the real reason, for whoever is debugging
   const messages = {
+    'auth/unauthorized-domain': `This web address (${location.hostname}) isn’t approved for sign-in yet. Try http://localhost:${location.port || 80}/studio/ instead.`,
+    'auth/operation-not-allowed': 'That sign-in method isn’t switched on yet. Please try the other option.',
+    'auth/web-storage-unsupported': 'Your browser is blocking storage that sign-in needs. Allow cookies for this site and try again.',
+    'auth/internal-error': 'Sign-in hit a temporary problem. Please try again in a moment.',
     'auth/invalid-email': 'That email address doesn’t look right.',
     'auth/invalid-action-code': 'This sign-in link has expired or was already used. Request a new one.',
     'auth/expired-action-code': 'This sign-in link has expired. Request a new one.',

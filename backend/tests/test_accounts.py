@@ -51,7 +51,7 @@ def test_sign_in_is_required(client):
     assert client.get('/api/projects').status_code == 401
     me = client.get('/api/me', headers=as_user('ana')).json()
     assert me['plan']['id'] == 'free'
-    assert me['usage'] == {'used': 0, 'limit': 3, 'remaining': 3, 'period_days': None}
+    assert me['usage'] == {'used': 0, 'limit': 3, 'remaining': 3, 'period_days': 30, 'resets': None}
 
 
 def test_users_only_see_their_own_work(client):

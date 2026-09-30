@@ -31,7 +31,7 @@ export default function StepCanvas({project,settings,time,original,onReady}) {
     const [width,height]=settings.ratio==='9:16'?[540,960]:settings.ratio==='1:1'?[720,720]:[960,540];canvas.width=width;canvas.height=height;
     const ctx=canvas.getContext('2d');ctx.fillStyle='#faf9f6';ctx.fillRect(0,0,width,height);
     const scale=Math.min(width*.9/project.width,height*.9/project.height),ox=(width-project.width*scale)/2,oy=(height-project.height*scale)/2;
-    const {index,local}=stageAt(project.stages,time/settings.duration),stage=project.stages[index],amount=Math.min(1,local/.9);
+    const {index,local}=stageAt(project.stages,time/settings.duration),stage=project.stages[index],amount=Math.min(1,local/(1-Math.min(.1,1.5/Math.max(.1,(stage.end-stage.start)*settings.duration))));
     if(original){ctx.drawImage(data.stages.at(-1).image,ox,oy,project.width*scale,project.height*scale);return}
     const target=data.stages[index],previous=index?data.stages[index-1].pixels:null,pixels=data.pixels.data,paper=[250,249,246];
     const mask=project.reveal_version>=2?advanceSweep(data,project.width,project.height,index,amount,stage.timeline,project.reveal_version>=3?target.labels:null):null;

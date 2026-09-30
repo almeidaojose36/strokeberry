@@ -144,7 +144,7 @@ Config lives in `.env.local` (see `.env.example`). Each part switches on only wh
   - Preview the signed-in UI locally: `STROKEBERRY_AUTH=dev STROKEBERRY_DEV_USER=tester npm run server`.
 - **Per-user data:** projects and jobs carry `user_id`. Other users' items return 404. `<img>` and `<video>` links are HMAC-signed and valid for 24 hours.
 - **Plans** (`accounts.PLANS`):
-  - Free: 3 lifetime exports, 720p, watermark (`backend/watermark.py`, compact mark plus strokeberry.com).
+  - Free: 3 exports per rolling 30 days (changed from 3 lifetime on 2026-09-30), up to 1 minute, 720p, watermark (`backend/watermark.py`, compact mark plus strokeberry.com).
   - Pro: 200 exports per rolling 30 days, 1080p, no watermark.
   - Failed renders don't count, and each user can run at most 2 renders at once. A cancelled Pro subscription lapses by itself at `plan_renews`.
 - **Payments:** Lemon Squeezy, the merchant of record (Stripe doesn't support South African payouts). Code is in `backend/billing.py`.
@@ -194,7 +194,7 @@ Config lives in `.env.local` (see `.env.example`). Each part switches on only wh
 
 ## 8. Pricing, guests and the landing page (2026-09-29)
 
-**Decisions (owner):** Free (3 videos, 720p, watermark) and one paid plan, **Pro: $10/month or $84/year** (30% off, about $7/month). Launch offer: **Founding member, $7/month locked for as long as the subscription stays active, first 100 customers, monthly plan only.**
+**Decisions (owner):** Free (3 videos every month, up to 1 minute, 720p, watermark) and one paid plan, **Pro: $10/month or $84/year** (30% off, about $7/month). Launch offer: **Founding member, $7/month locked for as long as the subscription stays active, first 100 customers, monthly plan only.**
 
 - **Founding offer, how it works:** a Lemon Squeezy discount code. Create it: 30% off, duration **forever**, max **100 redemptions**, limited to the monthly variant. Set `STROKEBERRY_FOUNDER_CODE` to the code. The server then applies it to monthly checkouts, `GET /api/offer` feeds the landing page banner and the upgrade dialog, and the spots-left counter reads the redemption count from Lemon Squeezy (cached 5 minutes). It disappears by itself when the 100 are used or the code is unset. `billing.founder_offer()`.
 - **Yearly plan:** create a second variant ($84/year) and set `LEMONSQUEEZY_PRO_YEARLY_VARIANT_ID`.
@@ -207,6 +207,8 @@ Config lives in `.env.local` (see `.env.example`). Each part switches on only wh
 
 ## 9. Usability and retention features (2026-09-30)
 
+- **Plan limits (updated 2026-09-30):** Free videos are up to **1 minute**, Pro up to **5 minutes** (`PLANS[...]['max_duration']`, enforced on export, batch and step creation; the slider and steps editor follow the plan). The finished picture is held for ~2 s however long the video (`artistry.phase_bounds`, mirrored in `main.jsx` and `StepCanvas.jsx`).
+
 Built on the same branch. Backend in `backend/app.py` (+ `brand.py`, `mailer.py`, `prune.py`), interface in `frontend/src/` (`ProjectsView`, `ExportsView`, `ExportResult`, `BrandKit`, `Presets`, `Ideas`, `Dialogs`).
 
 - **First run:** the drawing plays by itself the first time (and whenever you upload or pick an example). On phones a fixed **Export** bar stays at the bottom.
@@ -217,11 +219,11 @@ Built on the same branch. Backend in `backend/app.py` (+ `brand.py`, `mailer.py`
 - **Saved styles:** Free 1, Pro 20 (`/api/presets`). Guests are asked to create an account.
 - **Batch export (Pro):** `POST /api/batch` exports up to 6 projects x 3 formats (max 9 at once). Every video counts toward the 200/month. Free and guests are asked to upgrade or sign in.
 - **Brand kit (Pro):** drawing colour and a corner logo applied to every export (`/api/brand`); the live preview uses the colour too. The logo is stored under `data/brand/`. On 9:16 the logo moves to the top. Free users see the screen locked.
-- **Emails** (`backend/mailer.py`, off until `SMTP_*` are set, see `.env.example`): a welcome email on first sign-in, then "1 free video left" and "used your 3 free videos", each sent once. Use an **app password** for the Zoho mailbox, not the login password. Firebase's own sign-in emails are separate.
+- **Emails** (`backend/mailer.py`, off until `SMTP_*` are set, see `.env.example`): a welcome email on first sign-in, then "1 free video left" and "used your 3 free videos this month", each sent at most once a month. Use an **app password** for the Zoho mailbox, not the login password. Firebase's own sign-in emails are separate.
 - **Guest cleanup:** `.venv/bin/python -m backend.prune` deletes guest accounts older than 30 days with their files (Firebase auto clean-up removes the accounts on its side). Run it daily from cron on the server.
 - **Preview colours:** `frontend/src/drawing.js` and `backend/pipeline.py` both apply the brand colour, so preview and export match.
 
-**Firebase status (2026-09-30):** project `strokeberry-514b7` (owner: the Grupo Angbu Google account). Enabled: Email link, Anonymous (auto clean-up on). Authorised domains: localhost, strokeberry.com, www.strokeberry.com. Web config is in `.env.local`, so the local server now uses guests and real sign-in. **Google sign-in is not enabled yet:** Firebase requires a public "support email" that can only be an address of a project member; add the address you want as a project Owner (Users and permissions), then enable Google. To go back to the old single-user local studio, comment out the `VITE_FIREBASE_*` and `FIREBASE_PROJECT_ID` lines in `.env.local` and run `npm run build`.
+**Firebase status (2026-09-30):** project `strokeberry-514b7` (owner: the Grupo Angbu Google account). Enabled: Email link, Anonymous (auto clean-up on). Authorised domains: localhost, strokeberry.com, www.strokeberry.com. Web config is in `.env.local`, so the local server now uses guests and real sign-in. **Google sign-in is enabled** (2026-09-30) with public name "Strokeberry" and support email `almeida.jose@grupoangbu.com` (the only project member at the time). To show `support@strokeberry.com` instead: it has a pending Owner invitation (arrived in the Zoho inbox); accept it by creating a Google account with that address, then change the support email under Authentication -> Sign-in method -> Google. To go back to the old single-user local studio, comment out the `VITE_FIREBASE_*` and `FIREBASE_PROJECT_ID` lines in `.env.local` and run `npm run build`.
 
 - **First-run defaults:** new visitors start with the **Sweet cupcake** starter drawn in **Ink** (`defaults` in `frontend/src/main.jsx`, `SAMPLE_*` in `backend/app.py`). Returning users keep the style they saved in their browser. White backgrounds are blended into the paper colour in `prepare_image` (`SCENE_VERSION` 3), so older projects are refreshed when opened.
 

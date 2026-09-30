@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 from PIL import Image
 
-from .artistry import clean_paths, make_timeline, event_position, SCENE_VERSION
+from .artistry import clean_paths, make_timeline, event_position, stage_hold, SCENE_VERSION
 
 PAPER = np.array([250, 249, 246], dtype=np.uint8)
 REVEAL_VERSION = 5
@@ -425,7 +425,9 @@ class StepFrames:
     def frame(self, progress):
         index, local = stage_at(self.scene, progress)
         stage = self.scene['stages'][index]
-        amount = min(1., local / .9)
+        # Scenes that record their length get a short hold on each finished stage; older scenes keep the classic 10%.
+        hold = stage_hold((stage['end'] - stage['start']) * self.scene['duration']) if self.scene.get('duration') else .1
+        amount = min(1., local / (1 - hold))
         if self.scene.get('reveal_version', 0) >= 2:
             if index != self.index or amount < self.amount:
                 self.mask.fill(False); self.cursor = 0

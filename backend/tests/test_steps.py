@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw
 from fastapi.testclient import TestClient
 
 from backend import app as module
+from backend.artistry import stage_hold
 from backend import pipeline
 from backend.steps import alignment, detect_panels, prepare_steps, StepFrames, four_step_reading_order
 from backend.steps import reading_regions, swept_scene, PAPER, color_layers, REVEAL_VERSION
@@ -26,6 +27,7 @@ def tutorial():
         if i >= 3: d.rectangle((x+64,y+134,x+90,y+190),fill='#e67443')
     data = io.BytesIO();image.save(data,format='PNG');data.seek(0)
     return data
+
 
 
 def config_for(folder):

@@ -37,7 +37,7 @@ export default function ExportResult({job, sameProject, plan, remaining, onAgain
         <button className="chip" onClick={() => onAgain({style: other})}>Try {other === 'ink' ? 'Ink' : 'Pencil'}<small>{other === 'ink' ? 'bold lines' : 'soft strokes'}</small></button>
         {pro && <button className="chip chip-pro" onClick={onAllFormats}><Sparkles size={14}/>All 3 formats<small>one click</small></button>}
       </div>
-      {free && remaining != null && <small className="ready-next-note">Each new export uses 1 of your free videos ({remaining} left).</small>}
+      {free && remaining != null && <small className="ready-next-note">Each new export uses 1 of your 3 free videos this month ({remaining} left).</small>}
     </div>}
     <button className="text-button" onClick={onAnother}><LayoutGrid size={15}/>Make another video</button>
   </div>;

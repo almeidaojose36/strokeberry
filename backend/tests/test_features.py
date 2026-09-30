@@ -154,7 +154,7 @@ def test_free_users_get_a_welcome_and_allowance_emails(client, monkeypatch):
         with module.connect() as db:
             db.execute("UPDATE jobs SET status='completed'")
     subjects = [s for _, s in sent]
-    assert subjects == ['Welcome to Strokeberry', 'You have 1 free video left', 'You’ve used your 3 free videos']
+    assert subjects == ['Welcome to Strokeberry', 'You have 1 free video left', 'You’ve used your 3 free videos this month']
     module.notify_allowance(job['id'])
     assert len(sent) == 3  # never repeated
     # guests get nothing

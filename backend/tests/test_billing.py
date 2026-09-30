@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from backend import app as module
-from backend.tests.test_accounts import as_user, client  # noqa: F401  (shared fixture)
+from backend.tests.test_accounts import as_user, client, upload  # noqa: F401  (shared fixture)
 
 
 def when(days):
@@ -211,3 +211,47 @@ def test_founding_member_offer(client, monkeypatch):
     assert client.get('/api/offer').json()['founder'] is None
     client.post('/api/billing/checkout', headers=as_user('ana'), json={'interval': 'month'})
     assert 'discount_code' not in sent[2]['data']['attributes']['checkout_data']
+
+
+def make_pro(name):
+    with module.connect() as db:
+        db.execute("UPDATE users SET plan='pro' WHERE id=?", (name,))
+
+
+def test_videos_over_a_minute_are_part_of_pro(client):
+    project = upload(client, 'ana')
+    url = f"/api/projects/{project['id']}/jobs"
+    assert client.get('/api/me', headers=as_user('ana')).json()['plan']['max_duration'] == 60
+    long = client.post(url, headers=as_user('ana'), json={'duration': 61})
+    assert long.status_code == 403 and 'Pro' in long.json()['detail']
+    assert client.post(url, headers=as_user('ana'), json={'duration': 60}).status_code == 202
+    steps = {'stages': [{'crop': {'x': 0, 'y': 0, 'width': 1, 'height': 1}, 'label': 'All', 'seconds': 90}], 'align': True}
+    assert client.post(f"/api/projects/{project['id']}/steps", headers=as_user('ana'), json=steps).status_code == 403
+    make_pro('ana')
+    with module.connect() as db:
+        db.execute("UPDATE jobs SET status='completed'")
+    assert client.get('/api/me', headers=as_user('ana')).json()['plan']['max_duration'] == 300
+    assert client.post(url, headers=as_user('ana'), json={'duration': 300}).status_code == 202
+    assert client.post(f"/api/projects/{project['id']}/steps", headers=as_user('ana'), json=steps).status_code == 201
+
+
+def test_free_videos_come_back_a_month_after_they_were_made(client):
+    from datetime import datetime, timedelta, timezone
+    project = upload(client, 'ana')
+    url = f"/api/projects/{project['id']}/jobs"
+    now = datetime.now(timezone.utc)
+    with module.connect() as db:
+        for days_ago, name in ((10, 'a'), (20, 'b'), (5, 'c')):
+            db.execute("INSERT INTO jobs (id, project_id, status, progress, stage, settings, created, user_id) VALUES (?,?,'completed',100,'',?,?,?)",
+                       (name, project['id'], '{}', (now - timedelta(days=days_ago)).isoformat(), 'ana'))
+    usage = client.get('/api/me', headers=as_user('ana')).json()['usage']
+    assert usage['remaining'] == 0 and usage['resets']
+    back = datetime.fromisoformat(usage['resets'])
+    assert abs((back - (now + timedelta(days=10))).total_seconds()) < 5  # the 20-day-old video turns a month old in 10 days
+    blocked = client.post(url, headers=as_user('ana'), json={})
+    assert blocked.status_code == 402 and 'come back on' in blocked.json()['detail'] and 'Pro' in blocked.json()['detail']
+    # once the oldest video is more than a month old it stops counting and the slot returns
+    with module.connect() as db:
+        db.execute("UPDATE jobs SET created=? WHERE id='b'", ((now - timedelta(days=31)).isoformat(),))
+    assert client.get('/api/me', headers=as_user('ana')).json()['usage'] == {'used': 2, 'limit': 3, 'remaining': 1, 'period_days': 30, 'resets': None}
+    assert client.post(url, headers=as_user('ana'), json={}).status_code == 202

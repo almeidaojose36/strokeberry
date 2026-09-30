@@ -59,18 +59,18 @@ def welcome(to, name=None):
     first = (name or '').split(' ')[0]
     return send(to, 'Welcome to Strokeberry', [
         f'Hi {first},' if first else 'Hi there,',
-        'Thanks for joining Strokeberry. You have 3 free videos to try, and there’s a quick way to get a great first result: '
+        'Thanks for joining Strokeberry. You get 3 free videos every month, and there’s a quick way to get a great first result: '
         'pick one of the examples, choose Ink, and export it as a 9:16 video for Reels or TikTok.',
         'Your projects are saved, so you can come back and make more any time.'], ('Open the studio', '/studio/'))
 
 
-def allowance(to, remaining):
+def allowance(to, remaining, resets=None):
     if remaining > 0:
         return send(to, 'You have 1 free video left', [
-            'You’ve used 2 of your 3 free videos, so there’s 1 left. Make it a good one!',
-            'When you’re ready for more, Strokeberry Pro gives you 200 videos a month in Full HD with no watermark.'],
+            'You’ve used 2 of your 3 free videos this month, so there’s 1 left. Make it a good one!',
+            'You get 3 new free videos every month. If you’d like more sooner, Strokeberry Pro gives you 200 videos a month in Full HD with no watermark.'],
             ('Open the studio', '/studio/'))
-    return send(to, 'You’ve used your 3 free videos', [
-        'That’s all 3 free videos used. Your projects are still here and you can keep previewing as much as you like.',
+    return send(to, 'You’ve used your 3 free videos this month', [
+        'That’s all 3 free videos used for now' + (f'. They come back on {resets}.' if resets else '.') + ' Your projects are still here and you can keep previewing as much as you like.',
         'To export more, Strokeberry Pro gives you 200 videos a month in Full HD with no watermark. Cancel any time.'],
         ('See Pro', '/studio/?upgrade=1'))

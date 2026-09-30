@@ -28,16 +28,17 @@ from fastapi import HTTPException, Request
 FIREBASE_JWKS = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com'
 LOCAL_USER = 'local'
 
-# What each plan includes. Free exports count for the lifetime of the account; Pro exports reset every 30 days.
+# What each plan includes. Both Free (3) and Pro (200) allowances are counted over a rolling 30 days, so a Free user's
+# videos come back a month after they were made.
 # "guest" is a visitor who hasn't signed in yet (a Firebase anonymous user): they can try the studio and preview
 # drawings, but exporting needs a real account.
 GUEST_PROJECT_LIMIT = 3
 FREE_PRESET_LIMIT, PRO_PRESET_LIMIT = 1, 20
 ACTIVE_RENDERS = {'free': 2, 'pro': 9}  # queued + rendering exports per person
 PLANS = {
-    'guest': {'name': 'Guest', 'exports': 0, 'period_days': None, 'max_resolution': '720p', 'watermark': True},
-    'free': {'name': 'Free', 'exports': 3, 'period_days': None, 'max_resolution': '720p', 'watermark': True},
-    'pro': {'name': 'Pro', 'exports': 200, 'period_days': 30, 'max_resolution': '1080p', 'watermark': False},
+    'guest': {'name': 'Guest', 'exports': 0, 'period_days': None, 'max_resolution': '720p', 'max_duration': 60, 'watermark': True},
+    'free': {'name': 'Free', 'exports': 3, 'period_days': 30, 'max_resolution': '720p', 'max_duration': 60, 'watermark': True},
+    'pro': {'name': 'Pro', 'exports': 200, 'period_days': 30, 'max_resolution': '1080p', 'max_duration': 300, 'watermark': False},
 }
 
 _jwks_lock = threading.Lock()
@@ -169,8 +170,18 @@ def usage(db, user):
         query += ' AND created >= ?'
         args.append((datetime.now(timezone.utc) - timedelta(days=plan['period_days'])).isoformat())
     used = db.execute(query, args).fetchone()[0]
+    resets = None
+    if plan['period_days'] and used >= plan['exports'] > 0:
+        # The allowance frees up when the video that pushes you over the limit turns a month old.
+        row = db.execute(query.replace('count(*)', 'created') + ' ORDER BY created LIMIT 1 OFFSET ?', args + [used - plan['exports']]).fetchone()
+        if row:
+            resets = (datetime.fromisoformat(row[0]) + timedelta(days=plan['period_days'])).isoformat()
     return {'used': used, 'limit': plan['exports'], 'remaining': max(0, plan['exports'] - used),
-            'period_days': plan['period_days']}
+            'period_days': plan['period_days'], 'resets': resets}
+
+
+def short_date(iso):
+    return datetime.fromisoformat(iso).strftime('%-d %b')
 
 
 def account_summary(db, user):
@@ -192,16 +203,26 @@ def billing_info():
             'founder': billing.founder_offer()}
 
 
+def check_duration(user, seconds):
+    """Free videos can be up to a minute; longer ones (up to five minutes) are part of Pro."""
+    limit = plan_of(user)['max_duration']
+    if seconds > limit:
+        raise HTTPException(403, 'Videos longer than 1 minute are part of Pro. Shorten this one or upgrade to make it up to 5 minutes.')
+
+
 def check_export_allowed(db, user, settings):
     """Raise 402/403 with a friendly message when the plan doesn't allow this export."""
     plan = plan_of(user)
     if plan_id(user) == 'guest':
         raise HTTPException(401, 'Create a free account to export your video. It takes a few seconds.')
+    check_duration(user, settings['duration'])
     if settings['resolution'] == '1080p' and plan['max_resolution'] != '1080p':
         raise HTTPException(403, 'Full HD 1080p is part of Strokeberry Pro. Choose 720p or upgrade.')
     if usage(db, user)['remaining'] <= 0:
         if plan_id(user) == 'free':
-            raise HTTPException(402, "You've used your free videos. Upgrade to Pro to keep creating.")
+            when = usage(db, user)['resets']
+            back = f' They come back on {short_date(when)}, or upgrade' if when else ' Upgrade'
+            raise HTTPException(402, f"You've used your 3 free videos for this month.{back} to Pro to keep creating.")
         raise HTTPException(429, "You've reached this month's export limit. It resets soon — thanks for creating so much!")
     return plan
 

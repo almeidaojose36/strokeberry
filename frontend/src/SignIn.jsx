@@ -30,7 +30,7 @@ export default function SignIn({notice, dialog, onClose, onSignedIn, title, intr
         <button className="button ghost" onClick={() => setSent(false)}>Use a different email</button>
       </> : <>
         <h1>{title || 'Sign in to start drawing'}</h1>
-        <p>{intro || 'Your projects and videos are saved to your account. Your first 3 videos are free.'}</p>
+        <p>{intro || 'Your projects and videos are saved to your account. You get 3 free videos every month.'}</p>
         {error && <div className="sign-in-error" role="alert">{error}</div>}
         <button className="button google-button" onClick={google} disabled={Boolean(busy)}>
           {busy === 'google' ? <LoaderCircle size={18} className="spin"/> : <GoogleLogo/>}Continue with Google

@@ -159,3 +159,16 @@ def test_prepared_images_are_drawn_outline_first(tmp_path):
     scene = prepare_image(src, folder)
     extent = lambda s: np.ptp(np.asarray(s)[:, 0]) + np.ptp(np.asarray(s)[:, 1])
     assert extent(scene['paths'][0]) > 3 * extent(scene['paths'][-1])
+
+
+def test_the_finished_picture_is_held_for_a_couple_of_seconds_however_long_the_video():
+    from backend.artistry import phase_bounds, stage_hold
+    for duration, color in ((15, True), (15, False)):                       # short videos are unchanged
+        line_end, reveal = phase_bounds(duration, color)
+        assert abs(line_end - (.65 if color else .92)) < 1e-9 and reveal == (.27 if color else 0)
+    for duration in (60, 300):
+        line_end, reveal = phase_bounds(duration, True)
+        hold_seconds = (1 - line_end - reveal) * duration
+        assert abs(hold_seconds - 2.0) < 1e-9                                # ~2 s, not 24 s on a 5-minute video
+        assert abs(phase_bounds(duration, False)[0] * duration - (duration - 2.0)) < 1e-9
+    assert stage_hold(2) == .1 and abs(stage_hold(300) * 300 - 1.5) < 1e-9

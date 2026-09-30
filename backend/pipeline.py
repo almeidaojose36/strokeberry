@@ -13,7 +13,7 @@ from PIL import Image, ImageOps
 
 from . import watermark
 from .brand import hex_to_rgb
-from .artistry import SCENE_VERSION, clean_paths, make_timeline, event_position, order_strokes
+from .artistry import SCENE_VERSION, clean_paths, make_timeline, event_position, order_strokes, phase_bounds
 
 _scene_lock = threading.Lock()
 
@@ -160,7 +160,7 @@ def render(folder: Path, settings, update, output=None):
         try:
             for frame in range(frames):
                 progress = frame / max(1, frames - 1)
-                line_end = .65 if settings['color'] else .92
+                line_end, reveal_span = phase_bounds(settings['duration'], settings['color'])
                 draw_progress = min(1, progress / line_end)
                 while index < len(events) and events[index]['end'] <= draw_progress:
                     event = events[index]
@@ -177,7 +177,7 @@ def render(folder: Path, settings, update, output=None):
                     if event['kind'] == 'draw':
                         draw_mark(canvas, screen(event['a']), tip, event['pressure'], settings['style'], unit, tint)
                 if settings['color'] and progress > line_end:
-                    amount = min(1, (progress - line_end) / .27)
+                    amount = min(1, (progress - line_end) / reveal_span)
                     mask = np.clip((amount * 270 - reveal.astype(np.float32)) / 20, 0, 1)[..., None]
                     area = canvas[oy:oy + size[1], ox:ox + size[0]]
                     area[:] = np.uint8(area * (1 - mask) + source * mask)

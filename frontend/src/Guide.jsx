@@ -37,7 +37,7 @@ export default function Guide({account, onExamples}) {
       <figure className="good"><img src="/guide/tip-good.webp" alt="A fox illustration with bold outlines on a white background"/><figcaption><Check size={15}/>Bold outlines, plain background</figcaption></figure>
       <figure className="bad"><img src="/guide/tip-busy.webp" alt="The same fox on a cluttered background"/><figcaption><X size={15}/>Busy backgrounds and photos</figcaption></figure>
     </div>
-    {free && <p className="guide-plan">Free plan: {account.usage.limit} videos in 720p with a small watermark. Pro adds Full HD and removes the watermark.</p>}
+    {free && <p className="guide-plan">Free plan: {account.usage.limit} videos every month, up to 1 minute, in 720p with a small watermark. Pro adds Full HD, longer videos and no watermark.</p>}
     <div className="local-note">Your images and videos stay private to you. Strokeberry draws them itself — they’re never sent to a third‑party AI service.</div>
     <p className="modal-note">Need a hand? Email <a className="inline-link" href="mailto:support@strokeberry.com">support@strokeberry.com</a></p>
   </div>;

@@ -338,6 +338,7 @@ def step_layout(project_id: str, user=Depends(current_user)):
 @app.post('/api/projects/{project_id}/steps', status_code=201)
 def create_steps(project_id: str, config: StepConfig, user=Depends(current_user)):
     parent = get_project(project_id, user)
+    accounts.check_duration(user, sum(stage.seconds for stage in config.stages))
     config_data = config.model_dump()
     config_data['stages'] = four_step_reading_order(config_data['stages'])
     derived_id = uuid.uuid4().hex
@@ -366,9 +367,11 @@ def notify_allowance(job_id):
             if not user or not user['email'] or accounts.plan_id(dict(user)) != 'free':
                 return
             user = dict(user)
-            remaining = accounts.usage(db, user)['remaining']
-            if remaining <= 1 and mark_notice(db, user, 'allowance-%d' % remaining):
-                mailer.allowance(user['email'], remaining)
+            used = accounts.usage(db, user)
+            remaining = used['remaining']
+            month = datetime.now(timezone.utc).strftime('%Y-%m')  # one notice of each kind per month, since the allowance renews
+            if remaining <= 1 and mark_notice(db, user, f'allowance-{remaining}-{month}'):
+                mailer.allowance(user['email'], remaining, accounts.short_date(used['resets']) if used['resets'] else None)
     except Exception:
         logging.exception('Allowance notice failed')
 
