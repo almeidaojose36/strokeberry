@@ -40,6 +40,26 @@ def blend_white_background(rgb):
     return np.uint8(rgb * (1 - weight[..., None]) + paper * weight[..., None])
 
 
+TRIM_PADDING = .07  # empty border kept around the artwork, as a share of its longer side
+
+
+def trim_margins(image):
+    """Crop away empty paper so the subject fills the frame. Idempotent: a second pass finds nothing left to trim."""
+    rgb = np.array(image)
+    ink = np.abs(rgb.astype(np.int16) - np.array(PAPER, np.int16)).sum(axis=2) > 40
+    ink = cv2.morphologyEx(np.uint8(ink), cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)) > 0  # ignore specks and dust
+    rows, cols = np.where(ink.any(axis=1))[0], np.where(ink.any(axis=0))[0]
+    if not len(rows) or not len(cols):
+        return image
+    top, bottom, left, right = rows[0], rows[-1] + 1, cols[0], cols[-1] + 1
+    if (bottom - top) * (right - left) < .02 * ink.size:
+        return image  # too little to frame (a blank or nearly blank picture)
+    pad = round(TRIM_PADDING * max(bottom - top, right - left))
+    box = (max(0, left - pad), max(0, top - pad), min(image.width, right + pad), min(image.height, bottom + pad))
+    slack = (box[2] - box[0]) * (box[3] - box[1]) / (image.width * image.height)
+    return image.crop(box) if slack < .94 else image  # only when it gains something worth having
+
+
 def prepare_image(raw, folder: Path):
     with Image.open(raw) as image:
         if image.width * image.height > 20_000_000:
@@ -51,7 +71,7 @@ def prepare_image(raw, folder: Path):
         image = image.convert('RGB')
         if not (folder / 'original.png').exists():
             image.save(folder / 'original.png')
-        image = Image.fromarray(blend_white_background(np.array(image)))  # the original.png above stays untouched
+        image = trim_margins(Image.fromarray(blend_white_background(np.array(image))))  # original.png above stays untouched
         image.thumbnail((900, 900))
         image.save(folder / 'source.png')
     rgb = np.array(image)

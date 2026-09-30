@@ -4,7 +4,7 @@ import math
 import cv2
 import numpy as np
 
-SCENE_VERSION = 8  # 6: only real black outlines are drawn, as single centre lines (edge tracing is the fallback); 5: the colour reveal is spread by visible weight; 4: strokes ordered like a person draws; 3: white backgrounds blend into the paper
+SCENE_VERSION = 10  # 6: only real black outlines are drawn, as single centre lines (edge tracing is the fallback); 5: the colour reveal is spread by visible weight; 4: strokes ordered like a person draws; 3: white backgrounds blend into the paper
 
 
 def resample(points, step=3.0):

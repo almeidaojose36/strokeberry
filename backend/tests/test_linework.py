@@ -86,5 +86,6 @@ def test_a_colour_patch_without_an_outline_is_suggested_a_line():
 
 def test_fully_outlined_art_gets_no_suggestions():
     image = drawing()
+    cv2.circle(image, (200, 200), 60, (20, 20, 20), 6)   # the red disc gets its own outline
     strokes, width = linework.extract_strokes(image)
     assert linework.missing_lines(image, strokes, width) == []

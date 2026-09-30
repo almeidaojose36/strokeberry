@@ -10,8 +10,14 @@ import cv2
 import numpy as np
 
 MAX_STROKES = 800  # a very textured picture keeps its longest lines
-MIN_COVERAGE = .55  # share of strong colour boundaries that must lie beside a drawn outline
+MIN_COVERAGE = .4  # share of strong colour boundaries that must lie beside a drawn outline
 NEIGHBOURS = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
+
+
+def ink_mask(rgb, gray):
+    """Pen-black pixels: dark and not strongly coloured, so deep red or teal fills are not mistaken for outlines."""
+    spread = rgb.max(axis=2).astype(np.int16) - rgb.min(axis=2)
+    return (gray < 125) & (spread < 80)
 
 
 def thin(binary):
@@ -120,7 +126,7 @@ def extract_strokes(rgb):
 
     gray = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
     height, width = gray.shape
-    dark = np.uint8(gray < 125) * 255
+    dark = np.uint8(ink_mask(rgb, gray)) * 255
     if not 0.004 <= dark.mean() / 255 <= 0.30:
         return None
     dark = cv2.morphologyEx(dark, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8))
@@ -132,7 +138,8 @@ def extract_strokes(rgb):
     line_half_width = float(np.median(peaks))
     radius = max(2, int(round(line_half_width * 1.9)))
     thick = cv2.morphologyEx(dark, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * radius + 1, 2 * radius + 1)))
-    lines = cv2.bitwise_and(dark, cv2.bitwise_not(cv2.dilate(thick, np.ones((3, 3), np.uint8))))
+    fills = thick
+    lines = cv2.bitwise_and(dark, cv2.bitwise_not(cv2.dilate(fills, np.ones((3, 3), np.uint8))))
     lines = cv2.morphologyEx(lines, cv2.MORPH_OPEN, np.ones((2, 2), np.uint8))  # drop crumbs left beside fills
     count, labels, stats, _ = cv2.connectedComponentsWithStats(lines, 8)
     keep = np.zeros(count, bool)
@@ -153,7 +160,8 @@ def extract_strokes(rgb):
     drawn = np.zeros(gray.shape, np.uint8)
     for stroke in paths:
         cv2.polylines(drawn, [np.round(stroke).astype(np.int32)], False, 255, 1)
-    near = cv2.dilate(drawn, np.ones((9, 9), np.uint8)) > 0
+    reach = 2 * int(np.ceil(line_half_width)) + 5  # bold outlines have their edges further from the centre line
+    near = cv2.dilate(drawn, np.ones((reach, reach), np.uint8)) > 0
     edges = cv2.Canny(cv2.GaussianBlur(gray, (3, 3), 0), 45, 125) > 0
     smooth = cv2.GaussianBlur(rgb, (0, 0), 1.2).astype(np.float32)
     strength = np.hypot(np.abs(np.diff(smooth, axis=1, prepend=smooth[:, :1])).sum(axis=2),
@@ -229,7 +237,7 @@ def missing_lines(rgb, paths, line_width):
     for stroke in paths:
         cv2.polylines(drawn, [np.round(stroke).astype(np.int32)], False, 255, 1)
     reach = int(round(line_width)) * 2 + 5
-    covered = cv2.dilate(np.uint8(gray < 125) | (drawn > 0), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (reach, reach))) > 0
+    covered = cv2.dilate(np.uint8(ink_mask(rgb, gray)) | (drawn > 0), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (reach, reach))) > 0
     gaps = cv2.dilate(np.uint8(edge & ~covered) * 255, np.ones((3, 3), np.uint8))
     count, labels, stats, _ = cv2.connectedComponentsWithStats(gaps, 8)
     keep = np.zeros(count, bool)
