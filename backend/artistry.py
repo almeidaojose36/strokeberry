@@ -4,7 +4,7 @@ import math
 import cv2
 import numpy as np
 
-SCENE_VERSION = 4  # 4: strokes are ordered like a person draws (big shapes first); 3: white backgrounds blend into the paper
+SCENE_VERSION = 8  # 6: only real black outlines are drawn, as single centre lines (edge tracing is the fallback); 5: the colour reveal is spread by visible weight; 4: strokes ordered like a person draws; 3: white backgrounds blend into the paper
 
 
 def resample(points, step=3.0):
@@ -156,11 +156,26 @@ def stroke_tier(points, drawing_diagonal):
     return 0 if span >= .30 else 1 if span >= .10 else 2
 
 
+def is_closed(points):
+    return len(points) > 3 and float(np.hypot(*(np.asarray(points[0], float) - np.asarray(points[-1], float)))) < 1e-6
+
+
 def start_at(points, pen):
-    """Rotate a closed stroke so it begins at the vertex nearest to the pen, which keeps pen travel short."""
-    body = np.asarray(points, float)[:-1]
+    """Begin a stroke where the pen already is: a closed stroke is rotated to its nearest vertex, an open one is drawn
+    from whichever end is nearer."""
+    points = np.asarray(points, float)
+    if not is_closed(points):
+        return points if np.hypot(*(points[0] - pen)) <= np.hypot(*(points[-1] - pen)) else points[::-1]
+    body = points[:-1]
     index = int(np.argmin(((body - pen) ** 2).sum(axis=1)))
     return np.vstack([np.roll(body, -index, axis=0), body[index]])
+
+
+def pen_distance(points, pen):
+    """How far the pen must travel to start this stroke (its ends for an open stroke, any vertex for a closed one)."""
+    points = np.asarray(points, float)
+    reachable = points if is_closed(points) else points[[0, -1]]
+    return float(((reachable - pen) ** 2).sum(axis=1).min())
 
 
 def order_strokes(paths, width, height):
@@ -185,7 +200,7 @@ def order_strokes(paths, width, height):
         while pool:
             reach = float(pool[0][:, 1].min()) + band
             candidates = [k for k, p in enumerate(pool) if float(p[:, 1].min()) <= reach]
-            best = min(candidates, key=lambda k: float(((pool[k] - pen) ** 2).sum(axis=1).min()))
+            best = min(candidates, key=lambda k: pen_distance(pool[k], pen))
             stroke = start_at(pool.pop(best), pen)
             ordered.append(stroke)
             pen = stroke[-1]

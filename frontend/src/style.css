@@ -619,3 +619,16 @@ button.guide-callout:hover{border-color:var(--line-strong);background:#fff}
 .nav-website svg:last-child{margin-left:auto;width:13px;height:13px;color:var(--faint)}
 
 .upgrade-reset{margin:-10px 0 18px;color:var(--ink-2);font-size:14.5px;line-height:1.5}
+
+.suggest-bar{padding:12px 18px;display:flex;align-items:center;gap:10px;background:var(--surface-2);border-top:1px solid var(--line);font-size:13.5px}
+.suggest-bar svg{color:var(--accent,#e0245e);flex:none}
+.suggest-bar span{flex:1;min-width:0}
+.suggest-bar button{height:32px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:13px;cursor:pointer}
+.suggest-bar button:hover:not(:disabled){border-color:var(--accent,#e0245e)}
+.suggest-modal{width:760px}
+.suggest-compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 0 22px}
+.suggest-compare figure{margin:0}
+.suggest-compare figcaption{font-size:13px;color:var(--muted);margin-top:8px}
+.suggest-frame{position:relative;background:var(--paper,#faf8f4);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.suggest-frame img,.suggest-frame svg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+@media (max-width:640px){.suggest-compare{grid-template-columns:1fr}.suggest-bar{flex-wrap:wrap}}

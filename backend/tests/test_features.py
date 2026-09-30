@@ -208,3 +208,20 @@ def test_a_new_visitors_simultaneous_requests_create_one_account_and_one_welcome
     with module.connect() as db:
         assert db.execute("SELECT count(*) FROM users WHERE id='newcomer'").fetchone()[0] == 1
     assert sent == ['Welcome to Strokeberry']
+
+
+def test_missing_lines_are_suggested_and_only_added_when_accepted(client):
+    import cv2
+    from backend.tests.test_linework import unlined_patch_drawing
+    ok, png = cv2.imencode('.png', cv2.cvtColor(unlined_patch_drawing(), cv2.COLOR_RGB2BGR))
+    project = client.post('/api/projects', headers=as_user('ana'), files={'file': ('art.png', png.tobytes(), 'image/png')}).json()
+    url = f"/api/projects/{project['id']}/enhance"
+    assert project['enhance']['state'] is None and project['enhance']['count'] >= 1
+    plain = project['strokes']
+    assert client.post(url, headers=as_user('ben'), json={'accept': True}).status_code == 404
+    accepted = client.post(url, headers=as_user('ana'), json={'accept': True}).json()
+    assert accepted['enhance']['state'] == 'accepted' and accepted['strokes'] > plain
+    declined = client.post(url, headers=as_user('ana'), json={'accept': False}).json()
+    assert declined['enhance']['state'] == 'rejected' and declined['strokes'] == plain
+    # artwork that is already fully outlined has nothing to suggest
+    assert client.post(url.replace(project['id'], upload(client, 'ana')['id']), headers=as_user('ana'), json={'accept': True}).status_code == 409

@@ -525,6 +525,22 @@ def rename_project(project_id: str, body: ProjectName, user=Depends(current_user
     return project_detail(project_id, user)
 
 
+class EnhanceBody(BaseModel):
+    accept: bool
+
+
+@app.post('/api/projects/{project_id}/enhance')
+def enhance_project(project_id: str, body: EnhanceBody, user=Depends(current_user)):
+    """Accept or decline the suggested extra lines; the drawing is re-prepared with or without them."""
+    get_project(project_id, user)
+    folder = DATA / project_id
+    if not load_scene(folder).get('enhance'):
+        raise HTTPException(409, 'There are no suggested lines for this image.')
+    (folder / 'enhance.json').write_text(json.dumps({'state': 'accepted' if body.accept else 'rejected'}))
+    prepare_image(folder / 'source.png', folder)
+    return project_detail(project_id, user)
+
+
 @app.post('/api/projects/{project_id}/duplicate', status_code=201)
 def duplicate_project(project_id: str, user=Depends(current_user)):
     original = get_project(project_id, user)

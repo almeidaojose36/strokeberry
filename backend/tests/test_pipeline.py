@@ -96,3 +96,24 @@ def test_white_backgrounds_become_paper_but_inner_whites_and_the_original_stay(t
     assert tuple(source[5, 5]) == PAPER and tuple(source[-5, -5]) == PAPER  # the outside is paper now
     assert tuple(source[150, 150]) == (255, 255, 255)                      # the eye is still white
     assert tuple(np.array(Image.open(folder / 'original.png'))[5, 5]) == (255, 255, 255)  # original untouched
+
+
+def test_the_colour_reveal_is_spread_across_the_whole_phase(tmp_path):
+    import numpy as np
+    from PIL import Image, ImageDraw
+    from backend.pipeline import PAPER, prepare_image
+    image = Image.new('RGB', (400, 400), 'white')
+    draw = ImageDraw.Draw(image)
+    draw.ellipse((40, 40, 360, 360), fill=(236, 45, 52), outline=(25, 25, 25), width=8)      # big red, thin dark outline
+    draw.ellipse((150, 150, 250, 250), fill=(250, 240, 200))                                # a pale centre
+    draw.ellipse((90, 90, 120, 120), fill=(252, 252, 250))                                  # a near-white highlight
+    image.save(tmp_path / 'in.png')
+    folder = tmp_path / 'p'
+    folder.mkdir()
+    prepare_image(tmp_path / 'in.png', folder)
+    source = np.asarray(Image.open(folder / 'source.png').convert('RGB'), float)
+    rank = np.asarray(Image.open(folder / 'reveal.png'), float)
+    weight = np.abs(source - np.array(PAPER, float)).sum(axis=2)
+    shown = lambda amount: float((np.clip((amount * 270 - rank) / 20, 0, 1) * weight).sum() / weight.sum())
+    assert shown(.1) < .3 and shown(.5) < .8   # not front-loaded (it used to be ~90% visible by a quarter of the way)
+    assert shown(.5) > .3 and shown(.95) > .97  # and it does finish

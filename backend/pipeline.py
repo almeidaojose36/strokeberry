@@ -13,6 +13,7 @@ from PIL import Image, ImageOps
 
 from . import watermark
 from .brand import hex_to_rgb
+from .linework import edge_strokes, extract_strokes, missing_lines
 from .artistry import SCENE_VERSION, clean_paths, make_timeline, event_position, order_strokes, phase_bounds
 
 _scene_lock = threading.Lock()
@@ -55,10 +56,23 @@ def prepare_image(raw, folder: Path):
         image.save(folder / 'source.png')
     rgb = np.array(image)
     gray = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
-    edges = cv2.Canny(cv2.GaussianBlur(gray, (3, 3), 0), 45, 125)
-    contours, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    contours = sorted(contours, key=lambda c: cv2.arcLength(c, False), reverse=True)
-    paths = clean_paths(contours, gray.shape)
+    outlines = extract_strokes(rgb)
+    if outlines:
+        paths, method = outlines[0], 'outlines'  # the artwork's own black lines, one centre line each
+    else:
+        paths, method = edge_strokes(rgb), 'edges'  # no usable outlines: trace the colour edges, as single lines
+        if len(paths) < 4:  # nearly blank picture: the older contour tracing as a last resort
+            edges = cv2.Canny(cv2.GaussianBlur(gray, (3, 3), 0), 45, 125)
+            contours, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+            contours = sorted(contours, key=lambda c: cv2.arcLength(c, False), reverse=True)
+            paths, method = clean_paths(contours, gray.shape), 'contours'
+    # Lines the artwork lacks (fur tufts, tail tips...) are only suggested; the user accepts or keeps the original.
+    suggested = missing_lines(rgb, paths, outlines[1]) if outlines else []
+    state = None
+    if (folder / 'enhance.json').exists():
+        state = json.loads((folder / 'enhance.json').read_text()).get('state')
+    if suggested and state == 'accepted':
+        paths = list(paths) + suggested
     # Strokes are ordered like a person draws: major shapes first, then details, top to bottom (see artistry.order_strokes).
     ordered = [p.tolist() for p in order_strokes(paths, gray.shape[1], gray.shape[0])]
     # Deterministic color segmentation: median-cut palette, then region-by-region reveal.
@@ -70,13 +84,23 @@ def prepare_image(raw, folder: Path):
     yy, xx = np.indices(labels.shape)
     sweep = (xx / max(1, image.width - 1) + yy / max(1, image.height - 1)) / 2
     ranks = np.zeros(labels.shape, dtype=np.float32)
+    # Each colour gets a slice of the reveal proportional to how much it changes the picture, so the colour arrives steadily
+    # across the whole reveal instead of finishing early (the last colours are often near-white and invisible). Dark to
+    # light order is kept, and every colour gets at least a small slice so thin dark outlines still read as a step.
+    distance = np.abs(rgb.astype(np.float32) - np.array(PAPER, np.float32)).sum(axis=2)
+    weights = np.array([float(distance[labels == label].sum()) for label in used])
+    if weights.sum() <= 0:
+        weights = np.ones(len(used))
+    weights = np.maximum(weights / weights.sum(), .03)
+    edges = np.concatenate([[0.], np.cumsum(weights / weights.sum())])
     for i, label in enumerate(used):
         region = labels == label
-        ranks[region] = (i + sweep[region] * .85) / len(used)
+        ranks[region] = edges[i] + (edges[i + 1] - edges[i]) * sweep[region] * .9
     Image.fromarray(np.uint8(ranks * 245)).save(folder / 'reveal.png')
     scene = {'width': image.width, 'height': image.height, 'paths': ordered,
              'version': SCENE_VERSION, 'timeline': make_timeline(ordered),
-             'strokes': len(ordered), 'palette': [palette[k].tolist() for k in used]}
+             'strokes': len(ordered), 'line_method': method,
+             'enhance': {'state': state, 'count': len(suggested), 'lines': [np.round(np.array(x), 1).tolist() for x in suggested]} if suggested else None, 'palette': [palette[k].tolist() for k in used]}
     temporary = folder / 'scene.tmp'
     temporary.write_text(json.dumps(scene))
     temporary.replace(folder / 'scene.json')
