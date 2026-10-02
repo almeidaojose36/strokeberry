@@ -25,6 +25,8 @@ from urllib.parse import urlencode
 import jwt
 from fastapi import HTTPException, Request
 
+from . import analytics
+
 FIREBASE_JWKS = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com'
 LOCAL_USER = 'local'
 
@@ -137,12 +139,15 @@ def ensure_user(db, user_id, email=None, name=None, guest=False):
         # The visitor signed in (their anonymous account was linked to Google or an email): same id, keeps their work.
         db.execute("UPDATE users SET plan='free' WHERE id=?", (user_id,))
         row = db.execute('SELECT * FROM users WHERE id=?', (user_id,)).fetchone()
+        analytics.record(db, 'signup', user={'id': user_id})
     if row is None:
         # The local single-user studio keeps full features; real accounts start on Free, visitors as guests.
         plan = 'guest' if guest else os.environ.get('STROKEBERRY_LOCAL_PLAN', 'pro') if user_id == LOCAL_USER else 'free'
         # A new visitor's page fires several requests at once, so creating the row must tolerate a twin arriving first.
-        db.execute('INSERT OR IGNORE INTO users (id, email, name, plan, created) VALUES (?,?,?,?,?)',
-                   (user_id, email, name, plan if plan in PLANS else 'free', now()))
+        added = db.execute('INSERT OR IGNORE INTO users (id, email, name, plan, created) VALUES (?,?,?,?,?)',
+                           (user_id, email, name, plan if plan in PLANS else 'free', now())).rowcount
+        if added and plan == 'free':  # signed straight in, without trying the studio as a guest first
+            analytics.record(db, 'signup', user={'id': user_id})
         row = db.execute('SELECT * FROM users WHERE id=?', (user_id,)).fetchone()
     elif (email and email != row['email']) or (name and name != row['name']):
         db.execute('UPDATE users SET email=COALESCE(?, email), name=COALESCE(?, name) WHERE id=?', (email, name, user_id))

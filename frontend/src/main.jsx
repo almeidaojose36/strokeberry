@@ -153,6 +153,10 @@ function App({onSignOut}){
    // Saved styles, this week's ideas and the brand kit; reloaded when the plan changes (e.g. after upgrading).
    api('/api/presets').then(setPresets).catch(()=>{});api('/api/ideas').then(setIdeas).catch(()=>{});api('/api/brand').then(setBrandKit).catch(()=>{});
  },[account?.plan?.id]);
+ // Funnel counts (see backend/analytics.py): how often the upgrade offer and the sign-up dialog are seen.
+ const track=name=>{if(!local)api('/api/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})}).catch(()=>{})};
+ useEffect(()=>{if(upgrade)track('upgrade_open')},[upgrade]);
+ useEffect(()=>{if(signIn)track('signin_open')},[signIn]);
  useEffect(()=>{if(!pro&&!local&&settings.resolution==='4k')setSettings(s=>({...s,resolution:'1080p'}))},[pro,local,settings.resolution]);
  useEffect(()=>{
    // "Get Pro" on the landing page: open the upgrade dialog (guests create an account first).

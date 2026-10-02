@@ -22,7 +22,8 @@ from .pipeline import prepare_image, render, load_scene
 from .sample import create_sample
 from .steps import detect_panels, fallback_layout, prepare_steps, original_path, four_step_reading_order
 from .enhance import clean_background
-from . import accounts, billing, brand, gallery, mailer
+from . import accounts, analytics, billing, brand, gallery, mailer
+from starlette.concurrency import run_in_threadpool
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / 'data'
@@ -43,6 +44,7 @@ def init_db():
         db.executescript('''CREATE TABLE IF NOT EXISTS projects (id TEXT PRIMARY KEY, name TEXT, created TEXT, strokes INTEGER);
         CREATE TABLE IF NOT EXISTS jobs (id TEXT PRIMARY KEY, project_id TEXT, status TEXT, progress INTEGER, stage TEXT, settings TEXT, created TEXT, error TEXT);''')
         accounts.init_accounts(db)
+        analytics.init(db)
         if 'origin' not in {row[1] for row in db.execute('PRAGMA table_info(projects)')}:
             # 'upload' (the visitor's own image) or 'example' (the welcome sample and library examples)
             db.execute("ALTER TABLE projects ADD COLUMN origin TEXT NOT NULL DEFAULT 'upload'")
@@ -113,9 +115,16 @@ async def site_policies(request: Request, call_next):
         query = f'?{request.url.query}' if request.url.query else ''
         return RedirectResponse(f'https://{host[4:]}{request.url.path}{query}', status_code=301)
     response = await call_next(request)
+    if analytics.is_page_view(request, response.status_code):
+        await run_in_threadpool(count_page_view, request)
     for name, value in SECURITY_HEADERS.items():
         response.headers.setdefault(name, value)
     return response
+
+
+def count_page_view(request):
+    with connect() as db:
+        analytics.record(db, 'pageview', request)
 
 
 @app.exception_handler(StarletteHTTPException)
@@ -172,7 +181,10 @@ class CheckoutRequest(BaseModel):
 def checkout(body: CheckoutRequest = CheckoutRequest(), user=Depends(current_user)):
     if accounts.plan_id(user) == 'guest':
         raise HTTPException(401, 'Create a free account first, then upgrade.')
-    return {'url': billing.create_checkout(user, body.interval)}
+    url = billing.create_checkout(user, body.interval)
+    with connect() as db:
+        analytics.record(db, 'checkout', user=user, detail=body.interval)
+    return {'url': url}
 
 
 class PackRequest(BaseModel):
@@ -183,7 +195,10 @@ class PackRequest(BaseModel):
 def pack_checkout(body: PackRequest, user=Depends(current_user)):
     if accounts.plan_id(user) == 'guest':
         raise HTTPException(401, 'Create a free account first, then get a video pack.')
-    return {'url': billing.create_pack_checkout(user, body.pack)}
+    url = billing.create_pack_checkout(user, body.pack)
+    with connect() as db:
+        analytics.record(db, 'checkout', user=user, detail=f'pack-{body.pack}')
+    return {'url': url}
 
 
 @app.get('/api/offer')
@@ -201,8 +216,26 @@ def billing_portal(user=Depends(current_user)):
 async def billing_webhook(request: Request):
     raw = await request.body()
     billing.verify_webhook(raw, request.headers.get('X-Signature', ''))
+    payload = billing.parse(raw)
     with connect() as db:
-        billing.apply_webhook(db, billing.parse(raw))
+        user_id = billing.apply_webhook(db, payload)
+        event = payload.get('meta', {}).get('event_name', '')
+        if user_id and event in ('subscription_created', 'order_created'):
+            paid = 'pack' if event == 'order_created' else (payload.get('data', {}).get('attributes', {}).get('variant_name') or 'pro')
+            analytics.record(db, 'paid', user={'id': user_id}, detail=paid)
+    return {'ok': True}
+
+
+class Event(BaseModel):
+    name: str = Field(max_length=40)
+
+
+@app.post('/api/event')
+def client_event(body: Event, request: Request, user=Depends(current_user)):
+    """A few studio moments the server can't see itself (like the upgrade dialog opening). Unknown names are ignored."""
+    if body.name in analytics.CLIENT_EVENTS:
+        with connect() as db:
+            analytics.record(db, body.name, request, user=user, path='/studio/')
     return {'ok': True}
 
 
@@ -351,6 +384,7 @@ def add_project(raw, name, user, origin='upload'):
     with connect() as db:
         db.execute('INSERT INTO projects (id, name, created, strokes, user_id, origin) VALUES (?,?,?,?,?,?)',
                    (project_id, name[:100], datetime.now(timezone.utc).isoformat(), scene['strokes'], user['id'], origin))
+        analytics.record(db, 'project', user=user, detail=origin)
     return project_detail(project_id, user)
 
 
@@ -507,6 +541,7 @@ def enqueue(db, user, plan, project_id, settings):
     db.execute('INSERT INTO jobs (id, project_id, status, progress, stage, settings, created, error, user_id, paid_with) VALUES (?,?,?,?,?,?,?,?,?,?)',
                (job_id, project_id, 'queued', 0, 'Waiting in the render queue', json.dumps(job_settings),
                 datetime.now(timezone.utc).isoformat(), None, user['id'], plan.get('paid_with', 'plan')))
+    analytics.record(db, 'export', user=user, detail='pack' if plan.get('paid_with') == 'pack' else accounts.plan_id(user))
     db.commit()
     executor.submit(run_job, job_id, project_id, job_settings)
     return job_id
