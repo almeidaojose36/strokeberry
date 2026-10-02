@@ -143,7 +143,7 @@ def test_weekly_ideas_are_stable_and_usable(client):
 
 def test_free_users_get_a_welcome_and_allowance_emails(client, monkeypatch):
     sent = []
-    monkeypatch.setattr(mailer, 'send', lambda to, subject, paragraphs, button=None: sent.append((to, subject)) or True)
+    monkeypatch.setattr(mailer, 'send', lambda to, subject, paragraphs, button=None, picture=None: sent.append((to, subject)) or True)
     client.get('/api/me', headers=as_user('ana'))
     client.get('/api/me', headers=as_user('ana'))
     assert sent == [('ana@example.test', 'Welcome to Strokeberry')]  # once only
@@ -196,7 +196,7 @@ def test_a_new_visitors_simultaneous_requests_create_one_account_and_one_welcome
     import threading
     from concurrent.futures import ThreadPoolExecutor
     sent = []
-    monkeypatch.setattr(mailer, 'send', lambda to, subject, paragraphs, button=None: sent.append(subject) or True)
+    monkeypatch.setattr(mailer, 'send', lambda to, subject, paragraphs, button=None, picture=None: sent.append(subject) or True)
     gate = threading.Barrier(8)
 
     def visit(_):

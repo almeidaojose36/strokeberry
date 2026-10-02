@@ -39,18 +39,25 @@ def _send(to, subject, text, html):
         logging.exception('Could not send email to %s', to)
 
 
-def send(to, subject, paragraphs, button=None):
-    """paragraphs: list of strings; button: (label, path) linking into the app."""
+def send(to, subject, paragraphs, button=None, picture=None):
+    """paragraphs: list of strings; button: (label, path) linking into the app; picture: (path, alt) of an image on the
+    site shown above the button. Images are linked from strokeberry.com (never attached or SVG), so every mail app shows them."""
     if not to or not configured():
         return False
     url = f'{_app_url()}{button[1]}' if button else None
     text = '\n\n'.join(paragraphs) + (f'\n\n{button[0]}: {url}' if url else '') + \
         '\n\n— Strokeberry\nQuestions? Just reply to this email.'
     body = ''.join(f'<p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#3a352f">{p}</p>' for p in paragraphs)
+    base = _app_url()
+    image = ''
+    if picture:
+        image = (f'<a href="{url or base}" style="display:block;margin:8px 0 20px"><img src="{base}{picture[0]}" alt="{picture[1]}" width="280" '
+                 'style="display:block;width:100%;max-width:280px;height:auto;border-radius:14px;border:1px solid #efe2ca"></a>')
     cta = f'<p style="margin:24px 0"><a href="{url}" style="background:#1b1b1b;color:#fff;text-decoration:none;padding:14px 26px;border-radius:999px;font-weight:600;display:inline-block">{button[0]}</a></p>' if url else ''
     html = ('<div style="background:#fff8ec;padding:32px 16px;font-family:Figtree,Helvetica,Arial,sans-serif"><div style="max-width:520px;margin:0 auto;'
             'background:#fffdf8;border-radius:20px;padding:32px;border:1px solid #efe2ca"><p style="margin:0 0 20px;font-size:22px;font-weight:800;'
-            f'letter-spacing:-.02em;color:#1b1b1b">strokeberry</p>{body}{cta}<p style="margin:24px 0 0;font-size:13px;color:#8a8174">Questions? Just reply to this email.</p></div></div>')
+            f'letter-spacing:-.02em;color:#1b1b1b"><img src="{base}/email/mascot.png" alt="" width="34" height="34" '
+            f'style="vertical-align:middle;margin-right:8px;border:0">strokeberry</p>{body}{image}{cta}<p style="margin:24px 0 0;font-size:13px;color:#8a8174">Questions? Just reply to this email.</p></div></div>')
     threading.Thread(target=_send, args=(to, subject, text, html), daemon=True).start()
     return True
 
@@ -61,7 +68,8 @@ def welcome(to, name=None):
         f'Hi {first},' if first else 'Hi there,',
         'Thanks for joining Strokeberry. You get 3 free videos every month, and there’s a quick way to get a great first result: '
         'pick one of the examples, choose Ink, and export it as a 9:16 video for Reels or TikTok.',
-        'Your projects are saved, so you can come back and make more any time.'], ('Open the studio', '/studio/'))
+        'Your projects are saved, so you can come back and make more any time.'], ('Open the studio', '/studio/'),
+        ('/email/drawing.gif', 'A puppy being drawn by hand, then painted in'))
 
 
 def allowance(to, remaining, resets=None):
