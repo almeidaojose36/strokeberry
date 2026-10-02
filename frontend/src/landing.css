@@ -476,3 +476,32 @@ h3{font-size:19px;font-weight:650;letter-spacing:-.015em;margin:0;line-height:1.
   .hs-title{display:none}
   .hs-watch{right:16px}
 }
+/* Pricing, premium edition: a light Free card and a dark Pro card with the mascot peeking over its corner */
+.billing-toggle{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line-strong)}
+.billing-toggle button.on{background:var(--ink);color:#fff;box-shadow:0 6px 16px -8px rgba(27,27,27,.6)}
+.billing-toggle em{background:var(--sun);color:var(--ink)}
+.plans{gap:28px;max-width:900px;align-items:stretch}
+.plan-card{border-radius:30px;padding:40px 36px 32px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line-strong),0 30px 60px -40px rgba(27,27,27,.35)}
+.plan-card .plan-name{font-family:var(--display);font-size:22px;font-weight:750;letter-spacing:-.02em}
+.plan-card .plan-price{font-size:72px;font-weight:800;letter-spacing:-.05em}
+.plan-card ul{gap:14px}
+.plan-foot{margin:auto 0 0;padding-top:20px;font-size:13.5px;color:var(--muted);text-align:center}
+.plan-pro{background:#1b1b1b;color:#fff8ec;box-shadow:0 40px 80px -36px rgba(27,27,27,.7);overflow:visible}
+.plan-pro .plan-name{color:#fff8ec}
+.plan-pro .plan-price .per{color:rgba(255,248,236,.6)}
+.plan-pro .plan-sub{color:rgba(255,248,236,.72)}
+.plan-pro ul{border-top-color:rgba(255,248,236,.14)}
+.plan-pro li svg{color:var(--sun)}
+.plan-pro .plan-foot{color:rgba(255,248,236,.5)}
+.plan-pro .btn-primary{background:var(--sun);color:var(--ink);box-shadow:0 12px 26px -12px rgba(250,190,58,.9)}
+.plan-pro .btn-primary:hover{background:#ffcd56}
+.plan-flag{left:36px;top:-14px;background:var(--sun);color:var(--ink);font-size:12.5px;padding:6px 14px;box-shadow:0 6px 14px -6px rgba(250,190,58,.9)}
+.plan-mascot{position:absolute;right:-18px;top:-62px;width:118px;height:auto;transform:rotate(8deg);filter:drop-shadow(0 12px 18px rgba(0,0,0,.18));pointer-events:none}
+.plan-pro .founder-choice{background:rgba(250,190,58,.1);box-shadow:inset 0 0 0 1.5px rgba(250,190,58,.75)}
+.plan-pro .fc-tag{color:var(--sun)}
+.plan-pro .founder-choice strong{color:#fff8ec}
+.plan-pro .founder-choice small{color:rgba(255,248,236,.7)}
+.plan-pro .founder-choice .btn{background:transparent;color:#fff8ec;box-shadow:inset 0 0 0 1.5px rgba(250,190,58,.75)}
+.plan-pro .founder-choice .btn:hover{background:rgba(250,190,58,.16)}
+.compare .c-no{color:var(--muted);font-size:13px}
+@media(max-width:720px){.plan-mascot{width:90px;top:-48px;right:-6px}.plan-card .plan-price{font-size:60px}}

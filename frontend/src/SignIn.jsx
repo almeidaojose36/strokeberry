@@ -26,7 +26,7 @@ export default function SignIn({notice, dialog, onClose, onSignedIn, title, intr
       {sent ? <>
         <span className="dialog-icon"><MailCheck size={26}/></span>
         <h1>Check your inbox</h1>
-        <p>We sent a sign-in link to <strong>{email}</strong>. Open it on this device to continue. It can take a minute — check your spam folder too.</p>
+        <p>We sent a sign-in link to <strong>{email}</strong>. Open it on this device to continue. It can take a minute. Check your spam folder too.</p>
         <button className="button ghost" onClick={() => setSent(false)}>Use a different email</button>
       </> : <>
         <h1>{title || 'Sign in to start drawing'}</h1>

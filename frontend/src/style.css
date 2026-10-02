@@ -679,3 +679,10 @@ button.guide-callout:hover{border-color:var(--line-strong);background:#fff}
 .studio-loading{flex-direction:column;gap:10px;text-align:center}
 .studio-loading strong{font-size:17px;margin-top:6px}
 .studio-loading small{color:var(--muted);font-size:13.5px}
+/* quality dropdown in the export summary, so 720p / 1080p / 4K is chosen right next to Export */
+.quality-pick{position:relative;display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:0 8px 0 9px;height:28px;cursor:pointer;color:var(--ink);font-weight:600}
+.quality-pick:hover{border-color:var(--ink)}
+.quality-pick select{appearance:none;-webkit-appearance:none;border:0;background:transparent;font:inherit;font-size:12.5px;font-weight:650;color:inherit;padding:0 2px;cursor:pointer;outline:none}
+.quality-pick:focus-within{box-shadow:0 0 0 2px var(--accent)}
+.export-summary{align-items:center}
+.upgrade-billed{margin:-6px 0 16px;font-size:13px;color:var(--muted)}

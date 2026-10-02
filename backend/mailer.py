@@ -46,7 +46,7 @@ def send(to, subject, paragraphs, button=None, picture=None):
         return False
     url = f'{_app_url()}{button[1]}' if button else None
     text = '\n\n'.join(paragraphs) + (f'\n\n{button[0]}: {url}' if url else '') + \
-        '\n\n— Strokeberry\nQuestions? Just reply to this email.'
+        '\n\nThe Strokeberry team\nQuestions? Just reply to this email.'
     body = ''.join(f'<p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#3a352f">{p}</p>' for p in paragraphs)
     base = _app_url()
     image = ''

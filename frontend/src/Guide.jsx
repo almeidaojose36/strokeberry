@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Check, LayoutGrid, Pencil, Play, X} from 'lucide-react';
 
 const STEPS = [
-  {image: 'step-1-image', title: 'Add an image', text: 'Upload a PNG, JPG or WebP — or pick one from Examples.'},
+  {image: 'step-1-image', title: 'Add an image', text: 'Upload a PNG, JPG or WebP, or pick one from Examples.'},
   {image: 'step-2-style', title: 'Choose a style', text: 'Pencil or Ink, with the drawing pencil and colour reveal on or off.'},
   {image: 'step-3-preview', title: 'Preview it', text: 'Press play or drag the timeline to watch it draw.'},
   {image: 'step-4-export', title: 'Export', text: 'Pick a format and quality in Video settings, then download your MP4.'},
@@ -38,7 +38,7 @@ export default function Guide({account, onExamples}) {
       <figure className="bad"><img src="/guide/tip-busy.webp" alt="The same fox on a cluttered background"/><figcaption><X size={15}/>Busy backgrounds and photos</figcaption></figure>
     </div>
     {free && <p className="guide-plan">Free plan: {account.usage.limit} videos every month, up to 1 minute, in 1080p with a small watermark and end card. Video packs and Pro remove both and allow longer videos; Pro adds 4K.</p>}
-    <div className="local-note">Your images and videos stay private to you. Strokeberry draws them itself — they’re never sent to a third‑party AI service.</div>
+    <div className="local-note">Your images and videos stay private to you. Strokeberry draws them itself, so they’re never sent to a third‑party AI service.</div>
     <p className="modal-note">Need a hand? Email <a className="inline-link" href="mailto:support@strokeberry.com">support@strokeberry.com</a></p>
   </div>;
 }

@@ -242,7 +242,7 @@ def check_export_allowed(db, user, settings):
             return dict(plan, paid_with='plan')
         if packs > 0:
             return dict(plan, paid_with='pack')
-        raise HTTPException(429, "You've reached this month's export limit. It resets soon — thanks for creating so much!")
+        raise HTTPException(429, "You've reached this month's export limit. It resets soon. Thanks for creating so much!")
     if packs > 0:
         check_duration(user, settings['duration'], PACK_QUALITY['max_duration'])
         if settings['resolution'] == '4k':

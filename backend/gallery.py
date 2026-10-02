@@ -40,7 +40,7 @@ def find(item_id):
     raise HTTPException(404, 'That example is no longer available.')
 
 
-TIPS = [('ink', '9:16', 'Ink lines look bold on a phone screen — make it a Reel.'),
+TIPS = [('ink', '9:16', 'Ink lines look bold on a phone screen. Make it a Reel.'),
         ('pencil', '1:1', 'Soft pencil in a square is perfect for a feed post.'),
         ('ink', '16:9', 'A widescreen ink drawing makes a great YouTube intro.'),
         ('pencil', '9:16', 'Pencil with the colour reveal is very satisfying to watch.')]
