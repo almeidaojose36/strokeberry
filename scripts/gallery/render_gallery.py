@@ -30,6 +30,13 @@ ITEMS = [
     {'key': 'balloon', 'style': 'ink', 'duration': 10, 'hand': 'dark'},
     {'key': 'puppy', 'style': 'ink', 'duration': 12, 'hand': 'light'},
     {'key': 'fox', 'style': 'ink', 'duration': 12, 'hand': 'dark', 'canvas': 'greenboard'},
+    # one per audience (the same art as the hero clips, square for the gallery)
+    {'key': 'skincare', 'style': 'ink', 'duration': 12, 'hand': 'light'},
+    {'key': 'fashion', 'style': 'ink', 'duration': 12, 'hand': 'dark'},
+    {'key': 'creator', 'style': 'ink', 'duration': 12, 'hand': 'medium'},
+    {'key': 'cafe', 'style': 'ink', 'duration': 12, 'hand': 'light'},
+    {'key': 'lesson', 'style': 'ink', 'duration': 12, 'hand': 'dark'},
+    {'key': 'house', 'style': 'ink', 'duration': 12, 'hand': 'medium'},
     {'key': 'strawberry', 'steps': ['Body shape', 'Leaves & headphones', 'Face & details', 'Color'], 'seconds': [3, 4, 5, 4],
      # Crops sit just inside the light-blue dividers of the source sheet (960 px square).
      'crops': [{'x': x / 960, 'y': y / 960, 'width': 472 / 960, 'height': 472 / 960} for x, y in ((0, 0), (486, 0), (0, 486), (486, 486))]},

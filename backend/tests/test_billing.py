@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from backend import app as module
-from backend.tests.test_accounts import as_user, client, upload  # noqa: F401  (shared fixture)
+from backend.tests.test_accounts import as_user, client, illustration, upload  # noqa: F401  (shared fixture)
 
 
 def when(days):
@@ -156,9 +156,14 @@ def test_yearly_checkout_uses_the_yearly_variant(client, monkeypatch):
 def test_guests_can_try_but_not_export(client):
     guest = {'X-Dev-User': 'visitor', 'X-Dev-Guest': '1'}
     assert client.get('/api/me', headers=guest).json()['plan']['id'] == 'guest'
-    made = [client.post('/api/library/animals-01-fox/use', headers=guest) for _ in range(4)]
-    assert [r.status_code for r in made] == [201, 201, 201, 401]
-    project = made[0].json()
+    # Browsing the sample and examples never uses up a guest's projects; the same example reopens the same copy.
+    client.post('/api/sample', headers=guest)
+    fox = [client.post('/api/library/animals-01-fox/use', headers=guest).json()['id'] for _ in range(3)]
+    assert len(set(fox)) == 1
+    assert client.post('/api/library/animals-00-cat/use', headers=guest).status_code == 201
+    uploads = [client.post('/api/projects', headers=guest, files={'file': ('art.png', illustration(), 'image/png')}) for _ in range(4)]
+    assert [r.status_code for r in uploads] == [201, 201, 201, 401]   # but only 3 of their own images
+    project = uploads[0].json()
     exported = client.post(f"/api/projects/{project['id']}/jobs", headers=guest, json={})
     assert exported.status_code == 401 and 'free account' in exported.json()['detail']
     assert client.post('/api/billing/checkout', headers=guest).status_code == 401
@@ -166,7 +171,7 @@ def test_guests_can_try_but_not_export(client):
     # Signing in (same id, no longer anonymous) turns the guest into a Free user and keeps their projects.
     signed_in = {'X-Dev-User': 'visitor'}
     assert client.get('/api/me', headers=signed_in).json()['plan']['id'] == 'free'
-    assert len(client.get('/api/projects', headers=signed_in).json()) == 3
+    assert len(client.get('/api/projects', headers=signed_in).json()) == 6   # sample + 2 examples + 3 uploads
     assert client.post(f"/api/projects/{project['id']}/jobs", headers=signed_in, json={}).status_code == 202
 
 

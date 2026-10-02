@@ -12,8 +12,10 @@ from pathlib import Path
 from typing import Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Request, UploadFile, Form
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
+from fastapi.exception_handlers import http_exception_handler
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from pydantic import BaseModel, Field, model_validator
 from PIL import UnidentifiedImageError, Image
 from .pipeline import prepare_image, render, load_scene
@@ -41,9 +43,26 @@ def init_db():
         db.executescript('''CREATE TABLE IF NOT EXISTS projects (id TEXT PRIMARY KEY, name TEXT, created TEXT, strokes INTEGER);
         CREATE TABLE IF NOT EXISTS jobs (id TEXT PRIMARY KEY, project_id TEXT, status TEXT, progress INTEGER, stage TEXT, settings TEXT, created TEXT, error TEXT);''')
         accounts.init_accounts(db)
-        stuck = [row[0] for row in db.execute("SELECT id FROM jobs WHERE status IN ('queued','rendering')")]
-        db.execute("UPDATE jobs SET status='failed', error='The server restarted. Please export again.' WHERE status IN ('queued','rendering')")
-        accounts.refund_failed(db, stuck)
+        if 'origin' not in {row[1] for row in db.execute('PRAGMA table_info(projects)')}:
+            # 'upload' (the visitor's own image) or 'example' (the welcome sample and library examples)
+            db.execute("ALTER TABLE projects ADD COLUMN origin TEXT NOT NULL DEFAULT 'upload'")
+
+
+def resume_interrupted_jobs():
+    """Exports that were waiting or rendering when the server stopped are queued again and rendered from the start, so a
+    restart or deploy never costs anyone a video. Only exports whose project has gone are failed (and pack videos refunded)."""
+    with connect() as db:
+        rows = db.execute("SELECT id, project_id, settings FROM jobs WHERE status IN ('queued','rendering') ORDER BY created").fetchall()
+        gone = [row['id'] for row in rows if not (DATA / row['project_id']).exists()]
+        if gone:
+            db.execute(f"UPDATE jobs SET status='failed', error='The project was removed. Please export again.' WHERE id IN ({','.join('?' * len(gone))})", gone)
+            accounts.refund_failed(db, gone)
+        resumed = [row for row in rows if row['id'] not in gone]
+        for row in resumed:
+            db.execute("UPDATE jobs SET status='queued', progress=0, stage='Waiting in the render queue' WHERE id=?", (row['id'],))
+    for row in resumed:
+        executor.submit(run_job, row['id'], row['project_id'], json.loads(row['settings']))
+    return len(resumed)
 
 
 _initialised = set()  # databases whose tables were created in this process
@@ -65,11 +84,47 @@ async def lifespan(app):
     load_env_file()
     init_db()
     _initialised.add(DB)
+    resumed = resume_interrupted_jobs()
+    if resumed:
+        logging.info('Resumed %s interrupted export(s)', resumed)
     yield
-    executor.shutdown(wait=True)
+    # Don't hold a restart hostage to a long render: unfinished exports are resumed when the server comes back.
+    executor.shutdown(wait=False, cancel_futures=True)
 
 
-app = FastAPI(title='Strokeberry', lifespan=lifespan)
+# No public API docs in production: the API is only for the studio.
+app = FastAPI(title='Strokeberry', lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
+
+SECURITY_HEADERS = {
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'X-Frame-Options': 'SAMEORIGIN',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
+}
+
+
+@app.middleware('http')
+async def site_policies(request: Request, call_next):
+    """One address for the site (www redirects to the bare domain, which search engines treat as canonical) and the
+    browser security headers on every response."""
+    host = request.headers.get('host', '')
+    if host.startswith('www.'):
+        query = f'?{request.url.query}' if request.url.query else ''
+        return RedirectResponse(f'https://{host[4:]}{request.url.path}{query}', status_code=301)
+    response = await call_next(request)
+    for name, value in SECURITY_HEADERS.items():
+        response.headers.setdefault(name, value)
+    return response
+
+
+@app.exception_handler(StarletteHTTPException)
+async def not_found_page(request: Request, exc: StarletteHTTPException):
+    """A branded page for missing pages; the API keeps its JSON errors."""
+    page = ROOT / 'dist' / '404.html'
+    if exc.status_code == 404 and not request.url.path.startswith(('/api/', '/media/')) and page.exists():
+        return HTMLResponse(page.read_text(), status_code=404)
+    return await http_exception_handler(request, exc)
 
 
 def current_user(request: Request):
@@ -159,7 +214,7 @@ def library():
 @app.post('/api/library/{item_id}/use', status_code=201)
 def use_library_item(item_id: str, user=Depends(current_user)):
     item, path = gallery.find(item_id)
-    project = add_project(path, item['title'], user)
+    project = add_project(path, item['title'], user, origin='example')
     project['tutorial'] = bool(item.get('tutorial'))
     if project['tutorial']:  # step-by-step examples are 2×2 sheets, even when the panels can't be detected
         (DATA / project['id'] / 'layout-hint.json').write_text(json.dumps({'columns': 2, 'rows': 2}))
@@ -267,11 +322,22 @@ def project_detail(project_id, user=None):
     return project
 
 
-def add_project(raw, name, user):
+GUEST_EXAMPLE_LIMIT = 20  # examples a guest may open (each one is prepared on the server)
+
+
+def add_project(raw, name, user, origin='upload'):
+    """Prepare an image as a new project. A guest's limit counts only their own uploads, so browsing the welcome sample
+    and the examples never uses it up; reopening an example a guest already has returns that copy."""
     if accounts.plan_id(user) == 'guest':
         with connect() as db:
-            made = db.execute('SELECT count(*) FROM projects WHERE user_id=?', (user['id'],)).fetchone()[0]
-        if made >= accounts.GUEST_PROJECT_LIMIT:
+            if origin == 'example':
+                row = db.execute("SELECT id FROM projects WHERE user_id=? AND origin='example' AND name=? ORDER BY created LIMIT 1",
+                                 (user['id'], name[:100])).fetchone()
+                if row:
+                    return project_detail(row['id'], user)
+            made = db.execute('SELECT count(*) FROM projects WHERE user_id=? AND origin=?', (user['id'], origin)).fetchone()[0]
+        limit = GUEST_EXAMPLE_LIMIT if origin == 'example' else accounts.GUEST_PROJECT_LIMIT
+        if made >= limit:
             raise HTTPException(401, 'Create a free account to keep making projects.')
     project_id = uuid.uuid4().hex
     folder = DATA / project_id
@@ -283,8 +349,8 @@ def add_project(raw, name, user):
         shutil.rmtree(folder)
         raise HTTPException(400, str(exc) if isinstance(exc, ValueError) else 'Use a valid PNG, JPG, or WebP image.')
     with connect() as db:
-        db.execute('INSERT INTO projects (id, name, created, strokes, user_id) VALUES (?,?,?,?,?)',
-                   (project_id, name[:100], datetime.now(timezone.utc).isoformat(), scene['strokes'], user['id']))
+        db.execute('INSERT INTO projects (id, name, created, strokes, user_id, origin) VALUES (?,?,?,?,?,?)',
+                   (project_id, name[:100], datetime.now(timezone.utc).isoformat(), scene['strokes'], user['id'], origin))
     return project_detail(project_id, user)
 
 
@@ -326,12 +392,12 @@ def sample(user=Depends(current_user)):
         return project_detail(row['id'], user)
     try:
         _, path = gallery.find(SAMPLE_LIBRARY_ID)
-        return add_project(path, SAMPLE_NAME, user)
+        return add_project(path, SAMPLE_NAME, user, origin='example')
     except HTTPException:  # the example library isn't installed: fall back to the drawn botanical starter
         sample_path = DATA / 'botanical.png'
         if not sample_path.exists():
             create_sample(sample_path)
-        return add_project(sample_path, OLD_SAMPLE_NAME, user)
+        return add_project(sample_path, OLD_SAMPLE_NAME, user, origin='example')
 
 
 @app.get('/api/projects/{project_id}')
@@ -566,7 +632,7 @@ def duplicate_project(project_id: str, user=Depends(current_user)):
     original = get_project(project_id, user)
     if accounts.plan_id(user) == 'guest':
         with connect() as db:
-            made = db.execute('SELECT count(*) FROM projects WHERE user_id=?', (user['id'],)).fetchone()[0]
+            made = db.execute("SELECT count(*) FROM projects WHERE user_id=? AND origin='upload'", (user['id'],)).fetchone()[0]
         if made >= accounts.GUEST_PROJECT_LIMIT:
             raise HTTPException(401, 'Create a free account to keep making projects.')
     new_id = uuid.uuid4().hex
@@ -719,6 +785,12 @@ def ideas():
     """Three example suggestions that change every week, for the studio home."""
     year, week, _ = date.today().isocalendar()
     return list(gallery.ideas(year * 53 + week))
+
+
+@app.api_route('/api/{rest:path}', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], include_in_schema=False)
+def unknown_api(rest: str):
+    # Unknown API addresses get a JSON 404 (the site below would otherwise answer with its HTML "page not found").
+    raise HTTPException(404, 'Not found.')
 
 
 if (ROOT / 'dist').exists():

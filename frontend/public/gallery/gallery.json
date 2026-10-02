@@ -61,5 +61,47 @@
     "duration": 16,
     "hand": "pencil",
     "canvas": "paper"
+  },
+  {
+    "key": "skincare",
+    "style": "ink",
+    "duration": 12,
+    "hand": "light",
+    "canvas": "paper"
+  },
+  {
+    "key": "fashion",
+    "style": "ink",
+    "duration": 12,
+    "hand": "dark",
+    "canvas": "paper"
+  },
+  {
+    "key": "creator",
+    "style": "ink",
+    "duration": 12,
+    "hand": "medium",
+    "canvas": "paper"
+  },
+  {
+    "key": "cafe",
+    "style": "ink",
+    "duration": 12,
+    "hand": "light",
+    "canvas": "paper"
+  },
+  {
+    "key": "lesson",
+    "style": "ink",
+    "duration": 12,
+    "hand": "dark",
+    "canvas": "paper"
+  },
+  {
+    "key": "house",
+    "style": "ink",
+    "duration": 12,
+    "hand": "medium",
+    "canvas": "paper"
   }
 ]

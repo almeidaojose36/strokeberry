@@ -225,3 +225,34 @@ def test_missing_lines_are_suggested_and_only_added_when_accepted(client):
     assert declined['enhance']['state'] == 'rejected' and declined['strokes'] == plain
     # artwork that is already fully outlined has nothing to suggest
     assert client.post(url.replace(project['id'], upload(client, 'ana')['id']), headers=as_user('ana'), json={'accept': True}).status_code == 409
+
+
+def test_exports_interrupted_by_a_restart_are_resumed_not_failed(client):
+    project = upload(client, 'ana')
+    url = f"/api/projects/{project['id']}/jobs"
+    first = client.post(url, headers=as_user('ana'), json={}).json()
+    second = client.post(url, headers=as_user('ana'), json={}).json()
+    with module.connect() as db:   # the server stopped while one was rendering and one was waiting
+        db.execute("UPDATE jobs SET status='rendering', progress=40 WHERE id=?", (first['id'],))
+    client.submitted.clear()
+    assert module.resume_interrupted_jobs() == 2
+    assert [args[1] for args in client.submitted] == [first['id'], second['id']]   # in their original order
+    job = client.get(f"/api/jobs/{first['id']}", headers=as_user('ana')).json()
+    assert job['status'] == 'queued' and job['progress'] == 0
+    # an export whose project has gone is failed instead (and a pack video would be refunded)
+    with module.connect() as db:
+        db.execute("UPDATE jobs SET status='queued', project_id='missing' WHERE id=?", (second['id'],))
+    client.submitted.clear()
+    assert module.resume_interrupted_jobs() == 1
+    with module.connect() as db:
+        assert db.execute('SELECT status FROM jobs WHERE id=?', (second['id'],)).fetchone()[0] == 'failed'
+
+
+def test_security_headers_www_redirect_and_no_public_api_docs(client):
+    response = client.get('/api/health')
+    assert response.headers['X-Content-Type-Options'] == 'nosniff'
+    assert 'max-age' in response.headers['Strict-Transport-Security']
+    redirect = client.get('/pricing?x=1', headers={'host': 'www.strokeberry.com'}, follow_redirects=False)
+    assert redirect.status_code == 301 and redirect.headers['location'] == 'https://strokeberry.com/pricing?x=1'
+    assert client.get('/docs').status_code == 404 and client.get('/openapi.json').status_code == 404
+    assert client.get('/api/nothing-here').headers['content-type'].startswith('application/json')   # the API keeps JSON errors

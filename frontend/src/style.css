@@ -337,7 +337,7 @@ select{width:100%;border:1px solid var(--line-strong);border-radius:10px;backgro
   .editor-grid{grid-template-columns:1fr}.settings-panel{position:static}
   .preview-stage{aspect-ratio:1.5}.settings-content{min-height:0}
   .topbar-right .private-indicator{display:none}
-  .page-heading .new-project{display:none}
+  .heading-actions .new-project{order:-1}
   .export-card{flex-wrap:wrap}.export-card>.status{margin-left:auto}
 }
 @media(max-width:760px){
@@ -591,6 +591,8 @@ button.guide-callout:hover{border-color:var(--line-strong);background:#fff}
 @media(max-width:720px){
   .mobile-export{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(255,253,248,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line-strong);font-size:13px;color:var(--muted)}
   .mobile-export .button{height:44px;padding:0 22px}
+  .mobile-export .mobile-upload{padding:0 14px;flex:none}
+  .mobile-export span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .studio-page{padding-bottom:84px}
   .export-card{align-items:flex-start}.export-card>.export-actions{width:100%;justify-content:flex-start}
   .export-thumb{width:60px;height:60px}
@@ -674,3 +676,6 @@ button.guide-callout:hover{border-color:var(--line-strong);background:#fff}
 .render-steps li.active i{border-color:var(--accent);background:var(--accent-soft);animation:pulse 1.2s ease-in-out infinite}
 @keyframes pulse{50%{transform:scale(1.25)}}
 @media (max-width:640px){.pack-grid{grid-template-columns:1fr}.hand-options{grid-template-columns:repeat(5,1fr)}}
+.studio-loading{flex-direction:column;gap:10px;text-align:center}
+.studio-loading strong{font-size:17px;margin-top:6px}
+.studio-loading small{color:var(--muted);font-size:13.5px}

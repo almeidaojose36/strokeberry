@@ -14,7 +14,8 @@ FRONT = ROOT / 'frontend'
 
 HEAD = '''<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="theme-color" content="#FFF8EC"/>
 <title>{title}</title><meta name="description" content="{description}"/>
-<meta property="og:title" content="{title}"/><meta property="og:description" content="{description}"/><meta property="og:image" content="/brand/og-image.png"/>
+<meta property="og:title" content="{title}"/><meta property="og:description" content="{description}"/><meta property="og:image" content="https://strokeberry.com/brand/og-image.png"/>
+<link rel="canonical" href="https://strokeberry.com/{path}/"/><meta property="og:url" content="https://strokeberry.com/{path}/"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32.png"/><link rel="icon" type="image/png" sizes="192x192" href="/brand/strokeberry-192.png"/>
 <link rel="stylesheet" href="/src/landing.css"/>{extra_head}</head><body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol></defs></svg>
@@ -43,7 +44,7 @@ FOOT = '''<footer class="footer"><div class="wrap footer-inner"><a class="logo" 
 def page(path, title, description, body, extra_head='', extra_body=''):
     out = FRONT / path / 'index.html'
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(HEAD.format(title=html.escape(title), description=html.escape(description), extra_head=extra_head)
+    out.write_text(HEAD.format(title=html.escape(title), description=html.escape(description), extra_head=extra_head, path=path)
                    + body + FOOT.format(extra_body=extra_body))
     return f'{path}/index.html'
 
@@ -139,7 +140,10 @@ POSTS = [
 
 def build_examples():
     library = json.loads((FRONT / 'public' / 'library' / 'library.json').read_text())
-    made = [('strawberry', 'How to draw a strawberry', 'Tutorial · 4 steps'), ('owl', 'How to draw an owl', 'Tutorial · 4 steps'),
+    made = [('skincare', 'Skincare set', 'For e-commerce'), ('fashion', 'Handbag & heels', 'For fashion brands'),
+            ('creator', 'Creator setup', 'For YouTubers & creators'), ('cafe', 'Café badge', 'For cafés & food brands'),
+            ('lesson', 'Reading rocket', 'For teachers'), ('house', 'Family home', 'For real estate'),
+            ('strawberry', 'How to draw a strawberry', 'Tutorial · 4 steps'), ('owl', 'How to draw an owl', 'Tutorial · 4 steps'),
             ('cat', 'Curled-up cat', 'Pencil · hand'), ('sneaker', 'Product sketch', 'Ink · hand'), ('coffee', 'Coffee & croissant', 'Ink'),
             ('wreath', 'Floral wreath', 'Pencil'), ('balloon', 'Hot-air balloon', 'Ink · hand'),
             ('puppy', 'Happy puppy', 'Ink · hand'), ('fox', 'Chalkboard fox', 'Greenboard')]
@@ -186,6 +190,17 @@ def build_blog():
     return written
 
 
+def build_sitemap(pages):
+    """public/sitemap.xml and robots.txt: every public page (the studio included; the API and private media excluded)."""
+    urls = ['/', '/studio/', '/terms/', '/privacy/', '/refunds/'] + ['/' + p.rsplit('/index.html', 1)[0] + '/' for p in pages]
+    entries = ''.join(f'<url><loc>https://strokeberry.com{u}</loc></url>' for u in dict.fromkeys(urls))
+    (FRONT / 'public' / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n'
+                                                  f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{entries}</urlset>\n')
+    (FRONT / 'public' / 'robots.txt').write_text('User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /media/\n\n'
+                                                 'Sitemap: https://strokeberry.com/sitemap.xml\n')
+
+
 if __name__ == '__main__':
     pages = [build_examples()] + build_blog()
-    print('\n'.join(pages))
+    build_sitemap(pages)
+    print('\n'.join(pages + ['public/sitemap.xml', 'public/robots.txt']))
