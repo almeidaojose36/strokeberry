@@ -11,6 +11,9 @@ Configure with environment variables (keep the secret ones in .env.local, never 
   STROKEBERRY_FOUNDER_PRICE / STROKEBERRY_FOUNDER_LIMIT   display values, default "$7" and 100
   STROKEBERRY_PRICE_MONTH / STROKEBERRY_PRICE_YEAR  the prices shown to visitors, e.g. "$10" and "$84" (display only;
                                 the amount charged is whatever the Lemon Squeezy variant says)
+  LEMONSQUEEZY_PACK_5_VARIANT_ID / _15_ / _40_   (optional) one-time "video pack" products of 5, 15 and 40 videos; each
+                                pack shows only when its variant id is set. Display prices below (the charge is the variant's).
+  STROKEBERRY_PACK_PRICES       display prices for the 5/15/40 packs, default "$5,$12,$25"
   LEMONSQUEEZY_WEBHOOK_SECRET   the signing secret you set on the webhook (Settings → Webhooks)
   STROKEBERRY_APP_URL           public site address, e.g. https://strokeberry.com (checkout returns here)
 
@@ -30,6 +33,29 @@ from fastapi import HTTPException
 API = 'https://api.lemonsqueezy.com/v1'
 # Subscription statuses that still give Pro. "past_due" keeps access while Lemon Squeezy retries the card.
 ACTIVE = {'on_trial', 'active', 'past_due'}
+
+
+# One-time video packs, counted in videos (never per second) and never expiring. Bigger packs cost less per video, but every
+# pack costs more per video than Pro, so people who create regularly are better off subscribing.
+PACK_SIZES = (5, 15, 40)
+PACK_LABELS = {15: 'Most popular', 40: 'Best value'}
+
+
+def packs():
+    """The video packs on sale: [{'id', 'videos', 'price', 'per_video', 'label'}]. Empty when payments aren't set up."""
+    prices = (os.environ.get('STROKEBERRY_PACK_PRICES') or '$5,$12,$25').split(',')
+    offered = []
+    for size, shown in zip(PACK_SIZES, prices):
+        if not (os.environ.get(f'LEMONSQUEEZY_PACK_{size}_VARIANT_ID') and os.environ.get('LEMONSQUEEZY_API_KEY')
+                and os.environ.get('LEMONSQUEEZY_STORE_ID')):
+            continue
+        shown = shown.strip()
+        try:
+            per_video = f'${float(shown.lstrip("$")) / size:.2f}'
+        except ValueError:
+            per_video = None
+        offered.append({'id': str(size), 'videos': size, 'price': shown, 'per_video': per_video, 'label': PACK_LABELS.get(size)})
+    return offered
 
 
 def configured(interval='month'):
@@ -93,23 +119,35 @@ def create_checkout(user, interval='month'):
     """Return a hosted checkout URL for the Pro plan (monthly or yearly), tagged with our user id."""
     if not configured(interval):
         raise HTTPException(503, 'Payments are not set up yet. Please check back soon.')
-    app_url = os.environ.get('STROKEBERRY_APP_URL', 'http://127.0.0.1:8001').rstrip('/')
     checkout_data = {'custom': {'user_id': user['id']}}
     if interval == 'month' and founder_offer():  # the yearly plan is already discounted, so the code isn't stacked on it
         checkout_data['discount_code'] = os.environ['STROKEBERRY_FOUNDER_CODE'].strip()
+    variant = os.environ['LEMONSQUEEZY_PRO_YEARLY_VARIANT_ID' if interval == 'year' else 'LEMONSQUEEZY_PRO_VARIANT_ID']
+    return _checkout(user, checkout_data, variant, 'upgraded=1')
+
+
+def create_pack_checkout(user, pack):
+    """Return a hosted checkout URL for a one-time video pack."""
+    if not any(p['id'] == str(pack) for p in packs()):
+        raise HTTPException(404, 'That video pack is not available.')
+    variant = os.environ[f'LEMONSQUEEZY_PACK_{pack}_VARIANT_ID']
+    return _checkout(user, {'custom': {'user_id': user['id'], 'pack': str(pack)}}, variant, f'pack={pack}')
+
+
+def _checkout(user, checkout_data, variant, returned):
+    app_url = os.environ.get('STROKEBERRY_APP_URL', 'http://127.0.0.1:8001').rstrip('/')
     if user.get('email'):
         checkout_data['email'] = user['email']
     body = {'data': {
         'type': 'checkouts',
         'attributes': {
             'checkout_data': checkout_data,
-            'product_options': {'redirect_url': f'{app_url}/studio/?upgraded=1'},
+            'product_options': {'redirect_url': f'{app_url}/studio/?{returned}'},
             'checkout_options': {'embed': False},
         },
         'relationships': {
             'store': {'data': {'type': 'stores', 'id': str(os.environ['LEMONSQUEEZY_STORE_ID'])}},
-            'variant': {'data': {'type': 'variants', 'id': str(os.environ[
-                'LEMONSQUEEZY_PRO_YEARLY_VARIANT_ID' if interval == 'year' else 'LEMONSQUEEZY_PRO_VARIANT_ID'])}},
+            'variant': {'data': {'type': 'variants', 'id': str(variant)}},
         },
     }}
     try:
@@ -155,9 +193,37 @@ def _is_future(value):
         return False
 
 
-def apply_webhook(db, payload):
-    """Mirror a subscription event onto the user. Returns the user id it applied to, or None."""
+def apply_pack_order(db, payload):
+    """Credit (order_created, paid) or take back (order_refunded) a video pack. Each order counts once, however many
+    times Lemon Squeezy delivers the webhook. Returns the user id, or None when the order isn't a pack."""
     event = payload.get('meta', {}).get('event_name', '')
+    custom = payload.get('meta', {}).get('custom_data') or {}
+    data = payload.get('data', {})
+    order_id, user_id, pack = str(data.get('id') or ''), custom.get('user_id'), str(custom.get('pack') or '')
+    if not (order_id and user_id and pack.isdigit() and int(pack) in PACK_SIZES):
+        return None
+    videos = int(pack)
+    if event == 'order_created' and data.get('attributes', {}).get('status') == 'paid':
+        if not db.execute('SELECT 1 FROM users WHERE id=?', (user_id,)).fetchone():
+            return None
+        added = db.execute('INSERT OR IGNORE INTO pack_orders (order_id, user_id, pack, videos, created) VALUES (?,?,?,?,?)',
+                           (order_id, user_id, pack, videos, datetime.now(timezone.utc).isoformat())).rowcount
+        if added:
+            db.execute('UPDATE users SET pack_videos=pack_videos+? WHERE id=?', (videos, user_id))
+        return user_id
+    if event == 'order_refunded':
+        taken = db.execute('UPDATE pack_orders SET refunded=1 WHERE order_id=? AND refunded=0', (order_id,)).rowcount
+        if taken:
+            db.execute('UPDATE users SET pack_videos=MAX(0, pack_videos-?) WHERE id=?', (videos, user_id))
+        return user_id
+    return None
+
+
+def apply_webhook(db, payload):
+    """Mirror a subscription event onto the user, or credit a video pack. Returns the user id it applied to, or None."""
+    event = payload.get('meta', {}).get('event_name', '')
+    if event.startswith('order_'):
+        return apply_pack_order(db, payload)
     if not event.startswith('subscription_') or event.startswith('subscription_payment'):
         return None  # orders, refunds and payment receipts don't change the plan here
     data = payload.get('data', {})

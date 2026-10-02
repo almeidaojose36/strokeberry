@@ -36,10 +36,13 @@ GUEST_PROJECT_LIMIT = 3
 FREE_PRESET_LIMIT, PRO_PRESET_LIMIT = 1, 20
 ACTIVE_RENDERS = {'free': 2, 'pro': 9}  # queued + rendering exports per person
 PLANS = {
-    'guest': {'name': 'Guest', 'exports': 0, 'period_days': None, 'max_resolution': '720p', 'max_duration': 60, 'watermark': True},
-    'free': {'name': 'Free', 'exports': 3, 'period_days': 30, 'max_resolution': '720p', 'max_duration': 60, 'watermark': True},
-    'pro': {'name': 'Pro', 'exports': 200, 'period_days': 30, 'max_resolution': '1080p', 'max_duration': 300, 'watermark': False},
+    'guest': {'name': 'Guest', 'exports': 0, 'period_days': None, 'max_resolution': '1080p', 'max_duration': 60, 'watermark': True},
+    'free': {'name': 'Free', 'exports': 3, 'period_days': 30, 'max_resolution': '1080p', 'max_duration': 60, 'watermark': True},
+    'pro': {'name': 'Pro', 'exports': 200, 'period_days': 30, 'max_resolution': '4k', 'max_duration': 300, 'watermark': False},
 }
+RESOLUTIONS = ('720p', '1080p', '4k')  # lowest to highest
+# A video bought in a pack exports like Pro (no watermark or end card, up to 5 minutes) at up to 1080p. Packs never expire.
+PACK_QUALITY = {'name': 'Video pack', 'max_resolution': '1080p', 'max_duration': 300, 'watermark': False}
 
 _jwks_lock = threading.Lock()
 _jwks_cache = {'keys': None, 'fetched': 0.0}
@@ -68,6 +71,12 @@ def init_accounts(db):
         if 'user_id' not in columns:
             # Everything created before accounts existed belongs to the local single-user studio.
             db.execute(f"ALTER TABLE {table} ADD COLUMN user_id TEXT NOT NULL DEFAULT '{LOCAL_USER}'")
+    if 'pack_videos' not in {row[1] for row in db.execute('PRAGMA table_info(users)')}:
+        db.execute('ALTER TABLE users ADD COLUMN pack_videos INTEGER NOT NULL DEFAULT 0')
+    if 'paid_with' not in {row[1] for row in db.execute('PRAGMA table_info(jobs)')}:
+        db.execute("ALTER TABLE jobs ADD COLUMN paid_with TEXT NOT NULL DEFAULT 'plan'")  # 'plan' allowance or a 'pack' video
+    db.execute('''CREATE TABLE IF NOT EXISTS pack_orders (order_id TEXT PRIMARY KEY, user_id TEXT NOT NULL, pack TEXT,
+        videos INTEGER NOT NULL, created TEXT, refunded INTEGER NOT NULL DEFAULT 0)''')
 
 
 # ----------------------------------------------------------------------------------- tokens
@@ -164,7 +173,8 @@ def plan_of(user):
 
 def usage(db, user):
     plan = plan_of(user)
-    query = "SELECT count(*) FROM jobs WHERE user_id=? AND status != 'failed'"
+    # Deleted exports still count (they are kept as 'deleted'); pack videos are paid separately and don't.
+    query = "SELECT count(*) FROM jobs WHERE user_id=? AND status != 'failed' AND paid_with='plan'"
     args = [user['id']]
     if plan['period_days']:
         query += ' AND created >= ?'
@@ -190,6 +200,7 @@ def account_summary(db, user):
         'user': {'id': user['id'], 'email': user['email'], 'name': user['name']},
         'plan': {'id': plan_id(user), **plan},
         'usage': usage(db, user),
+        'packs': pack_balance(db, user),
         'billing': {'status': user.get('billing_status'), 'renews': user.get('plan_renews'),
                     'can_manage': bool(user.get('billing_subscription')), **billing_info()},
         'auth': auth_mode(),
@@ -200,31 +211,69 @@ def billing_info():
     from . import billing
     return {'enabled': billing.configured(), 'monthly': billing.price('month'), 'yearly': billing.price('year'),
             'yearly_enabled': billing.configured('year'), 'yearly_saving': billing.yearly_saving(),
-            'founder': billing.founder_offer()}
+            'founder': billing.founder_offer(), 'packs': billing.packs()}
 
 
-def check_duration(user, seconds):
-    """Free videos can be up to a minute; longer ones (up to five minutes) are part of Pro."""
-    limit = plan_of(user)['max_duration']
-    if seconds > limit:
-        raise HTTPException(403, 'Videos longer than 1 minute are part of Pro. Shorten this one or upgrade to make it up to 5 minutes.')
+def check_duration(user, seconds, limit=None):
+    """Free videos can be up to a minute; longer ones (up to five minutes) are part of Pro and of video packs."""
+    if seconds > (limit or plan_of(user)['max_duration']):
+        raise HTTPException(403, 'Videos longer than 1 minute are part of Pro and video packs. Shorten this one, or upgrade to make it up to 5 minutes.')
+
+
+def pack_balance(db, user):
+    row = db.execute('SELECT pack_videos FROM users WHERE id=?', (user['id'],)).fetchone()
+    return int(row[0]) if row else 0
 
 
 def check_export_allowed(db, user, settings):
-    """Raise 402/403 with a friendly message when the plan doesn't allow this export."""
-    plan = plan_of(user)
-    if plan_id(user) == 'guest':
+    """Decide how this export is paid for, or raise 401/402/403/429 with a friendly message.
+
+    Returns the plan features to export with, plus 'paid_with': 'plan' (the monthly allowance) or 'pack' (a bought video).
+    A Free member with pack videos uses them first, since they were bought for the better export; Pro uses its own
+    allowance and falls back to pack videos only once the month's 200 are used."""
+    pid, plan = plan_id(user), plan_of(user)
+    if pid == 'guest':
         raise HTTPException(401, 'Create a free account to export your video. It takes a few seconds.')
-    check_duration(user, settings['duration'])
-    if settings['resolution'] == '1080p' and plan['max_resolution'] != '1080p':
-        raise HTTPException(403, 'Full HD 1080p is part of Strokeberry Pro. Choose 720p or upgrade.')
-    if usage(db, user)['remaining'] <= 0:
-        if plan_id(user) == 'free':
-            when = usage(db, user)['resets']
-            back = f' They come back on {short_date(when)}, or upgrade' if when else ' Upgrade'
-            raise HTTPException(402, f"You've used your 3 free videos for this month.{back} to Pro to keep creating.")
+    packs = pack_balance(db, user)
+    remaining = usage(db, user)['remaining']
+    if pid == 'pro':
+        check_duration(user, settings['duration'])
+        if remaining > 0:
+            return dict(plan, paid_with='plan')
+        if packs > 0:
+            return dict(plan, paid_with='pack')
         raise HTTPException(429, "You've reached this month's export limit. It resets soon — thanks for creating so much!")
-    return plan
+    if packs > 0:
+        check_duration(user, settings['duration'], PACK_QUALITY['max_duration'])
+        if settings['resolution'] == '4k':
+            raise HTTPException(403, '4K is part of Strokeberry Pro. Choose 1080p, or upgrade.')
+        return dict(plan, **PACK_QUALITY, paid_with='pack')
+    check_duration(user, settings['duration'])
+    if RESOLUTIONS.index(settings['resolution']) > RESOLUTIONS.index(plan['max_resolution']):
+        raise HTTPException(403, '4K is part of Strokeberry Pro. Choose 1080p, or upgrade.')
+    if remaining <= 0:
+        when = usage(db, user)['resets']
+        back = f' They come back on {short_date(when)}, or get a video pack or Pro' if when else ' Get a video pack or Pro'
+        raise HTTPException(402, f"You've used your 3 free videos for this month.{back} to keep creating.")
+    return dict(plan, paid_with='plan')
+
+
+def spend(db, user, plan):
+    """Take one pack video for an export paid with a pack. Raises 402 if they ran out in the meantime."""
+    if plan.get('paid_with') != 'pack':
+        return
+    taken = db.execute('UPDATE users SET pack_videos=pack_videos-1 WHERE id=? AND pack_videos>0', (user['id'],)).rowcount
+    if not taken:
+        raise HTTPException(402, 'Your video pack is used up. Get another pack or go Pro to keep creating.')
+
+
+def refund_failed(db, job_ids):
+    """Give back the pack videos of exports that failed (the monthly allowance already ignores failed exports)."""
+    for job_id in job_ids:
+        row = db.execute("SELECT user_id FROM jobs WHERE id=? AND paid_with='pack'", (job_id,)).fetchone()
+        if row:
+            db.execute('UPDATE users SET pack_videos=pack_videos+1 WHERE id=?', (row['user_id'],))
+            db.execute("UPDATE jobs SET paid_with='refunded' WHERE id=?", (job_id,))
 
 
 # ------------------------------------------------------------------------------ signed URLs

@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="theme-color" content="#FFF8EC"/>
+<title>Drawing videos for your café’s Instagram · Strokeberry</title><meta name="description" content="Show your coffee, cakes and menu being drawn by hand: easy, scroll-stopping posts for cafés, bakeries and food brands."/>
+<meta property="og:title" content="Drawing videos for your café’s Instagram · Strokeberry"/><meta property="og:description" content="Show your coffee, cakes and menu being drawn by hand: easy, scroll-stopping posts for cafés, bakeries and food brands."/><meta property="og:image" content="/brand/og-image.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32.png"/><link rel="icon" type="image/png" sizes="192x192" href="/brand/strokeberry-192.png"/>
+<link rel="stylesheet" href="/src/landing.css"/><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Drawing videos for your caf\u00e9\u2019s Instagram", "description": "Show your coffee, cakes and menu being drawn by hand: easy, scroll-stopping posts for caf\u00e9s, bakeries and food brands.", "datePublished": "2026-10-01", "author": {"@type": "Organization", "name": "Strokeberry"}}</script></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol></defs></svg>
+<header class="nav scrolled"><div class="wrap nav-inner"><a class="logo" href="/" aria-label="Strokeberry home"><img src="/brand/strokeberry-mascot.png" srcset="/brand/strokeberry-mascot@2x.png 2x" width="43" height="44" alt=""/>Strokeberry</a>
+<nav class="nav-links" aria-label="Primary"><a href="/#gallery">Examples</a><a href="/#pricing">Pricing</a><a href="/examples/">Gallery</a><a href="/blog/">Blog</a></nav>
+<a class="btn btn-primary btn-sm" href="/studio/">Try free</a></div></header>
+<main class="doc post"><p class="doc-meta"><a href="/blog/">Blog</a> · 1 October 2026 · 5 min read</p><h1>Drawing videos for your café’s Instagram</h1><p class="post-lede">Show your coffee, cakes and menu being drawn by hand: easy, scroll-stopping posts for cafés, bakeries and food brands.</p>
+<p>Food posts are everywhere, and most of them look the same. A drawing of your signature drink or pastry being sketched and painted in by hand looks different: warm, crafted, and very “made here”. It’s an easy way to announce a new item, a seasonal menu or an opening-hours change.</p>
+<figure class="post-clip"><video muted loop playsinline preload="none" poster="/gallery/coffee.jpg" data-src="/gallery/coffee.mp4" aria-label="Café menu art: a coffee and croissant drawn and painted in"></video><figcaption>Café menu art: a coffee and croissant drawn and painted in</figcaption></figure>
+<h2>Ideas that work</h2>
+<ul><li><strong>New on the menu.</strong> Draw the new item, then post the photo of the real thing next to it.</li>
+<li><strong>Seasonal specials.</strong> A pumpkin latte in autumn, a berry tart in summer.</li>
+<li><strong>Your logo or shop front.</strong> A short reveal for your profile highlights or the start of your Stories.</li>
+<li><strong>Behind the counter.</strong> Draw your barista’s favourite drink and tag them.</li></ul>
+<h2>How to make one</h2>
+<ol><li><strong>Start from an illustration.</strong> A simple drawing of the item with clear outlines works far better than a photo. Commission one, draw it yourself, or start from one of the food examples in the gallery.</li>
+<li><strong>Choose pencil or ink.</strong> Pencil feels cosy and hand-made; ink looks bold and modern.</li>
+<li><strong>Use the 4:5 format for your feed</strong> and 9:16 for Reels and Stories.</li>
+<li><strong>Keep it under 15 seconds</strong> and let the finished picture stay on screen for a beat before it loops.</li></ol>
+<h2>What it costs</h2>
+<p>You can make 3 videos a month for free. For a single campaign, a video pack (from $5, paid once) gives you watermark-free videos you can use commercially. If you post every week, Pro is the better deal at $10 a month for 200 videos.</p>
+<aside class="post-cta"><p><strong>Try it with your own picture.</strong> Upload an image and watch it being drawn: no sign-up to preview, 3 free videos every month.</p><a class="btn btn-primary" href="/studio/">Open the studio <svg width="18" height="18"><use href="#arrow"/></svg></a></aside></main><footer class="footer"><div class="wrap footer-inner"><a class="logo" href="/"><img src="/brand/strokeberry-mascot.png" srcset="/brand/strokeberry-mascot@2x.png 2x" width="35" height="36" alt=""/>Strokeberry</a>
+<p>Your images. Drawn to life.</p><nav class="footer-links" aria-label="More"><a href="/examples/">Gallery</a><a href="/blog/">Blog</a><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/refunds/">Refunds</a><a class="footer-mail" href="mailto:hi@strokeberry.com">hi@strokeberry.com</a></nav>
+<p class="copy">© 2026 Strokeberry</p></div></footer>
+<script>
+  // Clips load and play only while they are on screen; posters show straight away so nothing is ever blank.
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clips = document.querySelectorAll('video[data-src]');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(entries => entries.forEach(({target: v, isIntersecting}) => {
+      if (isIntersecting) { if (!v.src) v.src = v.dataset.src; if (!reduced) v.play().catch(() => {}); } else v.pause();
+    }), {threshold: .35});
+    clips.forEach(v => io.observe(v));
+  }
+</script>
+</body></html>

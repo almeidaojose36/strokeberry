@@ -29,7 +29,7 @@ export default function ExportResult({job, sameProject, plan, remaining, onAgain
       {canShare && <button className="button secondary" onClick={share} disabled={sharing}>{sharing ? <LoaderCircle size={16} className="spin"/> : <Share2 size={16}/>}Share</button>}
     </div>
     <p className="ready-tip">Post it as a Reel, TikTok or Short. Vertical 9:16 videos get the most reach.</p>
-    {free && <div className="ready-upsell"><span><strong>Want it without the watermark?</strong> Pro removes it and adds Full HD.</span><button className="button primary" onClick={onUpgrade}><Crown size={15}/>See Pro</button></div>}
+    {free && <div className="ready-upsell"><span><strong>Want it without the watermark?</strong> A video pack or Pro removes it and the end card.</span><button className="button primary" onClick={onUpgrade}><Crown size={15}/>See Pro</button></div>}
     {sameProject && <div className="ready-next">
       <p className="ready-next-title">Make it again</p>
       <div className="chips">

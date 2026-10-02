@@ -107,7 +107,7 @@ def test_steps_export_is_a_real_video(tmp_path,monkeypatch,whole_sheet):
     if whole_sheet:
         config['stages'] = [dict(config['stages'][0], crop=dict(x=0,y=0,width=1,height=1), seconds=8)]
     prepare_steps(source,out,config)
-    monkeypatch.setattr(pipeline,'dimensions',lambda _: (240,320))
+    monkeypatch.setattr(pipeline,'dimensions',lambda *_: (240,320))
     updates=[]
     path=pipeline.render(out,module.Settings(duration=8,pen=False).model_dump(),lambda p,s: updates.append(s))
     video=cv2.VideoCapture(str(path))

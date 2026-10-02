@@ -41,7 +41,9 @@ def init_db():
         db.executescript('''CREATE TABLE IF NOT EXISTS projects (id TEXT PRIMARY KEY, name TEXT, created TEXT, strokes INTEGER);
         CREATE TABLE IF NOT EXISTS jobs (id TEXT PRIMARY KEY, project_id TEXT, status TEXT, progress INTEGER, stage TEXT, settings TEXT, created TEXT, error TEXT);''')
         accounts.init_accounts(db)
+        stuck = [row[0] for row in db.execute("SELECT id FROM jobs WHERE status IN ('queued','rendering')")]
         db.execute("UPDATE jobs SET status='failed', error='The server restarted. Please export again.' WHERE status IN ('queued','rendering')")
+        accounts.refund_failed(db, stuck)
 
 
 _initialised = set()  # databases whose tables were created in this process
@@ -118,6 +120,17 @@ def checkout(body: CheckoutRequest = CheckoutRequest(), user=Depends(current_use
     return {'url': billing.create_checkout(user, body.interval)}
 
 
+class PackRequest(BaseModel):
+    pack: Literal['5', '15', '40']
+
+
+@app.post('/api/billing/pack')
+def pack_checkout(body: PackRequest, user=Depends(current_user)):
+    if accounts.plan_id(user) == 'guest':
+        raise HTTPException(401, 'Create a free account first, then get a video pack.')
+    return {'url': billing.create_pack_checkout(user, body.pack)}
+
+
 @app.get('/api/offer')
 def offer():
     """Public: the Founding member offer for the landing page (null when it isn't running)."""
@@ -189,10 +202,12 @@ def media(project_id: str, filename: str, e: str = None, s: str = None):
 class Settings(BaseModel):
     style: Literal['pencil', 'ink'] = 'pencil'
     duration: int = Field(default=15, ge=5, le=300)
-    ratio: Literal['16:9', '9:16', '1:1'] = '16:9'
-    resolution: Literal['720p', '1080p'] = '720p'
+    ratio: Literal['16:9', '9:16', '1:1', '4:5', 'auto'] = '16:9'
+    resolution: Literal['720p', '1080p', '4k'] = '1080p'
     color: bool = True
     pen: bool = True
+    hand: Literal['pencil', 'light', 'medium', 'dark'] = 'pencil'  # what draws: a plain pencil, or a hand in a skin tone
+    canvas: Literal['paper', 'blackboard', 'greenboard'] = 'paper'
 
 
 class Crop(BaseModel):
@@ -389,6 +404,7 @@ def run_job(job_id, project_id, settings):
         logging.exception('Render failed: %s', job_id)
         with connect() as db:
             db.execute("UPDATE jobs SET status='failed', error=? WHERE id=?", ('Rendering failed. Check the server log and confirm FFmpeg is installed, then try again.', job_id))
+            accounts.refund_failed(db, [job_id])
 
 
 def check_capacity(db, user, extra=1):
@@ -419,11 +435,12 @@ def brand_for_export(db, user):
 def enqueue(db, user, plan, project_id, settings):
     """Insert an export job and hand it to the renderer. The caller has already checked the plan and capacity."""
     job_id = uuid.uuid4().hex
-    # The watermark and brand kit are decided by the server from the plan, never by the request.
-    job_settings = dict(settings, watermark=plan['watermark'], **brand_for_export(db, user))
-    db.execute('INSERT INTO jobs (id, project_id, status, progress, stage, settings, created, error, user_id) VALUES (?,?,?,?,?,?,?,?,?)',
+    # The watermark, end card and brand kit are decided by the server from the plan, never by the request.
+    job_settings = dict(settings, watermark=plan['watermark'], end_card=plan['watermark'], **brand_for_export(db, user))
+    accounts.spend(db, user, plan)
+    db.execute('INSERT INTO jobs (id, project_id, status, progress, stage, settings, created, error, user_id, paid_with) VALUES (?,?,?,?,?,?,?,?,?,?)',
                (job_id, project_id, 'queued', 0, 'Waiting in the render queue', json.dumps(job_settings),
-                datetime.now(timezone.utc).isoformat(), None, user['id']))
+                datetime.now(timezone.utc).isoformat(), None, user['id'], plan.get('paid_with', 'plan')))
     db.commit()
     executor.submit(run_job, job_id, project_id, job_settings)
     return job_id
@@ -441,7 +458,7 @@ def export(project_id: str, settings: Settings, user=Depends(current_user)):
 
 class BatchRequest(BaseModel):
     project_ids: list[str] = Field(min_length=1, max_length=6)
-    ratios: list[Literal['16:9', '9:16', '1:1']] = Field(min_length=1, max_length=3)
+    ratios: list[Literal['16:9', '9:16', '1:1', '4:5', 'auto']] = Field(min_length=1, max_length=5)
     settings: Settings = Settings()
 
 
@@ -458,7 +475,7 @@ def batch_export(body: BatchRequest, user=Depends(current_user)):
     total = len(ids) * len(ratios)
     with queue_lock, connect() as db:
         plan = accounts.check_export_allowed(db, user, body.settings.model_dump())
-        if accounts.usage(db, user)['remaining'] < total:
+        if plan['paid_with'] != 'plan' or accounts.usage(db, user)['remaining'] < total:
             raise HTTPException(429, 'That would go over this month’s export limit. Choose fewer videos or formats.')
         check_capacity(db, user, total)
         made = [enqueue(db, user, plan, project_id, dict(body.settings.model_dump(), ratio=ratio))
@@ -474,7 +491,8 @@ def delete_job(job_id: str, user=Depends(current_user)):
             raise HTTPException(404, 'Export not found.')
         if row['status'] in ('queued', 'rendering'):
             raise HTTPException(409, 'This video is still rendering.')
-        db.execute('DELETE FROM jobs WHERE id=?', (job_id,))
+        # Kept as 'deleted' so a removed video still counts towards the month's allowance.
+        db.execute("UPDATE jobs SET status='deleted' WHERE id=?", (job_id,))
     for suffix in ('.mp4', '.log', '.partial.mp4'):
         (DATA / row['project_id'] / f'{job_id}{suffix}').unlink(missing_ok=True)
 
@@ -483,7 +501,7 @@ def delete_job(job_id: str, user=Depends(current_user)):
 def job(job_id: str, user=Depends(current_user)):
     with connect() as db:
         row = db.execute('SELECT * FROM jobs WHERE id=?', (job_id,)).fetchone()
-    if not row or row['user_id'] != user['id']:
+    if not row or row['user_id'] != user['id'] or row['status'] == 'deleted':
         raise HTTPException(404, 'Export not found.')
     item = dict(row)
     item.pop('user_id', None)
@@ -496,7 +514,7 @@ def job(job_id: str, user=Depends(current_user)):
 @app.get('/api/jobs')
 def jobs(user=Depends(current_user)):
     with connect() as db:
-        rows = db.execute('SELECT id FROM jobs WHERE user_id=? ORDER BY created DESC LIMIT 50', (user['id'],)).fetchall()
+        rows = db.execute("SELECT id FROM jobs WHERE user_id=? AND status != 'deleted' ORDER BY created DESC LIMIT 50", (user['id'],)).fetchall()
     return [job(row['id'], user) for row in rows]
 
 
@@ -507,6 +525,8 @@ def download(job_id: str, e: str = None, s: str = None):
     with connect() as db:
         row = db.execute('SELECT project_id, status FROM jobs WHERE id=?', (job_id,)).fetchone()
     if not row:
+        raise HTTPException(404, 'Export not found.')
+    if row['status'] == 'deleted':
         raise HTTPException(404, 'Export not found.')
     if row['status'] != 'completed':
         raise HTTPException(409, 'Your video is not ready yet.')
@@ -564,7 +584,7 @@ def delete_project(project_id: str, user=Depends(current_user)):
         busy = db.execute("SELECT count(*) FROM jobs WHERE project_id=? AND status IN ('queued','rendering')", (project_id,)).fetchone()[0]
         if busy:
             raise HTTPException(409, 'A video from this project is still rendering. Try again in a moment.')
-        db.execute('DELETE FROM jobs WHERE project_id=?', (project_id,))
+        db.execute("UPDATE jobs SET status='deleted' WHERE project_id=?", (project_id,))
         db.execute('DELETE FROM projects WHERE id=?', (project_id,))
     shutil.rmtree(DATA / project_id, ignore_errors=True)
 

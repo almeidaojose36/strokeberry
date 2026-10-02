@@ -23,11 +23,13 @@ from backend.steps import detect_panels, four_step_reading_order, prepare_steps 
 SRC = ROOT / 'assets' / 'gallery-src'
 LEAD_IN = 0.5  # seconds of empty canvas trimmed from the start so a card is never blank when it appears
 ITEMS = [
-    {'key': 'cat', 'style': 'pencil', 'duration': 10},
-    {'key': 'sneaker', 'style': 'ink', 'duration': 10},
+    {'key': 'cat', 'style': 'pencil', 'duration': 10, 'hand': 'light'},
+    {'key': 'sneaker', 'style': 'ink', 'duration': 10, 'hand': 'medium'},
     {'key': 'coffee', 'style': 'ink', 'duration': 10},
     {'key': 'wreath', 'style': 'pencil', 'duration': 12},
-    {'key': 'balloon', 'style': 'ink', 'duration': 10},
+    {'key': 'balloon', 'style': 'ink', 'duration': 10, 'hand': 'dark'},
+    {'key': 'puppy', 'style': 'ink', 'duration': 12, 'hand': 'light'},
+    {'key': 'fox', 'style': 'ink', 'duration': 12, 'hand': 'dark', 'canvas': 'greenboard'},
     {'key': 'strawberry', 'steps': ['Body shape', 'Leaves & headphones', 'Face & details', 'Color'], 'seconds': [3, 4, 5, 4],
      # Crops sit just inside the light-blue dividers of the source sheet (960 px square).
      'crops': [{'x': x / 960, 'y': y / 960, 'width': 472 / 960, 'height': 472 / 960} for x, y in ((0, 0), (486, 0), (0, 486), (486, 486))]},
@@ -59,14 +61,16 @@ def make_video(item, manifest, out_dir):
         folder.mkdir()
         scene = prepare_steps(parent, folder, config)
         duration = scene['duration']
-    settings = {'style': item.get('style', 'pencil'), 'duration': duration, 'ratio': '1:1', 'resolution': '720p', 'color': True, 'pen': True}
+    settings = {'style': item.get('style', 'pencil'), 'duration': duration, 'ratio': '1:1', 'resolution': '720p', 'color': True, 'pen': True,
+                'hand': item.get('hand', 'pencil'), 'canvas': item.get('canvas', 'paper')}  # showcase clips are like Pro: no end card
     raw = work / 'raw.mp4'
     render(folder, settings, lambda *a: None, raw)
     video = out_dir / f"{item['key']}.mp4"
     ffmpeg('-ss', str(LEAD_IN), '-i', str(raw), '-c:v', 'libx264', '-crf', '22', '-preset', 'slow', '-pix_fmt', 'yuv420p', '-an', '-movflags', '+faststart', str(video))
     ffmpeg('-sseof', '-0.2', '-i', str(video), '-frames:v', '1', '-q:v', '3', str(out_dir / f"{item['key']}.jpg"))
     shutil.rmtree(work, ignore_errors=True)
-    return {'key': item['key'], 'style': 'steps' if item.get('steps') else settings['style'], 'duration': duration}
+    return {'key': item['key'], 'style': 'steps' if item.get('steps') else settings['style'], 'duration': duration,
+            'hand': settings['hand'], 'canvas': settings['canvas']}
 
 
 def main():

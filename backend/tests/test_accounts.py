@@ -80,14 +80,14 @@ def test_media_links_need_a_valid_signature(client):
 def test_free_plan_limits_quality_and_watermark(client):
     project = upload(client, 'ana')
     url = f"/api/projects/{project['id']}/jobs"
-    locked = client.post(url, headers=as_user('ana'), json={'resolution': '1080p'})
+    locked = client.post(url, headers=as_user('ana'), json={'resolution': '4k'})
     assert locked.status_code == 403 and 'Pro' in locked.json()['detail']
     for _ in range(3):
-        response = client.post(url, headers=as_user('ana'), json={'resolution': '720p'})
+        response = client.post(url, headers=as_user('ana'), json={'resolution': '1080p'})   # Free exports Full HD
         assert response.status_code == 202, response.text
         with module.connect() as db:  # let the next export past the two-at-a-time rule
             db.execute("UPDATE jobs SET status='completed'")
-    assert all(args[3]['watermark'] is True for args in client.submitted)
+    assert all(args[3]['watermark'] is True and args[3]['end_card'] is True for args in client.submitted)
     over = client.post(url, headers=as_user('ana'), json={})
     assert over.status_code == 402
     assert client.get('/api/me', headers=as_user('ana')).json()['usage']['remaining'] == 0

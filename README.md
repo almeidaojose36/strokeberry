@@ -13,7 +13,7 @@ npm install
 npm start
 ```
 
-Open http://127.0.0.1:8000 for the landing page and http://127.0.0.1:8000/studio/ for the app. `npm start` builds the frontend and serves the complete application from FastAPI. If FFmpeg is outside your PATH, set `FFMPEG_PATH` to its executable path.
+Open http://127.0.0.1:8001 for the landing page and http://127.0.0.1:8001/studio/ for the app. `npm start` builds the frontend and serves the complete application from FastAPI. If FFmpeg is outside your PATH, set `FFMPEG_PATH` to its executable path.
 
 For development, run these in separate terminals:
 
@@ -25,7 +25,7 @@ npm run server
 npm run dev
 ```
 
-Open http://127.0.0.1:5173 (landing) or http://127.0.0.1:5173/studio/ (app). Vite proxies API and image requests to port 8000.
+Open http://127.0.0.1:5173 (landing) or http://127.0.0.1:5173/studio/ (app). Vite proxies API and image requests to port 8001.
 
 ## Landing-page gallery
 

@@ -1,0 +1,25 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="theme-color" content="#FFF8EC"/>
+<title>Blog · Strokeberry</title><meta name="description" content="Guides to making hand-drawn videos for your business, your classroom and your social media."/>
+<meta property="og:title" content="Blog · Strokeberry"/><meta property="og:description" content="Guides to making hand-drawn videos for your business, your classroom and your social media."/><meta property="og:image" content="/brand/og-image.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32.png"/><link rel="icon" type="image/png" sizes="192x192" href="/brand/strokeberry-192.png"/>
+<link rel="stylesheet" href="/src/landing.css"/></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol></defs></svg>
+<header class="nav scrolled"><div class="wrap nav-inner"><a class="logo" href="/" aria-label="Strokeberry home"><img src="/brand/strokeberry-mascot.png" srcset="/brand/strokeberry-mascot@2x.png 2x" width="43" height="44" alt=""/>Strokeberry</a>
+<nav class="nav-links" aria-label="Primary"><a href="/#gallery">Examples</a><a href="/#pricing">Pricing</a><a href="/examples/">Gallery</a><a href="/blog/">Blog</a></nav>
+<a class="btn btn-primary btn-sm" href="/studio/">Try free</a></div></header>
+<main class="wrap ex-page"><header class="ex-head"><p class="eyebrow">Blog</p><h1>Ideas for hand-drawn videos</h1>
+<p class="section-sub">Practical guides for small businesses, teachers and creators.</p></header><div class="blog-grid"><a class="blog-card" href="/blog/logo-reveal-video/"><span class="doc-meta">1 October 2026 · 5 min read</span><strong>How to make a logo reveal video for your business</strong><p>Turn your logo into a short hand-drawn reveal for Reels, TikTok, YouTube intros and launch posts, in about a minute.</p><em>Read →</em></a><a class="blog-card" href="/blog/drawing-tutorial-video/"><span class="doc-meta">1 October 2026 · 6 min read</span><strong>Turn a how-to-draw sheet into a video lesson</strong><p>Teachers and tutorial creators: turn a step-by-step drawing sheet into one video that builds the picture stage by stage.</p><em>Read →</em></a><a class="blog-card" href="/blog/cafe-instagram-drawing-videos/"><span class="doc-meta">1 October 2026 · 5 min read</span><strong>Drawing videos for your café’s Instagram</strong><p>Show your coffee, cakes and menu being drawn by hand: easy, scroll-stopping posts for cafés, bakeries and food brands.</p><em>Read →</em></a><a class="blog-card" href="/blog/what-is-a-speed-drawing-video/"><span class="doc-meta">1 October 2026 · 4 min read</span><strong>What is a speed-drawing video?</strong><p>Speed-drawing (or speed paint) videos explained: what they are, why people love watching them, and how to make one from any image.</p><em>Read →</em></a></div></main><footer class="footer"><div class="wrap footer-inner"><a class="logo" href="/"><img src="/brand/strokeberry-mascot.png" srcset="/brand/strokeberry-mascot@2x.png 2x" width="35" height="36" alt=""/>Strokeberry</a>
+<p>Your images. Drawn to life.</p><nav class="footer-links" aria-label="More"><a href="/examples/">Gallery</a><a href="/blog/">Blog</a><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/refunds/">Refunds</a><a class="footer-mail" href="mailto:hi@strokeberry.com">hi@strokeberry.com</a></nav>
+<p class="copy">© 2026 Strokeberry</p></div></footer>
+<script>
+  // Clips load and play only while they are on screen; posters show straight away so nothing is ever blank.
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clips = document.querySelectorAll('video[data-src]');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(entries => entries.forEach(({target: v, isIntersecting}) => {
+      if (isIntersecting) { if (!v.src) v.src = v.dataset.src; if (!reduced) v.play().catch(() => {}); } else v.pause();
+    }), {threshold: .35});
+    clips.forEach(v => io.observe(v));
+  }
+</script>
+</body></html>

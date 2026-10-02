@@ -2,36 +2,64 @@
   {
     "key": "cat",
     "style": "pencil",
-    "duration": 10
+    "duration": 10,
+    "hand": "light",
+    "canvas": "paper"
   },
   {
     "key": "sneaker",
     "style": "ink",
-    "duration": 10
+    "duration": 10,
+    "hand": "medium",
+    "canvas": "paper"
   },
   {
     "key": "coffee",
     "style": "ink",
-    "duration": 10
+    "duration": 10,
+    "hand": "pencil",
+    "canvas": "paper"
   },
   {
     "key": "wreath",
     "style": "pencil",
-    "duration": 12
+    "duration": 12,
+    "hand": "pencil",
+    "canvas": "paper"
   },
   {
     "key": "balloon",
     "style": "ink",
-    "duration": 10
+    "duration": 10,
+    "hand": "dark",
+    "canvas": "paper"
+  },
+  {
+    "key": "puppy",
+    "style": "ink",
+    "duration": 12,
+    "hand": "light",
+    "canvas": "paper"
+  },
+  {
+    "key": "fox",
+    "style": "ink",
+    "duration": 12,
+    "hand": "dark",
+    "canvas": "greenboard"
   },
   {
     "key": "strawberry",
     "style": "steps",
-    "duration": 16
+    "duration": 16,
+    "hand": "pencil",
+    "canvas": "paper"
   },
   {
     "key": "owl",
     "style": "steps",
-    "duration": 16
+    "duration": 16,
+    "hand": "pencil",
+    "canvas": "paper"
   }
 ]

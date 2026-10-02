@@ -1,0 +1,56 @@
+{
+  "dark-brush": {
+    "aspect": 1.107,
+    "file": "dark-brush.png",
+    "hand": 0.5034,
+    "tip": [
+      0.0009,
+      0.2415
+    ]
+  },
+  "dark-pencil": {
+    "aspect": 0.9422,
+    "file": "dark-pencil.png",
+    "hand": 0.4811,
+    "tip": [
+      0.0014,
+      0.2502
+    ]
+  },
+  "light-brush": {
+    "aspect": 0.8778,
+    "file": "light-brush.png",
+    "hand": 0.4955,
+    "tip": [
+      0.0009,
+      0.2288
+    ]
+  },
+  "light-pencil": {
+    "aspect": 0.8767,
+    "file": "light-pencil.png",
+    "hand": 0.4959,
+    "tip": [
+      0.0009,
+      0.2665
+    ]
+  },
+  "medium-brush": {
+    "aspect": 0.9111,
+    "file": "medium-brush.png",
+    "hand": 0.5092,
+    "tip": [
+      0.0009,
+      0.2664
+    ]
+  },
+  "medium-pencil": {
+    "aspect": 1.0147,
+    "file": "medium-pencil.png",
+    "hand": 0.5257,
+    "tip": [
+      0.0013,
+      0.3047
+    ]
+  }
+}

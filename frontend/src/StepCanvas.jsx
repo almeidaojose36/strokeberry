@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {eventPosition} from './drawing.js';
 import {advanceSweep} from './sweep.js';
+import {frameSize} from './frame.js';
 
 export function stageAt(stages, progress) {
   let index=stages.findIndex(stage=>progress<stage.end);
@@ -28,7 +29,7 @@ export default function StepCanvas({project,settings,time,original,onReady}) {
   },[project]);
   useEffect(()=>{
     const canvas=ref.current,data=assets.current;if(!data||!canvas)return;
-    const [width,height]=settings.ratio==='9:16'?[540,960]:settings.ratio==='1:1'?[720,720]:[960,540];canvas.width=width;canvas.height=height;
+    const [width,height]=frameSize(settings.ratio,project);canvas.width=width;canvas.height=height;
     const ctx=canvas.getContext('2d');ctx.fillStyle='#faf9f6';ctx.fillRect(0,0,width,height);
     const scale=Math.min(width*.9/project.width,height*.9/project.height),ox=(width-project.width*scale)/2,oy=(height-project.height*scale)/2;
     const {index,local}=stageAt(project.stages,time/settings.duration),stage=project.stages[index],amount=Math.min(1,local/(1-Math.min(.1,1.5/Math.max(.1,(stage.end-stage.start)*settings.duration))));
@@ -43,5 +44,6 @@ export default function StepCanvas({project,settings,time,original,onReady}) {
       if(lift>0){ctx.fillStyle='#dddfd6';ctx.beginPath();ctx.ellipse(x+8*unit,y+3*unit,7*unit,2*unit,0,0,Math.PI*2);ctx.fill()}
       x+=lift*3*unit;y-=lift*10*unit;ctx.fillStyle='#cfa257';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+17*unit,y-46*unit);ctx.lineTo(x+28*unit,y-40*unit);ctx.lineTo(x+5*unit,y+2*unit);ctx.closePath();ctx.fill();ctx.fillStyle='#3c413b';ctx.beginPath();ctx.arc(x,y,2*unit,0,Math.PI*2);ctx.fill();}}
   },[project,settings,time,original,version]);
-  return <canvas ref={ref} aria-label="Step-by-step drawing preview" className={`drawing-canvas ratio-${settings.ratio.replace(':','-')}`}/>;
+  const [w,h]=frameSize(settings.ratio,project);
+  return <canvas ref={ref} aria-label="Step-by-step drawing preview" className={`drawing-canvas ${w>h?'ratio-wide':w<h?'ratio-tall':'ratio-square'}`} style={{aspectRatio:`${w} / ${h}`}}/>;
 }

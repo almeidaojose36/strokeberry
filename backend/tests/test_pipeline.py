@@ -43,7 +43,7 @@ def test_flat_image_is_supported(tmp_path):
 @pytest.mark.parametrize("duration", [5, 65])
 def test_encoded_video_reveals_source(tmp_path, monkeypatch, duration):
     pipeline.prepare_image(illustration(), tmp_path)
-    monkeypatch.setattr(pipeline, 'dimensions', lambda _: (320, 180))
+    monkeypatch.setattr(pipeline, 'dimensions', lambda *_: (320, 180))
     updates = []
     output = pipeline.render(tmp_path, module.Settings(duration=duration, pen=False).model_dump(), lambda p,s: updates.append(p))
     video = cv2.VideoCapture(str(output))
@@ -136,3 +136,12 @@ def test_empty_margins_are_trimmed_once_and_only_once(tmp_path):
     full[20:380, 20:380] = (30, 30, 30)            # art that already fills the frame is left alone
     Image.fromarray(full).save(tmp_path / 'full.png')
     assert pipeline.prepare_image(tmp_path / 'full.png', tmp_path)['width'] == 400
+
+
+def test_pen_weight_follows_the_artwork_outline_within_limits():
+    from backend.pipeline import pen_weight
+    assert pen_weight(None, 1.) == 1.                      # unknown outline weight: the default pen
+    assert pen_weight(1., 1.) == 1.                        # fine lines never get thinner than the default
+    assert 3.4 < pen_weight(6., 1.) < 3.6                   # a 6 px outline is drawn at about 85% of its width
+    assert pen_weight(80., 1.) == 4.                       # ...but never absurdly heavy
+    assert pen_weight(6., 2.) < pen_weight(6., 1.)         # a larger canvas already draws a heavier default pen
