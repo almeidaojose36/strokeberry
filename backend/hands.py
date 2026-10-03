@@ -1,4 +1,5 @@
-"""The realistic drawing hand: a cut-out photo of a hand holding a pencil (line phase) or a brush (colour phase), in three
+"""The realistic drawing hand: a cut-out photo of a hand holding an ink pen or a pencil (line phase, for the Ink and
+Pencil styles) or a brush (colour phase), in three
 skin tones. The artwork lives in frontend/public/hands/ (made by scripts/hands/cutout.py) so the browser preview and the
 MP4 renderer use the very same images; hands.json records where the tip is, and that point is put on the active line.
 """

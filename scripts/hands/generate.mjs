@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Generates the realistic drawing-hand artwork with KIE (grok-imagine-image-2-0): a right hand holding a pencil (line
- * phase) or a brush (colour phase) in three skin tones, two candidates each.
+ * Generates the realistic drawing-hand artwork with KIE (grok-imagine-image-2-0): a right hand holding a pencil or an ink pen
+ * (line phase, for the Pencil and Ink styles) or a brush (colour phase) in three skin tones, two candidates each.
  *
- *   node scripts/hands/generate.mjs [tone/tool ...]     e.g. light/pencil dark/brush   (default: all six)
+ *   node scripts/hands/generate.mjs [tone/tool ...]     e.g. light/pencil dark/brush   (default: all nine)
  *
  * Writes marketing/hands/<tone>-<tool>-<n>.(png|jpg). Cut-outs for the app are made by scripts/hands/cutout.py.
  * KIE_API_KEY is read from .env.local.
@@ -20,6 +20,7 @@ const MODEL = "grok-imagine-image-2-0/text-to-image";
 const TONES = { light: "fair, light", medium: "medium olive-tan", dark: "deep dark brown" };
 const TOOLS = {
   pencil: "a sharpened yellow wooden pencil, held as if drawing",
+  pen: "a slim black fine-liner ink pen with a matte black barrel and a fine black tip, held as if drawing",
   brush: "a slim artist's paintbrush with a wooden handle and a small round tip wet with paint, held as if painting",
 };
 const prompt = (tone, tool) =>

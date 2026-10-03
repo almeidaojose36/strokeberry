@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {ArrowDownToLine, Check, Crown, LayoutGrid, LoaderCircle, Share2, Sparkles} from 'lucide-react';
+import {ArrowDownToLine, Check, Crown, LayoutGrid, LoaderCircle, Music2, Share2, Sparkles} from 'lucide-react';
 
 const OTHER_RATIOS = {'16:9': ['9:16', '1:1'], '9:16': ['1:1', '16:9'], '1:1': ['9:16', '16:9']};
 const RATIO_NAME = {'16:9': 'widescreen', '9:16': 'Reels & TikTok', '1:1': 'square post'};
@@ -28,7 +28,8 @@ export default function ExportResult({job, sameProject, plan, remaining, onAgain
       <a className="button primary" href={job.url} download><ArrowDownToLine size={18}/>Download MP4</a>
       {canShare && <button className="button secondary" onClick={share} disabled={sharing}>{sharing ? <LoaderCircle size={16} className="spin"/> : <Share2 size={16}/>}Share</button>}
     </div>
-    <p className="ready-tip">Post it as a Reel, TikTok or Short. Vertical 9:16 videos get the most reach.</p>
+    <p className="ready-sound"><Music2 size={15}/><span><strong>Your video has no sound, on purpose.</strong> Add a trending sound or your voice when you post it on TikTok, Reels or Shorts: it helps more people see it.</span></p>
+    <p className="ready-tip">Vertical 9:16 videos get the most reach.</p>
     {free && <div className="ready-upsell"><span><strong>Want it without the watermark?</strong> A video pack or Pro removes it and the end card.</span><button className="button primary" onClick={onUpgrade}><Crown size={15}/>See Pro</button></div>}
     {sameProject && <div className="ready-next">
       <p className="ready-next-title">Make it again</p>

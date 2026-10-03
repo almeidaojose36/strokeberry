@@ -49,20 +49,6 @@
     "canvas": "greenboard"
   },
   {
-    "key": "strawberry",
-    "style": "steps",
-    "duration": 16,
-    "hand": "pencil",
-    "canvas": "paper"
-  },
-  {
-    "key": "owl",
-    "style": "steps",
-    "duration": 16,
-    "hand": "pencil",
-    "canvas": "paper"
-  },
-  {
     "key": "skincare",
     "style": "ink",
     "duration": 12,
@@ -102,6 +88,20 @@
     "style": "ink",
     "duration": 12,
     "hand": "medium",
+    "canvas": "paper"
+  },
+  {
+    "key": "strawberry",
+    "style": "steps",
+    "duration": 16,
+    "hand": "pencil",
+    "canvas": "paper"
+  },
+  {
+    "key": "owl",
+    "style": "steps",
+    "duration": 16,
+    "hand": "pencil",
     "canvas": "paper"
   }
 ]

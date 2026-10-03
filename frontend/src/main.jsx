@@ -65,11 +65,11 @@ function DrawingCanvas({project,settings,time,original,onReady,inkColor}) {
    }).catch(()=>{if(alive)onReady?.('Could not load the project image. Please reload the project.');});
    return ()=>{alive=false};
  },[project]);
- // The realistic hand artwork for the chosen skin tone (pencil for lines, brush for colour).
+ // The realistic hand artwork for the chosen skin tone (an ink pen or a pencil for the lines, a brush for the colour).
  useEffect(()=>{
    let alive=true;const tone=settings.hand;
    if(!HAND_TONES.includes(tone)||hands.current.tone===tone)return;
-   Promise.all([handArt(tone,'pencil'),handArt(tone,'brush')]).then(([pencil,brush])=>{if(alive){hands.current={tone,pencil,brush};setVersion(v=>v+1)}});
+   Promise.all([handArt(tone,'pencil'),handArt(tone,'pen'),handArt(tone,'brush')]).then(([pencil,pen,brush])=>{if(alive){hands.current={tone,pencil,pen,brush};setVersion(v=>v+1)}});
    return ()=>{alive=false};
  },[settings.hand]);
  useEffect(()=>{
@@ -104,7 +104,7 @@ function DrawingCanvas({project,settings,time,original,onReady,inkColor}) {
    if(settings.pen&&realHand&&painting&&progress<lineEnd+reveal&&project.paint_path?.length){
      const spot=paintPoint(project.paint_path,(progress-lineEnd)/reveal);if(spot)drawHand(ctx,hands.current.brush,...toScreen(spot),short);
    }else if(settings.pen&&realHand&&tip&&progress<lineEnd){
-     drawHand(ctx,hands.current.pencil,...toScreen(tip),short,lift);
+     drawHand(ctx,settings.style==='ink'?hands.current.pen:hands.current.pencil,...toScreen(tip),short,lift);
    }else if(settings.pen&&tip&&progress<lineEnd){
      ctx.save();ctx.translate(ox,oy);ctx.scale(scale,scale);
      let [x,y]=tip;

@@ -13,6 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 FRONT = ROOT / 'frontend'
+GALLERY_VERSION = 'pen1'  # bump when the gallery clips are re-rendered, so Cloudflare's cache serves the new files
 
 HEAD = '''<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="theme-color" content="#FFF8EC"/>
 <title>{title}</title><meta name="description" content="{description}"/>
@@ -53,8 +54,8 @@ def page(path, title, description, body, extra_head='', extra_body=''):
 
 
 def clip(key, caption):
-    return (f'<figure class="post-clip"><video muted loop playsinline preload="none" poster="/gallery/{key}.jpg" '
-            f'data-src="/gallery/{key}.mp4" aria-label="{html.escape(caption)}"></video><figcaption>{caption}</figcaption></figure>')
+    return (f'<figure class="post-clip"><video muted loop playsinline preload="none" poster="/gallery/{key}.jpg?v={GALLERY_VERSION}" '
+            f'data-src="/gallery/{key}.mp4?v={GALLERY_VERSION}" aria-label="{html.escape(caption)}"></video><figcaption>{caption}</figcaption></figure>')
 
 
 CTA = ('<aside class="post-cta"><p><strong>Try it with your own picture.</strong> Upload an image and watch it being drawn: '
@@ -206,7 +207,7 @@ GUIDES = [
     ['Drawing your own image', 'Automatic: the lines and the order are worked out for you', 'Smart Draw: you set the draw path by pointing and clicking'],
     ['Runs in', 'Your browser, on any computer', 'Desktop app for Mac and PC'],
     ['Boards', 'Paper, blackboard and greenboard (chalk)', 'Whiteboard, blackboard, glassboard and green screen'],
-    ['Hands', 'Realistic hands in three skin tones, with a pencil or a brush, or no hand', 'Many male and female hands in different skin tones'],
+    ['Hands', 'Realistic hands in three skin tones, with an ink pen or a pencil for the lines and a brush for the colour, or no hand', 'Many male and female hands in different skin tones'],
     ['Voiceover', 'No: export silent and add sound where you post', 'Yes: record or import a voiceover'],
     ['Formats', '16:9, 9:16, 1:1, 4:5 or fit to the image', 'See Doodly’s site'],
     ['Free option', '3 videos every month, no card, no time limit', '14-day free trial'],
@@ -325,7 +326,7 @@ GUIDES = [
 <li><strong>Relaxing speed paints.</strong> Full pieces up to 5 minutes long.</li></ul>
 <h2>How to make one</h2>
 <ol><li><strong>Start from an illustration</strong> with clear outlines.</li>
-<li><strong>Pick the hand:</strong> a realistic hand with a pencil and a brush, or no hand for a clean look.</li>
+<li><strong>Pick the hand:</strong> a realistic hand with an ink pen and a brush, or no hand for a clean look.</li>
 <li><strong>Export 9:16</strong> for Shorts, TikTok and Reels, or 16:9 for YouTube. 4K with Pro.</li>
 <li><strong>Add music where you post.</strong> Videos export silent so you can use a trending sound.</li></ol>
 <h2>What it costs</h2>
@@ -355,10 +356,10 @@ def lead_clip(content):
 def card(href, key, tag, title, description, badge='', featured=False):
     """A blog-page card. The featured card plays its drawing while on screen (see FOOT); the others show the finished
     picture and play the drawing only on hover (BLOG_HOVER), so the page isn't a wall of moving video."""
-    media = (f'<video muted loop playsinline preload="none" poster="/gallery/{key}.jpg" data-src="/gallery/{key}.mp4" aria-hidden="true"></video>'
+    media = (f'<video muted loop playsinline preload="none" poster="/gallery/{key}.jpg?v={GALLERY_VERSION}" data-src="/gallery/{key}.mp4?v={GALLERY_VERSION}" aria-hidden="true"></video>'
              if featured else
-             f'<img src="/gallery/{key}.jpg" alt="" loading="lazy" width="720" height="720"/>'
-             f'<video muted loop playsinline preload="none" data-hover="/gallery/{key}.mp4" aria-hidden="true"></video>'
+             f'<img src="/gallery/{key}.jpg?v={GALLERY_VERSION}" alt="" loading="lazy" width="720" height="720"/>'
+             f'<video muted loop playsinline preload="none" data-hover="/gallery/{key}.mp4?v={GALLERY_VERSION}" aria-hidden="true"></video>'
              '<span class="bcard-play"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z" fill="currentColor"/></svg>Watch it draw</span>')
     return (f'<a class="bcard{" bcard-featured" if featured else ""}" href="{href}"><span class="bcard-media">{media}'
             f'{f"<span class=bcard-badge>{badge}</span>" if badge else ""}</span>'
@@ -382,7 +383,7 @@ def build_examples():
             ('cat', 'Curled-up cat', 'Pencil · hand'), ('sneaker', 'Product sketch', 'Ink · hand'), ('coffee', 'Coffee & croissant', 'Ink'),
             ('wreath', 'Floral wreath', 'Pencil'), ('balloon', 'Hot-air balloon', 'Ink · hand'),
             ('puppy', 'Happy puppy', 'Ink · hand'), ('fox', 'Chalkboard fox', 'Greenboard')]
-    clips = ''.join(f'<figure class="ex-clip"><video muted loop playsinline preload="none" poster="/gallery/{k}.jpg" data-src="/gallery/{k}.mp4" '
+    clips = ''.join(f'<figure class="ex-clip"><video muted loop playsinline preload="none" poster="/gallery/{k}.jpg?v={GALLERY_VERSION}" data-src="/gallery/{k}.mp4?v={GALLERY_VERSION}" '
                     f'aria-label="{html.escape(t)}"></video><figcaption><strong>{html.escape(t)}</strong><span>{s}</span></figcaption></figure>'
                     for k, t, s in made)
     chips = '<button class="chip on" data-cat="all">All</button>' + ''.join(

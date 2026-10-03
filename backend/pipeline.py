@@ -337,7 +337,7 @@ def render(folder: Path, settings, update, output=None):
                     spot = frame_point(paint, (progress - line_end) / reveal_span)
                     hands.draw(canvas, tone, 'brush', screen(spot))
                 elif settings['pen'] and tone and tip and (step_frames or progress < line_end):
-                    hands.draw(canvas, tone, 'pencil', tip, lift)
+                    hands.draw(canvas, tone, 'pen' if settings['style'] == 'ink' else 'pencil', tip, lift)
                 elif settings['pen'] and tip and (step_frames or progress < line_end):
                     x, y = tip
                     if lift > 0:
