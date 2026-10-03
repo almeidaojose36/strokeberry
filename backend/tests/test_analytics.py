@@ -23,6 +23,7 @@ def test_page_views_are_counted_without_cookies_and_bots_are_skipped(tmp_path, m
     assert 'set-cookie' not in response.headers
     client.get('/', headers={**BROWSER, 'referer': 'https://www.youtube.com/watch?v=1'})
     client.get('/', headers={'user-agent': 'Googlebot/2.1', 'accept': 'text/html'})
+    client.get('/', headers={**BROWSER, 'referer': 'https://increasebacklinks.site/'})   # referral spam
     client.get('/favicon-32.png', headers=BROWSER)
     views = events('pageview')
     assert len(views) == 2
@@ -44,3 +45,8 @@ def test_funnel_steps_and_report(tmp_path, monkeypatch):
     with app_module.connect() as db:
         text = analytics.report(db, 7)
     assert 'Saw the upgrade offer' in text and 'Visitors per day' in text
+
+
+def test_referral_spam_is_recognised():
+    assert analytics.is_spam('increasebacklinks.site') and analytics.is_spam('dofollowlink.space')
+    assert not analytics.is_spam('tiktok') and not analytics.is_spam('youtube.com') and not analytics.is_spam(None)

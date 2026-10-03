@@ -20,6 +20,9 @@ BOTS = re.compile(r'bot|crawl|spider|slurp|preview|monitor|headless|lighthouse|p
                   re.I)
 PAGE = re.compile(r'^/(?:[a-z0-9-]+/)*(?:index\.html)?$', re.I)  # pages, not assets (assets have an extension)
 SITE_HOSTS = ('strokeberry.com', 'www.strokeberry.com', 'localhost', '127.0.0.1')
+# Referral spam: sites (or their bots) that fake visits so their name shows up in analytics, e.g. increasebacklinks.site.
+SPAM_WORDS = ('backlink', 'linkbuilding', 'link-building', 'dofollow', 'linkmanagement', 'seo', 'traffic',
+              'buttons-for', 'free-share', 'social-buttons', 'best-price')
 
 
 def init(db):
@@ -63,12 +66,18 @@ def source(request):
     return host[:60] if host and host not in SITE_HOSTS else None
 
 
+def is_spam(source_name):
+    return bool(source_name) and any(word in source_name for word in SPAM_WORDS)
+
+
 def record(db, name, request=None, user=None, detail=None, path=None):
     """Store one event. Never raises: analytics must not break the thing being measured."""
     try:
         who = visitor(db, request) if request is not None else None
         if request is not None and who is None and user is None:
             return  # a bot
+        if name == 'pageview' and is_spam(source(request)):
+            return  # referral spam, not a person
         db.execute('INSERT INTO events (day, created, name, path, visitor, user_id, source, detail) VALUES (?,?,?,?,?,?,?,?)',
                    (_today(), datetime.now(timezone.utc).isoformat(timespec='seconds'), name,
                     path or (request.url.path if request is not None else None), who,
@@ -87,9 +96,11 @@ def is_page_view(request, status):
 
 # ------------------------------------------------------------------------------------ report
 
+# Page views, without referral spam recorded before the filter existed.
+VIEWS = "name='pageview' AND (source IS NULL OR NOT (" + ' OR '.join(f"source LIKE '%{w}%'" for w in SPAM_WORDS) + '))'
 FUNNEL = [
-    ('Visited the site', "name='pageview'", 'visitor'),
-    ('Opened the studio', "name='pageview' AND path LIKE '/studio%'", 'visitor'),
+    ('Visited the site', VIEWS, 'visitor'),
+    ('Opened the studio', VIEWS + " AND path LIKE '/studio%'", 'visitor'),
     ('Uploaded their own image', "name='project' AND detail='upload'", 'user_id'),
     ('Created a free account', "name='signup'", 'user_id'),
     ('Exported a video', "name='export'", 'user_id'),
@@ -111,15 +122,15 @@ def report(db, days=30):
         first = first or n
         share = f'{n / first * 100:5.1f}%' if first else '    -'
         out.append(f'  {label:<28}{n:>7}  {share}')
-    views = db.execute("SELECT count(*) FROM events WHERE day>=? AND name='pageview'", (since,)).fetchone()[0]
+    views = db.execute(f"SELECT count(*) FROM events WHERE day>=? AND {VIEWS}", (since,)).fetchone()[0]
     exports = db.execute("SELECT detail, count(*) FROM events WHERE day>=? AND name='export' GROUP BY detail", (since,)).fetchall()
     out += ['', f'  Page views: {views}', '  Exports by plan: ' + (', '.join(f'{d or "?"} {n}' for d, n in exports) or 'none')]
     for title, sql in (
-            ('Top pages', "SELECT path, count(DISTINCT day || visitor) n FROM events WHERE day>=? AND name='pageview' GROUP BY path ORDER BY n DESC LIMIT 10"),
-            ('Where visitors came from', "SELECT source, count(DISTINCT day || visitor) n FROM events WHERE day>=? AND name='pageview' AND source IS NOT NULL GROUP BY source ORDER BY n DESC LIMIT 10")):
+            ('Top pages', f"SELECT path, count(DISTINCT day || visitor) n FROM events WHERE day>=? AND {VIEWS} GROUP BY path ORDER BY n DESC LIMIT 10"),
+            ('Where visitors came from', f"SELECT source, count(DISTINCT day || visitor) n FROM events WHERE day>=? AND {VIEWS} AND source IS NOT NULL GROUP BY source ORDER BY n DESC LIMIT 10")):
         rows = db.execute(sql, (since,)).fetchall()
         out += ['', f'  {title}:'] + ([f'    {n:>6}  {name}' for name, n in rows] or ['    (none yet)'])
-    daily = db.execute("SELECT day, count(DISTINCT visitor) FROM events WHERE day>=? AND name='pageview' GROUP BY day ORDER BY day DESC LIMIT 14", (since,)).fetchall()
+    daily = db.execute(f"SELECT day, count(DISTINCT visitor) FROM events WHERE day>=? AND {VIEWS} GROUP BY day ORDER BY day DESC LIMIT 14", (since,)).fetchall()
     out += ['', '  Visitors per day:'] + ([f'    {d}  {n}' for d, n in daily] or ['    (none yet)'])
     return '\n'.join(out)
 
