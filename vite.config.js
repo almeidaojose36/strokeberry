@@ -1,4 +1,11 @@
 import { defineConfig } from 'vite';
+import { readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-const page = path => fileURLToPath(new URL(`frontend/${path}`, import.meta.url));
-export default defineConfig({root:'frontend',envDir:'..',build:{outDir:'../dist',emptyOutDir:true,rollupOptions:{input:{landing:page('index.html'),studio:page('studio/index.html'),terms:page('terms/index.html'),privacy:page('privacy/index.html'),refunds:page('refunds/index.html'),examples:page('examples/index.html'),notfound:page('404.html'),blog:page('blog/index.html'),'blog-logo':page('blog/logo-reveal-video/index.html'),'blog-tutorial':page('blog/drawing-tutorial-video/index.html'),'blog-cafe':page('blog/cafe-instagram-drawing-videos/index.html'),'blog-what':page('blog/what-is-a-speed-drawing-video/index.html')}}},server:{port:5173,proxy:{'/api':'http://127.0.0.1:8001','/media':'http://127.0.0.1:8001'}}});
+const front = fileURLToPath(new URL('frontend/', import.meta.url));
+// Every page is an index.html under frontend/ (the landing page, the studio, legal pages, gallery, blog, guides) plus the
+// 404 page, so a page written by scripts/site/build_pages.py is built without listing it here.
+const pages = readdirSync(front, {recursive: true})
+  .filter(file => /(^|\/)index\.html$/.test(file) && !/^(public|src|node_modules)\//.test(file))
+  .reduce((input, file) => ({...input, [file.replace(/\/?index\.html$/, '').replaceAll('/', '-') || 'landing']: front + file}),
+          {notfound: front + '404.html'});
+export default defineConfig({root:'frontend',envDir:'..',build:{outDir:'../dist',emptyOutDir:true,rollupOptions:{input:pages}},server:{port:5173,proxy:{'/api':'http://127.0.0.1:8001','/media':'http://127.0.0.1:8001'}}});
