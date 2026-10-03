@@ -27,7 +27,7 @@ HEAD = '''<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name
 <a class="btn btn-primary btn-sm" href="/studio/">Try free</a></div></header>
 '''
 FOOT = '''<footer class="footer"><div class="wrap footer-inner"><a class="logo" href="/"><img src="/brand/strokeberry-mascot.png" srcset="/brand/strokeberry-mascot@2x.png 2x" width="35" height="36" alt=""/>Strokeberry</a>
-<p>Your images. Drawn to life.</p><nav class="footer-guides" aria-label="Guides"><a href="/for/teachers/">For teachers</a><a href="/for/ecommerce/">For online shops</a><a href="/for/real-estate/">For real estate</a><a href="/for/creators/">For creators</a><a href="/compare/videoscribe-alternative/">VideoScribe alternative</a><a href="/compare/doodly-alternative/">Doodly alternative</a><a href="/compare/speedpainter-alternative/">SpeedPainter alternative</a></nav>
+<p>Your images. Drawn to life.</p><nav class="footer-guides" aria-label="Guides"><a href="/for/teachers/">For teachers</a><a href="/for/ecommerce/">For online shops</a><a href="/for/real-estate/">For real estate</a><a href="/for/interiors/">For interior designers</a><a href="/for/creators/">For creators</a><a href="/compare/videoscribe-alternative/">VideoScribe alternative</a><a href="/compare/doodly-alternative/">Doodly alternative</a><a href="/compare/speedpainter-alternative/">SpeedPainter alternative</a></nav>
 <nav class="footer-links" aria-label="More"><a href="/examples/">Gallery</a><a href="/blog/">Blog</a><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/refunds/">Refunds</a><a class="footer-mail" href="mailto:hi@strokeberry.com">hi@strokeberry.com</a></nav>
 <p class="copy">© 2026 Strokeberry</p></div></footer>
 <script>
@@ -302,15 +302,38 @@ GUIDES = [
 {clip('house', 'A family home sketched and painted in')}
 <h2>Ideas that work</h2>
 <ul><li><strong>Just listed.</strong> Draw the house, then cut to the real photo.</li>
-<li><strong>Floor plans.</strong> A plan that draws itself room by room is easier to read than a static image.</li>
+<li><strong>Floor plans.</strong> The walls go up first, room by room, then the furniture and colours appear. Easier to read than a static plan.</li>
 <li><strong>Sold and thank-you posts</strong> for the buyers, with their new home drawn.</li>
 <li><strong>Your agency logo</strong> as a short intro for every video.</li></ul>
+{clip('floorplan', 'A two-bedroom floor plan: walls first, then the rooms come to life')}
 <h2>How to make one</h2>
 <ol><li><strong>Start from a sketch or illustration of the property.</strong> Line drawings and architectural sketches draw beautifully. A photo doesn’t draw well: turn it into an illustration first.</li>
 <li><strong>Pick pencil</strong> for an architect’s-sketch feel, or ink for a bolder look.</li>
 <li><strong>Export 9:16</strong> for Reels and Stories, 4:5 for the feed, 16:9 for YouTube and your website.</li></ol>
 <h2>What it costs</h2>
 <p>Try 3 videos a month free. For one listing campaign, a pack of 5 videos is $5, paid once, with no watermark. If you post every week, Pro is $10 a month for 200 videos.</p>
+{GUIDE_CTA}'''),
+
+    ('for/interiors', 'for', 'For interiors & furniture',
+     'Drawing videos for interior designers and furniture brands',
+     'Turn a room sketch, a furniture illustration or a floor plan into a hand-drawn video for Instagram, Pinterest, TikTok and your website.',
+     f'''
+<p>Interior design sells a feeling before it sells a product, and watching a room come together line by line is a feeling people stop for. Strokeberry draws your room or furniture illustration the way a designer would sketch it, then paints the colours and materials in.</p>
+{clip('livingroom', 'A Scandinavian living room, sketched and painted in')}
+<h2>Ideas that work</h2>
+<ul><li><strong>Mood boards that move.</strong> Show a client’s room concept being sketched before the reveal.</li>
+<li><strong>Furniture launches.</strong> A new chair or sofa drawn in a few seconds makes a striking product post or ad.</li>
+<li><strong>Before and after.</strong> Draw the plan for a room, then cut to the photo of the finished space.</li>
+<li><strong>Floor plans.</strong> The walls go up room by room, then the home appears in colour.</li></ul>
+{clip('armchair', 'A lounge armchair, drawn then painted in mustard')}
+<h2>How to make one</h2>
+<ol><li><strong>Start from an illustration or sketch</strong> of the room or the piece, with clear outlines. Photos of real rooms don’t draw well: turn them into an illustration first.</li>
+<li><strong>Pick ink</strong> for crisp, architectural lines, or pencil for a softer concept-sketch feel.</li>
+<li><strong>Choose the format:</strong> 9:16 for Reels, TikTok and Pinterest, 4:5 for the Instagram feed, 16:9 for your website or YouTube.</li>
+<li><strong>Add your brand kit</strong> (Pro) so the pen draws in your colour and your logo sits in a corner.</li></ol>
+{clip('kitchen', 'A sage-green kitchen drawn line by line')}
+<h2>What it costs</h2>
+<p>3 videos a month are free. For a single launch, a pack of 5 videos is $5, paid once, with no watermark and commercial use included. If you post every week, Pro is $10 a month for 200 videos.</p>
 {GUIDE_CTA}'''),
 
     ('for/creators', 'for', 'For YouTubers and creators',
@@ -374,38 +397,88 @@ def guide_cards(kind):
                    for path, k, name, _, description, content in GUIDES if k == kind)
 
 
+# The gallery's videos, grouped by who they are for: (id, chip name, [(clip key, title, how it was made, library example)]).
+MADE = [
+    ('shops', 'Shops & products', [('skincare', 'Skincare set', 'Ink · pen & brush', None), ('fashion', 'Handbag & heels', 'Ink · pen & brush', None),
+                                   ('sneaker', 'Product sketch', 'Ink · pen & brush', 'objects-00-sneaker')]),
+    ('home', 'Home & interiors', [('livingroom', 'Living room', 'Ink · pen & brush', 'home-01-living-room'),
+                                  ('armchair', 'Lounge armchair', 'Ink · pen & brush', 'home-02-armchair'),
+                                  ('kitchen', 'Kitchen', 'Ink · pen & brush', 'home-03-kitchen'),
+                                  ('house', 'Family home', 'Ink · pen & brush', None),
+                                  ('floorplan', 'Floor plan', 'Ink · walls first', 'home-04-floor-plan')]),
+    ('food', 'Cafés & food', [('cafe', 'Café badge', 'Ink · pen & brush', None), ('coffee', 'Coffee & croissant', 'Ink', 'food-00-coffee')]),
+    ('learning', 'Teachers & lessons', [('strawberry', 'How to draw a strawberry', 'Tutorial · 4 steps', None),
+                                        ('owl', 'How to draw an owl', 'Tutorial · 4 steps', 'tutorial-00-owl'),
+                                        ('lesson', 'Reading rocket', 'Ink · pen & brush', None),
+                                        ('fox', 'Chalkboard fox', 'Greenboard · chalk', 'animals-01-fox')]),
+    ('creators', 'Creators', [('creator', 'Creator setup', 'Ink · pen & brush', None), ('balloon', 'Hot-air balloon', 'Ink · pen & brush', 'travel-02-hot-air-balloon')]),
+    ('fun', 'Pets & occasions', [('puppy', 'Happy puppy', 'Ink · pen & brush', 'animals-04-puppy'), ('cat', 'Curled-up cat', 'Pencil · hand', 'animals-00-cat'),
+                                 ('wreath', 'Floral wreath', 'Pencil', 'occasion-00-wreath')]),
+]
+
+
+def chips(groups, label):
+    return (f'<div class="chips" role="tablist" aria-label="{label}"><button class="chip on" data-cat="all">All</button>'
+            + ''.join(f'<button class="chip" data-cat="{cat}">{html.escape(name)}</button>' for cat, name in groups) + '</div>')
+
+
+EXAMPLES_SHOWN = 18  # three rows of six before "See all"
+# The order categories take turns in, so the first rows mix businesses, food and fun instead of a block of animals.
+MIX = ['home', 'food', 'logo', 'animals', 'objects', 'occasion', 'tutorial', 'nature', 'travel']
+
+
+def mixed(items):
+    """Interleave the library by category (one from each in turn), keeping each category's own order."""
+    queues = {}
+    for item in items:
+        queues.setdefault(item['category'], []).append(item)
+    order = [c for c in MIX if c in queues] + [c for c in queues if c not in MIX]
+    out = []
+    while any(queues.values()):
+        out += [queues[c].pop(0) for c in order if queues[c]]
+    return out
+
+
 def build_examples():
     library = json.loads((FRONT / 'public' / 'library' / 'library.json').read_text())
-    made = [('skincare', 'Skincare set', 'For e-commerce'), ('fashion', 'Handbag & heels', 'For fashion brands'),
-            ('creator', 'Creator setup', 'For YouTubers & creators'), ('cafe', 'Café badge', 'For cafés & food brands'),
-            ('lesson', 'Reading rocket', 'For teachers'), ('house', 'Family home', 'For real estate'),
-            ('strawberry', 'How to draw a strawberry', 'Tutorial · 4 steps'), ('owl', 'How to draw an owl', 'Tutorial · 4 steps'),
-            ('cat', 'Curled-up cat', 'Pencil · hand'), ('sneaker', 'Product sketch', 'Ink · hand'), ('coffee', 'Coffee & croissant', 'Ink'),
-            ('wreath', 'Floral wreath', 'Pencil'), ('balloon', 'Hot-air balloon', 'Ink · hand'),
-            ('puppy', 'Happy puppy', 'Ink · hand'), ('fox', 'Chalkboard fox', 'Greenboard')]
-    clips = ''.join(f'<figure class="ex-clip"><video muted loop playsinline preload="none" poster="/gallery/{k}.jpg?v={GALLERY_VERSION}" data-src="/gallery/{k}.mp4?v={GALLERY_VERSION}" '
-                    f'aria-label="{html.escape(t)}"></video><figcaption><strong>{html.escape(t)}</strong><span>{s}</span></figcaption></figure>'
-                    for k, t, s in made)
-    chips = '<button class="chip on" data-cat="all">All</button>' + ''.join(
-        f'<button class="chip" data-cat="{c["id"]}">{html.escape(c["name"])}</button>' for c in library['categories'])
+    clips = ''.join(
+        f'<figure class="ex-clip" data-cat="{cat}"><video muted loop playsinline preload="none" poster="/gallery/{k}.jpg?v={GALLERY_VERSION}" '
+        f'data-src="/gallery/{k}.mp4?v={GALLERY_VERSION}" aria-label="{html.escape(t)}"></video><figcaption><strong>{html.escape(t)}</strong>'
+        + (f'<a href="/studio/?example={example}">Use this →</a>' if example else f'<span>{how}</span>') + '</figcaption></figure>'
+        for cat, _, items in MADE for k, t, how, example in items)
     cards = ''.join(
-        f'<a class="ex-card" data-cat="{i["category"]}" href="/studio/?example={i["id"]}"><img src="/library/{i["thumb"]}" alt="" loading="lazy" width="360" height="360"/>'
+        f'<a class="ex-card{" ex-extra" if n >= EXAMPLES_SHOWN else ""}" data-cat="{i["category"]}" href="/studio/?example={i["id"]}"{" hidden" if n >= EXAMPLES_SHOWN else ""}>'
+        f'<img src="/library/{i["thumb"]}" alt="" loading="lazy" width="360" height="360"/>'
         f'<span><strong>{html.escape(i["title"])}</strong><em>{"Tutorial" if i["tutorial"] else "Use this"} →</em></span></a>'
-        for i in library['items'])
+        for n, i in enumerate(mixed(library['items'])))
+    more = (f'<button class="btn btn-quiet ex-more" type="button">See all {len(library["items"])} pictures</button>'
+            if len(library['items']) > EXAMPLES_SHOWN else '')
+    videos = sum(len(items) for _, _, items in MADE)
     body = f'''<main class="wrap ex-page">
 <header class="ex-head"><p class="eyebrow">Gallery</p><h1>Watch it draw. Then make your own.</h1>
-<p class="section-sub">Real exports from Strokeberry, and {len(library['items'])} ready-to-use pictures. Pick one and it opens in the studio, already drawing: no sign-up to preview.</p></header>
-<section><h2 class="ex-title">Made in Strokeberry</h2><div class="ex-clips">{clips}</div></section>
-<section><h2 class="ex-title">Start from an example</h2><div class="chips" role="tablist" aria-label="Categories">{chips}</div><div class="ex-grid">{cards}</div></section>
+<p class="section-sub">{videos} real exports from Strokeberry, and {len(library['items'])} ready-to-use pictures. Pick one and it opens in the studio, already drawing: no sign-up to preview.</p></header>
+<section class="ex-filter"><h2 class="ex-title">Made in Strokeberry</h2>{chips([(c, n) for c, n, _ in MADE], 'Video categories')}<div class="ex-clips">{clips}</div></section>
+<section class="ex-filter"><h2 class="ex-title">Start from an example</h2>{chips([(c['id'], c['name']) for c in library['categories']], 'Example categories')}<div class="ex-grid">{cards}</div>{more}</section>
 </main>'''
     script = '''<script>
-  document.querySelector('.chips').addEventListener('click', e => {
+  // Each section filters its own videos or pictures by category.
+  document.querySelectorAll('.ex-filter').forEach(section => section.querySelector('.chips').addEventListener('click', e => {
     const chip = e.target.closest('.chip'); if (!chip) return;
-    document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === chip));
-    document.querySelectorAll('.ex-card').forEach(card => card.hidden = chip.dataset.cat !== 'all' && card.dataset.cat !== chip.dataset.cat);
-  });
+    section.querySelectorAll('.chip').forEach(c => { c.classList.toggle('on', c === chip); c.setAttribute('aria-selected', c === chip); });
+    const all = chip.dataset.cat === 'all', more = section.querySelector('.ex-more');
+    // "All" shows a balanced first selection with "See all" for the rest; a category shows everything in it.
+    section.querySelectorAll('[data-cat]:not(.chip)').forEach(item => item.hidden =
+      all ? item.classList.contains('ex-extra') && !section.classList.contains('expanded') : item.dataset.cat !== chip.dataset.cat);
+    if (more) more.hidden = !all || section.classList.contains('expanded');
+  }));
+  document.querySelectorAll('.ex-more').forEach(button => button.addEventListener('click', () => {
+    const section = button.closest('.ex-filter');
+    section.classList.add('expanded');
+    section.querySelectorAll('.ex-extra').forEach(item => item.hidden = false);
+    button.hidden = true;
+  }));
 </script>'''
-    return page('examples', 'Gallery · Strokeberry', 'Hand-drawn videos made with Strokeberry, and ready-to-use pictures for animals, food, occasions, logos and drawing tutorials.', body, extra_body=script)
+    return page('examples', 'Gallery · Strokeberry', 'Hand-drawn videos made with Strokeberry for shops, interiors, cafés, teachers and creators, and ready-to-use pictures to start from.', body, extra_body=script)
 
 
 FEATURED = 'what-is-a-speed-drawing-video'  # the big card at the top of the blog page
@@ -439,7 +512,7 @@ def build_blog():
 <p class="section-sub">Practical guides for small businesses, teachers and creators, with real videos made in Strokeberry.</p></header>
 {post_card(featured, featured=True)}
 <section class="blog-block"><div class="blog-block-head"><p class="eyebrow">How-to guides</p><h2>Make your first drawing video</h2></div><div class="bcard-grid">{cards}</div></section>
-<section class="blog-block"><div class="blog-block-head"><p class="eyebrow">Use cases</p><h2>Strokeberry for…</h2></div><div class="bcard-grid bcard-grid-4">{guide_cards('for')}</div></section>
+<section class="blog-block"><div class="blog-block-head"><p class="eyebrow">Use cases</p><h2>Strokeberry for…</h2></div><div class="bcard-grid bcard-grid-5">{guide_cards('for')}</div></section>
 <section class="blog-block"><div class="blog-block-head"><p class="eyebrow">Comparisons</p><h2>How Strokeberry compares</h2></div><div class="bcard-grid">{guide_cards('compare')}</div></section>
 <aside class="blog-band"><img src="/brand/strokeberry-mascot@2x.png" width="86" height="88" alt=""/><div><h2>Your picture, drawn in a minute</h2><p>Drop in a logo, a product or a drawing and watch it come to life. No sign-up to preview.</p></div>
 <a class="btn btn-primary" href="/studio/">Try it free <svg width="18" height="18"><use href="#arrow"/></svg></a></aside></main>'''

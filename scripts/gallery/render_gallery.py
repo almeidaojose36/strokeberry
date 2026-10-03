@@ -37,6 +37,11 @@ ITEMS = [
     {'key': 'cafe', 'style': 'ink', 'duration': 12, 'hand': 'light'},
     {'key': 'lesson', 'style': 'ink', 'duration': 12, 'hand': 'dark'},
     {'key': 'house', 'style': 'ink', 'duration': 12, 'hand': 'medium'},
+    # home & interiors
+    {'key': 'livingroom', 'style': 'ink', 'duration': 12, 'hand': 'light'},
+    {'key': 'armchair', 'style': 'ink', 'duration': 10, 'hand': 'dark'},
+    {'key': 'kitchen', 'style': 'ink', 'duration': 14, 'hand': 'light'},
+    {'key': 'floorplan', 'style': 'ink', 'duration': 14, 'hand': 'medium'},
     {'key': 'strawberry', 'steps': ['Body shape', 'Leaves & headphones', 'Face & details', 'Color'], 'seconds': [3, 4, 5, 4],
      # Crops sit just inside the light-blue dividers of the source sheet (960 px square).
      'crops': [{'x': x / 960, 'y': y / 960, 'width': 472 / 960, 'height': 472 / 960} for x, y in ((0, 0), (486, 0), (0, 486), (486, 486))]},
@@ -92,7 +97,12 @@ def main():
         print(f"-> {item['key']} ...", end=' ', flush=True)
         results.append(make_video(item, manifest, out_dir))
         print('done')
-    (out_dir / 'gallery.json').write_text(json.dumps(results, indent=2) + '\n')
+    # Rendering only some keys keeps the other clips' entries (in ITEMS order).
+    listing = out_dir / 'gallery.json'
+    known = {entry['key']: entry for entry in (json.loads(listing.read_text()) if wanted and listing.exists() else [])}
+    known.update({entry['key']: entry for entry in results})
+    order = [item['key'] for item in ITEMS]
+    listing.write_text(json.dumps(sorted(known.values(), key=lambda e: order.index(e['key']) if e['key'] in order else 99), indent=2) + '\n')
     print(f'{len(results)} videos written to {out_dir}')
 
 

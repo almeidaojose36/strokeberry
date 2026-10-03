@@ -5,8 +5,10 @@
  * are then drawn by Strokeberry itself (scripts/gallery/render_hero.py), so the hero shows real output.
  *
  *   node scripts/gallery/generate-hero-art.mjs [key ...]
+ *   node scripts/gallery/generate-hero-art.mjs --set interiors --model z-image [key ...]
  *
- * Writes assets/hero-src/<key>-1.jpg and -2.jpg. KIE_API_KEY is read from .env.local.
+ * Writes assets/hero-src/<key>-1.jpg and -2.jpg (or assets/interiors-src/ for the interiors set). --model picks another
+ * KIE model: z-image is the cheapest (0.8 credits an image, October 2026). KIE_API_KEY is read from .env.local.
  */
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -14,9 +16,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const OUT = path.join(root, "assets/hero-src");
+const arg = name => { const i = process.argv.indexOf(name); return i > 0 ? process.argv.splice(i, 2)[1] : null; };
+const SET = arg("--set") || "hero";
+const OUT = path.join(root, SET === "interiors" ? "assets/interiors-src" : "assets/hero-src");
 const KIE_API = "https://api.kie.ai/api/v1/jobs";
-const MODEL = "grok-imagine-image-2-0/text-to-image";
+const MODEL = arg("--model") || "grok-imagine-image-2-0/text-to-image";
 const STYLE =
   "Clean vector-style illustration with bold, smooth black outlines and flat solid colors. Pure white background, subject centered with generous margins. No shading gradients, no texture, no text, no letters, no numbers, no logos, no brand names, no watermark, no border, no signature.";
 
@@ -27,6 +31,14 @@ export const JOBS = [  // audience: subject
   { key: "creator", prompt: "Content creator setup: a smartphone mounted on a small tripod with a round ring light behind it, a clip-on microphone beside it and three floating speech-bubble icons with a heart, a thumbs-up and a star. Coral, teal and warm grey. Nothing that looks like a real app or platform logo." },
   { key: "lesson", prompt: "Education illustration: an open book with a small cartoon rocket launching out of its pages, surrounded by two little planets, a star and a pencil. Bright blue, orange and yellow." },
   { key: "house", prompt: "Real estate illustration: a modern two-storey house with a pitched roof, large windows, a front door with a small porch, a round tree and a little garden path. Sage green, warm white walls, wood and terracotta." },
+];
+
+// Floor plans, interior design and furniture brands (a possible new audience; tested before being promised anywhere).
+export const INTERIORS = [
+  { key: "floorplan", prompt: "Architectural floor plan of a small two-bedroom apartment seen from directly above, drawn like a bold illustration: black outer walls, inner walls and door swing arcs, and every piece of furniture (a sofa, two beds with pillows, a dining table with four chairs, a kitchen counter with a sink, a bathtub and plants) drawn with the same bold black outline as the walls. Soft beige floors, light wood and sage green furniture. No text, no labels, no dimensions, no numbers." },
+  { key: "livingroom", prompt: "Interior design illustration of a cosy Scandinavian living room: a three-seat sofa with cushions, a round wooden coffee table, a floor lamp, a large potted plant, a framed abstract picture on the wall and a patterned rug. Warm beige, sage green, terracotta and light oak." },
+  { key: "armchair", prompt: "Furniture product illustration: a mid-century modern lounge armchair with curved wooden arms, tapered legs and a mustard yellow upholstered seat and back, with a small round side table beside it. Mustard, walnut wood and warm grey." },
+  { key: "kitchen", prompt: "Interior design illustration of a modern kitchen: shaker-style cabinets, an island with two bar stools, pendant lights above, open shelves with plates and jars, a window and a plant. Sage green cabinets, white worktops, light oak and brass accents." },
 ];
 
 async function loadEnv() {
@@ -67,6 +79,6 @@ const key = process.env.KIE_API_KEY;
 if (!key) throw new Error("KIE_API_KEY missing (.env.local)");
 await mkdir(OUT, { recursive: true });
 const wanted = process.argv.slice(2);
-const jobs = JOBS.filter(j => !wanted.length || wanted.includes(j.key));
+const jobs = (SET === "interiors" ? INTERIORS : JOBS).filter(j => !wanted.length || wanted.includes(j.key));
 await Promise.all(jobs.flatMap(job => [1, 2].map(n => generate(job, n, key)
   .then(f => console.log("  " + path.relative(root, f)), e => console.error(`  ${job.key} #${n}: ${e.message}`)))));

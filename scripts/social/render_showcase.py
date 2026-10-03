@@ -20,7 +20,7 @@ from backend.app import DrawingStage, StepConfig  # noqa: E402
 from backend.pipeline import prepare_image, render  # noqa: E402
 from backend.steps import detect_panels, fallback_layout, four_step_reading_order, prepare_steps  # noqa: E402
 
-HERO, LIBRARY = ROOT / 'assets' / 'hero-src', ROOT / 'frontend' / 'public' / 'library'
+HERO, LIBRARY, HOME = ROOT / 'assets' / 'hero-src', ROOT / 'frontend' / 'public' / 'library', ROOT / 'assets' / 'interiors-src'
 LEAD_IN = .3
 TUTORIAL = ['Guide shapes', 'Outlines', 'Details', 'Colour']
 CLIPS = [  # number-key, source, style, hand, canvas, seconds (or tutorial step seconds)
@@ -36,6 +36,9 @@ CLIPS = [  # number-key, source, style, hand, canvas, seconds (or tutorial step 
     ('10-guess-panda', LIBRARY / 'animals-02-panda.jpg', 'ink', 'light', 'paper', 14),
     ('11-guess-van', LIBRARY / 'travel-01-van.jpg', 'ink', 'medium', 'paper', 14),
     ('12-guess-whale', LIBRARY / 'animals-03-whale.jpg', 'ink', 'dark', 'paper', 14),
+    ('13-living-room', HOME / 'livingroom-2.jpg', 'ink', 'light', 'paper', 12),
+    ('14-armchair', HOME / 'armchair-2.jpg', 'ink', 'dark', 'paper', 10),
+    ('15-kitchen', HOME / 'kitchen-1.jpg', 'ink', 'medium', 'paper', 14),
 ]
 
 

@@ -18,14 +18,19 @@ from PIL import Image, ImageOps
 ROOT = Path(__file__).resolve().parents[2]
 SOURCES = [ROOT / 'marketing' / 'gallery-source', ROOT / 'marketing' / 'marketing_gallery-source_']
 OUT = ROOT / 'frontend' / 'public' / 'library'
-CATEGORIES = [('animals', 'Animals'), ('food', 'Food & drink'), ('nature', 'Nature'), ('occasion', 'Occasions'),
+CATEGORIES = [('animals', 'Animals'), ('food', 'Food & drink'), ('home', 'Home & interiors'), ('nature', 'Nature'), ('occasion', 'Occasions'),
               ('objects', 'Objects'), ('travel', 'Travel'), ('logo', 'Logos'), ('tutorial', 'Step-by-step')]
 # Starter images that already ship with the repo (the strawberry stays out: it's the brand's own art).
 SEEDS = {'animals-00-cat': ('assets/gallery-src/cat.jpg', 'Cat'),
          'food-00-coffee': ('assets/gallery-src/coffee.jpg', 'Coffee & croissant'),
          'occasion-00-wreath': ('assets/gallery-src/wreath.jpg', 'Wreath'),
          'objects-00-sneaker': ('assets/gallery-src/sneaker.jpg', 'Sneaker'),
-         'tutorial-00-owl': ('assets/gallery-src/owl.jpg', 'Owl steps')}
+         'tutorial-00-owl': ('assets/gallery-src/owl.jpg', 'Owl steps'),
+         # Home & interiors (made with scripts/gallery/generate-hero-art.mjs --set interiors --model z-image)
+         'home-01-living-room': ('assets/interiors-src/livingroom-2.jpg', 'Living room'),
+         'home-02-armchair': ('assets/interiors-src/armchair-2.jpg', 'Lounge armchair'),
+         'home-03-kitchen': ('assets/interiors-src/kitchen-1.jpg', 'Kitchen'),
+         'home-04-floor-plan': ('assets/interiors-src/floorplan-2.jpg', 'Floor plan')}
 # The ID at the start of the file name; anything after it (".png_<timestamp>", etc.) is ignored.
 ID = re.compile(r'^([a-z]+)-(\d\d)-([a-z0-9]+(?:-[a-z0-9]+)*)')
 TITLES = {'icecream': 'Ice cream', 'avocado': 'Avocado toast', 'boba': 'Bubble tea', 'plant-books': 'Books & plant',

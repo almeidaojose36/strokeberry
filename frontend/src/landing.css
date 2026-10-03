@@ -566,3 +566,15 @@ h3{font-size:19px;font-weight:650;letter-spacing:-.015em;margin:0;line-height:1.
 .bcard-play{position:absolute;right:14px;bottom:14px;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(255,253,248,.92);box-shadow:0 2px 10px rgba(0,0,0,.08),inset 0 0 0 1px var(--line);font-size:12.5px;font-weight:700;color:var(--ink);transition:opacity .2s}
 .bcard.playing .bcard-play{opacity:0}
 @media(hover:none){.bcard-play{display:none}}
+.ex-clip[hidden]{display:none}
+.ex-clip figcaption a{font-size:13px;font-weight:700;color:var(--accent-ink);white-space:nowrap;text-decoration:none}
+.ex-filter .chips{margin-bottom:18px}
+/* Five use cases: two large cards, then three */
+.bcard-grid-5{grid-template-columns:repeat(6,1fr)}
+.bcard-grid-5>.bcard{grid-column:span 2}
+.bcard-grid-5>.bcard:nth-child(-n+2){grid-column:span 3}
+.bcard-grid-5>.bcard:nth-child(-n+2) .bcard-media{aspect-ratio:16/9}
+@media(max-width:980px){.bcard-grid-5{grid-template-columns:repeat(2,1fr)}.bcard-grid-5>.bcard,.bcard-grid-5>.bcard:nth-child(-n+2){grid-column:span 1}.bcard-grid-5>.bcard:nth-child(-n+2) .bcard-media{aspect-ratio:4/3}}
+@media(max-width:720px){.bcard-grid-5{grid-template-columns:1fr}}
+.ex-more{display:flex;margin:26px auto 0}
+.ex-more[hidden]{display:none}

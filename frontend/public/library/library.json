@@ -9,6 +9,10 @@
       "name": "Food & drink"
     },
     {
+      "id": "home",
+      "name": "Home & interiors"
+    },
+    {
       "id": "nature",
       "name": "Nature"
     },
@@ -168,6 +172,38 @@
       "category": "food",
       "image": "food-07-donut.jpg",
       "thumb": "food-07-donut-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "home-01-living-room",
+      "title": "Living room",
+      "category": "home",
+      "image": "home-01-living-room.jpg",
+      "thumb": "home-01-living-room-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "home-02-armchair",
+      "title": "Lounge armchair",
+      "category": "home",
+      "image": "home-02-armchair.jpg",
+      "thumb": "home-02-armchair-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "home-03-kitchen",
+      "title": "Kitchen",
+      "category": "home",
+      "image": "home-03-kitchen.jpg",
+      "thumb": "home-03-kitchen-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "home-04-floor-plan",
+      "title": "Floor plan",
+      "category": "home",
+      "image": "home-04-floor-plan.jpg",
+      "thumb": "home-04-floor-plan-thumb.webp",
       "tutorial": false
     },
     {

@@ -1,4 +1,4 @@
-# Showcase batch 01: 12 clips for TikTok, Reels and Shorts
+# Showcase batch 01: 15 clips for TikTok, Reels and Shorts
 
 All clips are 9:16, 1080×1920, about 15 seconds. They are drawn like a Pro export (no watermark) and end on the
 "Made with Strokeberry · strokeberry.com" card. **They are silent on purpose:** add a trending sound in the app when
@@ -17,7 +17,8 @@ you post (it helps reach). Every picture is our own artwork: no brands, no famou
 
 Where a post can carry its own link (Facebook, LinkedIn, Pinterest, Reddit), use the clip's own link below.
 
-**Posting order (one a day, two on days 1 and 7):** 10, 01 · 05 · 03 · 07 · 11 · 09 · 12, 04 · then 02, 06, 08.
+**Posting order (one a day, two on days 1 and 7):** 10, 01 · 05 · 03 · 07 · 11 · 09 · 12, 04 · then 13, 02, 14, 06, 15, 08.
+The interiors clips (13 to 15) also suit Pinterest: post them as Idea Pins with the clip's own link.
 Lead with the "guess what" clips: they are the easiest to watch to the end.
 
 ---
@@ -106,7 +107,29 @@ Lead with the "guess what" clips: they are the easiest to watch to the end.
 - **Hashtags:** #guessthedrawing #oddlysatisfying #speeddrawing #oceanart #drawing
 - **Link:** `strokeberry.com/studio/?example=animals-03-whale&ref=sc12_whale`
 
+
+## 13 · Scandinavian living room (interior designers)
+- **Hook:** Watch this room come together ✏️
+- **Caption:** From the first line to the last cushion. Turn your room sketches and concepts into hand-drawn videos with Strokeberry: perfect for client reveals and mood boards. Free to try, link in bio.
+  Which would you change first: the sofa or the rug? 👇
+- **Hashtags:** #interiordesign #scandinavianinterior #livingroomdecor #interiordesigner #homedecor
+- **Link:** `strokeberry.com/for/interiors/?ref=sc13_livingroom`
+
+## 14 · Lounge armchair (furniture brands)
+- **Hook:** Our new chair, drawn by hand
+- **Caption:** A furniture launch that stops the scroll. Upload a sketch or illustration of the piece and Strokeberry draws it, then paints the fabric and wood in. Videos made with Pro or a pack can be used in ads. Link in bio.
+  Mustard or sage green? 👇
+- **Hashtags:** #furnituredesign #midcenturymodern #furniturebrand #productdesign #homedecor
+- **Link:** `strokeberry.com/for/interiors/?ref=sc14_armchair`
+
+## 15 · Sage-green kitchen (interior designers, kitchen makers)
+- **Hook:** Your dream kitchen in 15 seconds
+- **Caption:** Cabinets, pendants, stools, then colour. Show clients their kitchen being drawn before it's built. Made with Strokeberry from one illustration, no animation skills needed. Link in bio.
+  Would you go sage green? 👇
+- **Hashtags:** #kitchendesign #kitcheninspo #interiordesign #sagegreen #kitchenrenovation
+- **Link:** `strokeberry.com/for/interiors/?ref=sc15_kitchen`
+
 ---
 
 **After a week:** ask Claude for the stats. The "Where visitors came from" list will show which platforms and clips
-(`sc01`…`sc12`) brought people to the site, and the funnel shows how many of them uploaded, exported or reserved.
+(`sc01`…`sc15`) brought people to the site, and the funnel shows how many of them uploaded, exported or reserved.

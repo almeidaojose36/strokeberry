@@ -91,6 +91,34 @@
     "canvas": "paper"
   },
   {
+    "key": "livingroom",
+    "style": "ink",
+    "duration": 12,
+    "hand": "light",
+    "canvas": "paper"
+  },
+  {
+    "key": "armchair",
+    "style": "ink",
+    "duration": 10,
+    "hand": "dark",
+    "canvas": "paper"
+  },
+  {
+    "key": "kitchen",
+    "style": "ink",
+    "duration": 14,
+    "hand": "light",
+    "canvas": "paper"
+  },
+  {
+    "key": "floorplan",
+    "style": "ink",
+    "duration": 14,
+    "hand": "medium",
+    "canvas": "paper"
+  },
+  {
     "key": "strawberry",
     "style": "steps",
     "duration": 16,
