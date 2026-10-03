@@ -363,6 +363,11 @@
     const choice = document.querySelector('.founder-choice');
     choice.querySelector('.fc-price').textContent = founder.price;
     choice.querySelector('.fc-left').textContent = founder.left != null ? `${founder.left} of ${founder.limit} spots left` : `first ${founder.limit} customers`;
+    if (data.reserve) {   // payments aren't live yet: the founding price is reserved, with nothing to pay today
+      choice.querySelector('.fc-left').textContent = `${founder.left} of ${founder.limit} places left · nothing to pay today`;
+      choice.querySelector('a').textContent = 'Reserve the founding price';
+      document.querySelector('.plan-pro .btn-lg').firstChild.textContent = 'Reserve founding price ';
+    }
     choice.hidden = false;
     renderPrice();
   }).catch(() => {});

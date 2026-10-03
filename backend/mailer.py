@@ -1,4 +1,4 @@
-"""Plain, occasional emails: a welcome message and free-allowance notices.
+"""Plain, occasional emails: a welcome message, free-allowance notices and founding-member reservations.
 
 Sending is off until SMTP is configured (for Zoho: SMTP_HOST=smtp.zoho.com, SMTP_PORT=465, SMTP_USER=hi@strokeberry.com,
 SMTP_PASSWORD=<an app-specific password from Zoho>, optional SMTP_FROM="Strokeberry <hi@strokeberry.com>"). Emails are sent on a
@@ -82,3 +82,23 @@ def allowance(to, remaining, resets=None):
         'That’s all 3 free videos used for now' + (f'. They come back on {resets}.' if resets else '.') + ' Your projects are still here and you can keep previewing as much as you like.',
         'To export more, Strokeberry Pro gives you 200 videos a month in Full HD with no watermark. Cancel any time.'],
         ('See Pro', '/studio/?upgrade=1'))
+
+
+def reserved(to, position, limit, price, gift, name=None):
+    first = (name or '').split(' ')[0]
+    return send(to, f'You’re founding member #{position}', [
+        f'Hi {first},' if first else 'Hi there,',
+        f'Your founding place is reserved: you’re number {position} of {limit}. When payments open you can go Pro for {price} a month '
+        'instead of $10, for as long as you stay subscribed. There’s nothing to pay now.',
+        f'As a thank-you, we’ve added {gift} videos without a watermark or end card to your account. Use them on anything you like.',
+        'We’ll email you as soon as your price is ready to claim.'], ('Make a video', '/studio/'),
+        ('/email/drawing.gif', 'A puppy being drawn by hand, then painted in'))
+
+
+def founding_open(to, price):
+    return send(to, 'Your founding price is ready', [
+        'Hi there,',
+        f'Payments are now open, and the founding price you reserved is waiting for you: Strokeberry Pro for {price} a month, '
+        'for as long as you stay subscribed.',
+        'Pro gives you 200 videos a month, up to 5 minutes each, in up to 4K, with no watermark. Cancel anytime.'],
+        ('Claim my founding price', '/studio/?upgrade=1'))

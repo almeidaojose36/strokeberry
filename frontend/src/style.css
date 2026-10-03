@@ -686,3 +686,10 @@ button.guide-callout:hover{border-color:var(--line-strong);background:#fff}
 .quality-pick:focus-within{box-shadow:0 0 0 2px var(--accent)}
 .export-summary{align-items:center}
 .upgrade-billed{margin:-6px 0 16px;font-size:13px;color:var(--muted)}
+/* Founding-member reservation (while payments aren't live) */
+.reserve-intro{margin:0 0 18px;font-size:14.5px;line-height:1.55;color:var(--muted)}
+.reserve-intro b{color:var(--ink)}
+.reserve-done p{margin:0 0 14px;font-size:15px;line-height:1.55;color:var(--muted)}
+.reserve-done b{color:var(--ink)}
+.reserve-number strong{display:block;font-family:var(--display);font-size:44px;line-height:1.1;letter-spacing:-.03em;color:var(--ink)}
+.reserve-gift{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;background:var(--teal-soft);color:var(--teal-ink)!important;font-weight:600;font-size:14px!important}

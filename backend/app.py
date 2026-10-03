@@ -22,7 +22,7 @@ from .pipeline import prepare_image, render, load_scene
 from .sample import create_sample
 from .steps import detect_panels, fallback_layout, prepare_steps, original_path, four_step_reading_order
 from .enhance import clean_background
-from . import accounts, analytics, billing, brand, gallery, mailer
+from . import accounts, analytics, billing, brand, gallery, mailer, reservations
 from starlette.concurrency import run_in_threadpool
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -45,6 +45,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS jobs (id TEXT PRIMARY KEY, project_id TEXT, status TEXT, progress INTEGER, stage TEXT, settings TEXT, created TEXT, error TEXT);''')
         accounts.init_accounts(db)
         analytics.init(db)
+        reservations.init(db)
         if 'origin' not in {row[1] for row in db.execute('PRAGMA table_info(projects)')}:
             # 'upload' (the visitor's own image) or 'example' (the welcome sample and library examples)
             db.execute("ALTER TABLE projects ADD COLUMN origin TEXT NOT NULL DEFAULT 'upload'")
@@ -170,7 +171,10 @@ def signed(path):
 @app.get('/api/me')
 def me(user=Depends(current_user)):
     with connect() as db:
-        return accounts.account_summary(db, user)
+        summary = accounts.account_summary(db, user)
+        if reservations.enabled():  # payments aren't live: the founding offer is reserved instead of bought
+            summary['billing'].update(reserve=True, founder=reservations.offer(db), packs=[], reservation=reservations.mine(db, user))
+        return summary
 
 
 class CheckoutRequest(BaseModel):
@@ -181,6 +185,7 @@ class CheckoutRequest(BaseModel):
 def checkout(body: CheckoutRequest = CheckoutRequest(), user=Depends(current_user)):
     if accounts.plan_id(user) == 'guest':
         raise HTTPException(401, 'Create a free account first, then upgrade.')
+    no_checkout_while_reserving()
     url = billing.create_checkout(user, body.interval)
     with connect() as db:
         analytics.record(db, 'checkout', user=user, detail=body.interval)
@@ -195,15 +200,37 @@ class PackRequest(BaseModel):
 def pack_checkout(body: PackRequest, user=Depends(current_user)):
     if accounts.plan_id(user) == 'guest':
         raise HTTPException(401, 'Create a free account first, then get a video pack.')
+    no_checkout_while_reserving()
     url = billing.create_pack_checkout(user, body.pack)
     with connect() as db:
         analytics.record(db, 'checkout', user=user, detail=f'pack-{body.pack}')
     return {'url': url}
 
 
+def no_checkout_while_reserving():
+    """While payments aren't live, nobody is sent to a (test-mode) checkout page."""
+    if reservations.enabled():
+        raise HTTPException(409, 'Payments open very soon. Reserve your founding place instead: there’s nothing to pay today.')
+
+
+@app.post('/api/reserve')
+def reserve(user=Depends(current_user)):
+    """Claim a founding place while payments aren't live (see reservations.py)."""
+    if accounts.plan_id(user) == 'guest':
+        raise HTTPException(401, 'Create a free account first, then reserve your place.')
+    if accounts.plan_id(user) == 'pro':
+        raise HTTPException(409, 'You’re already on Pro.')
+    with connect() as db:
+        return reservations.reserve(db, user)
+
+
 @app.get('/api/offer')
 def offer():
     """Public: the Founding member offer for the landing page (null when it isn't running)."""
+    if reservations.enabled():
+        with connect() as db:
+            founder = reservations.offer(db)
+        return {'founder': founder, 'reserve': True, 'monthly': billing.price('month'), 'yearly': billing.price('year')}
     return {'founder': billing.founder_offer(), 'monthly': billing.price('month'), 'yearly': billing.price('year')}
 
 

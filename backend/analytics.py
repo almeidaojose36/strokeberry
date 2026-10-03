@@ -94,6 +94,7 @@ FUNNEL = [
     ('Created a free account', "name='signup'", 'user_id'),
     ('Exported a video', "name='export'", 'user_id'),
     ('Saw the upgrade offer', "name IN ('upgrade_open','pack_open')", 'user_id'),
+    ('Reserved a founding place', "name='reserve'", 'user_id'),
     ('Started a checkout', "name='checkout'", 'user_id'),
     ('Paid (Pro or a pack)', "name='paid'", 'user_id'),
 ]
