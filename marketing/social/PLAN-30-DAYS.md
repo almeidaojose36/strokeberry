@@ -37,6 +37,16 @@ realtors, teachers and small brands. That is the biggest growth lever and can't 
 | Fri Oct 9 | 12:30 PM | Reel · creator intro (dreamy indie) | Scheduled |
 | Fri Oct 9 | 7:30 PM | Reel · dino-lesson (soft piano, 4 steps) | Scheduled |
 
+## Sports (added Oct 4)
+Invented athletes in plain flag-coloured kits (no real people, federation crests, sponsor or brand marks). Gallery category
+"Sports", 8 images in `assets/sports-src/` (`generate-hero-art.mjs --set sports --model z-image`).
+
+| Day | Time | Post | Status |
+|---|---|---|---|
+| Sat Oct 10 | 12:30 PM ET (6:30 PM SAST) | Reel · guess-dunk (funk bounce) on Instagram, Facebook and TikTok | Scheduled |
+
+**guess-dunk** · Slam dunk, drawn from one picture 🏀 Guess what we're drawing before the color comes in! Clubs, coaches and fan pages: turn any illustration into a hand-drawn video with Strokeberry. Free to try, link in bio. Which sport should we draw next? 👇 #guessthedrawing #basketball #speeddrawing #satisfying #sportsart
+
 ## Captions (week 1)
 
 **process-skincare** · From flat image to hand-drawn video ✏️ Swipe to watch one product picture come to life in 4 steps. / Upload a product shot, logo or sketch. Strokeberry draws the lines, paints the color in, and gives you an MP4 for Reels, TikTok and ads. / 3 free videos a month, no card needed. Link in bio. Which product should we draw next? 👇 #smallbusiness #productmarketing #skincarebrand #contentcreation #reelsideas

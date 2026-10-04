@@ -7,7 +7,7 @@
  *   node scripts/gallery/generate-hero-art.mjs [key ...]
  *   node scripts/gallery/generate-hero-art.mjs --set interiors --model z-image [key ...]
  *
- * Writes assets/hero-src/<key>-1.jpg and -2.jpg (or assets/interiors-src/ for the interiors set). --model picks another
+ * Writes assets/hero-src/<key>-1.jpg and -2.jpg (assets/interiors-src/ for --set interiors, assets/sports-src/ for --set sports). --model picks another
  * KIE model: z-image is the cheapest (0.8 credits an image, October 2026). KIE_API_KEY is read from .env.local.
  */
 import { readFile, writeFile, mkdir } from "node:fs/promises";
@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const arg = name => { const i = process.argv.indexOf(name); return i > 0 ? process.argv.splice(i, 2)[1] : null; };
 const SET = arg("--set") || "hero";
-const OUT = path.join(root, SET === "interiors" ? "assets/interiors-src" : "assets/hero-src");
+const OUT = path.join(root, { interiors: "assets/interiors-src", sports: "assets/sports-src" }[SET] || "assets/hero-src");
 const KIE_API = "https://api.kie.ai/api/v1/jobs";
 const MODEL = arg("--model") || "grok-imagine-image-2-0/text-to-image";
 const STYLE =
@@ -39,6 +39,18 @@ export const INTERIORS = [
   { key: "livingroom", prompt: "Interior design illustration of a cosy Scandinavian living room: a three-seat sofa with cushions, a round wooden coffee table, a floor lamp, a large potted plant, a framed abstract picture on the wall and a patterned rug. Warm beige, sage green, terracotta and light oak." },
   { key: "armchair", prompt: "Furniture product illustration: a mid-century modern lounge armchair with curved wooden arms, tapered legs and a mustard yellow upholstered seat and back, with a small round side table beside it. Mustard, walnut wood and warm grey." },
   { key: "kitchen", prompt: "Interior design illustration of a modern kitchen: shaker-style cabinets, an island with two bar stools, pendant lights above, open shelves with plates and jars, a window and a plant. Sage green cabinets, white worktops, light oak and brass accents." },
+];
+
+// Invented athletes in plain flag-coloured kits: no real people, no federation crests, no sponsor or brand marks.
+export const SPORTS = [
+  { key: "striker", prompt: "Illustration of an invented football striker celebrating a goal, mouth open in a shout, fists clenched, wearing a plain green and yellow shirt with a blue stripe across the chest (flag colours, no badge, no logo, no number). Green, yellow, blue and warm skin tones." },
+  { key: "keeper", prompt: "Illustration of an invented football goalkeeper diving to the left with outstretched gloves and a ball just beyond his fingertips, wearing a plain sky blue and white vertically striped shirt (flag colours, no badge, no logo). Sky blue, white and bright orange gloves." },
+  { key: "sprinter", prompt: "Illustration of an invented sprinter at full speed, leaning forward on a running track, in a plain red, white and green kit (flag colours, no logo, no number). Red, white, green and rust track." },
+  { key: "boxer", prompt: "Illustration of an invented boxer in a guard stance wearing red boxing gloves and plain tricolour trunks of blue, white and red horizontal bands (flag colours, no logo, no text). Blue, white and red." },
+  { key: "dunk", prompt: "Illustration of an invented basketball player mid-air about to dunk, one arm cocked back holding the ball, wearing a plain orange, white and green kit (flag colours, no logo, no number). Orange, white, green and a wooden hoop backboard." },
+  { key: "rugby", prompt: "Illustration of an invented rugby player running with the ball tucked under one arm, wearing a plain black jersey with a white stripe and silver trim (flag colours, no badge, no logo). Black, white, silver and grass green." },
+  { key: "cricketer", prompt: "Illustration of an invented cricket batter in mid-swing, bat raised, wearing plain white cricket clothes with a green and gold trim and a green helmet (flag colours, no logo). White, green and gold." },
+  { key: "fan", prompt: "Illustration of an invented football fan cheering with arms raised, face painted in stripes of yellow, green and blue, a scarf in the same colours and a flag waving behind (a plain flag of three stripes, no emblem). Yellow, green and blue." },
 ];
 
 async function loadEnv() {
@@ -79,6 +91,6 @@ const key = process.env.KIE_API_KEY;
 if (!key) throw new Error("KIE_API_KEY missing (.env.local)");
 await mkdir(OUT, { recursive: true });
 const wanted = process.argv.slice(2);
-const jobs = (SET === "interiors" ? INTERIORS : JOBS).filter(j => !wanted.length || wanted.includes(j.key));
+const jobs = ({ interiors: INTERIORS, sports: SPORTS }[SET] || JOBS).filter(j => !wanted.length || wanted.includes(j.key));
 await Promise.all(jobs.flatMap(job => [1, 2].map(n => generate(job, n, key)
   .then(f => console.log("  " + path.relative(root, f)), e => console.error(`  ${job.key} #${n}: ${e.message}`)))));

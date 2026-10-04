@@ -18,7 +18,7 @@ from PIL import Image, ImageOps
 ROOT = Path(__file__).resolve().parents[2]
 SOURCES = [ROOT / 'marketing' / 'gallery-source', ROOT / 'marketing' / 'marketing_gallery-source_']
 OUT = ROOT / 'frontend' / 'public' / 'library'
-CATEGORIES = [('animals', 'Animals'), ('food', 'Food & drink'), ('home', 'Home & interiors'), ('nature', 'Nature'), ('occasion', 'Occasions'),
+CATEGORIES = [('animals', 'Animals'), ('food', 'Food & drink'), ('home', 'Home & interiors'), ('nature', 'Nature'), ('sports', 'Sports'), ('occasion', 'Occasions'),
               ('objects', 'Objects'), ('travel', 'Travel'), ('logo', 'Logos'), ('tutorial', 'Step-by-step')]
 # Starter images that already ship with the repo (the strawberry stays out: it's the brand's own art).
 SEEDS = {'animals-00-cat': ('assets/gallery-src/cat.jpg', 'Cat'),
@@ -30,7 +30,16 @@ SEEDS = {'animals-00-cat': ('assets/gallery-src/cat.jpg', 'Cat'),
          'home-01-living-room': ('assets/interiors-src/livingroom-2.jpg', 'Living room'),
          'home-02-armchair': ('assets/interiors-src/armchair-2.jpg', 'Lounge armchair'),
          'home-03-kitchen': ('assets/interiors-src/kitchen-1.jpg', 'Kitchen'),
-         'home-04-floor-plan': ('assets/interiors-src/floorplan-2.jpg', 'Floor plan')}
+         'home-04-floor-plan': ('assets/interiors-src/floorplan-2.jpg', 'Floor plan'),
+         # Sports: invented athletes in plain flag-coloured kits (generate-hero-art.mjs --set sports --model z-image)
+         'sports-01-striker': ('assets/gallery-src/striker.jpg', 'Striker'),
+         'sports-02-goalkeeper': ('assets/gallery-src/keeper.jpg', 'Goalkeeper'),
+         'sports-03-sprinter': ('assets/gallery-src/sprinter.jpg', 'Sprinter'),
+         'sports-04-boxer': ('assets/gallery-src/boxer.jpg', 'Boxer'),
+         'sports-05-dunk': ('assets/gallery-src/dunk.jpg', 'Basketball dunk'),
+         'sports-06-rugby': ('assets/gallery-src/rugby.jpg', 'Rugby'),
+         'sports-07-cricketer': ('assets/gallery-src/cricketer.jpg', 'Cricket'),
+         'sports-08-fan': ('assets/gallery-src/fan.jpg', 'Fan with flag')}
 # The ID at the start of the file name; anything after it (".png_<timestamp>", etc.) is ignored.
 ID = re.compile(r'^([a-z]+)-(\d\d)-([a-z0-9]+(?:-[a-z0-9]+)*)')
 TITLES = {'icecream': 'Ice cream', 'avocado': 'Avocado toast', 'boba': 'Bubble tea', 'plant-books': 'Books & plant',

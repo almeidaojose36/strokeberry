@@ -42,6 +42,15 @@ ITEMS = [
     {'key': 'armchair', 'style': 'ink', 'duration': 10, 'hand': 'dark'},
     {'key': 'kitchen', 'style': 'ink', 'duration': 14, 'hand': 'light'},
     {'key': 'floorplan', 'style': 'ink', 'duration': 14, 'hand': 'medium'},
+    # sports (invented athletes in flag-coloured kits)
+    {'key': 'striker', 'style': 'ink', 'duration': 12, 'hand': 'medium'},
+    {'key': 'keeper', 'style': 'ink', 'duration': 12, 'hand': 'light'},
+    {'key': 'sprinter', 'style': 'ink', 'duration': 12, 'hand': 'dark'},
+    {'key': 'boxer', 'style': 'ink', 'duration': 12, 'hand': 'light'},
+    {'key': 'dunk', 'style': 'ink', 'duration': 12, 'hand': 'medium'},
+    {'key': 'rugby', 'style': 'ink', 'duration': 12, 'hand': 'dark'},
+    {'key': 'cricketer', 'style': 'ink', 'duration': 12, 'hand': 'light'},
+    {'key': 'fan', 'style': 'ink', 'duration': 12, 'hand': 'medium'},
     {'key': 'strawberry', 'steps': ['Body shape', 'Leaves & headphones', 'Face & details', 'Color'], 'seconds': [3, 4, 5, 4],
      # Crops sit just inside the light-blue dividers of the source sheet (960 px square).
      'crops': [{'x': x / 960, 'y': y / 960, 'width': 472 / 960, 'height': 472 / 960} for x, y in ((0, 0), (486, 0), (0, 486), (486, 486))]},

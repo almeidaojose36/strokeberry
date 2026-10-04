@@ -119,6 +119,62 @@
     "canvas": "paper"
   },
   {
+    "key": "striker",
+    "style": "ink",
+    "duration": 12,
+    "hand": "medium",
+    "canvas": "paper"
+  },
+  {
+    "key": "keeper",
+    "style": "ink",
+    "duration": 12,
+    "hand": "light",
+    "canvas": "paper"
+  },
+  {
+    "key": "sprinter",
+    "style": "ink",
+    "duration": 12,
+    "hand": "dark",
+    "canvas": "paper"
+  },
+  {
+    "key": "boxer",
+    "style": "ink",
+    "duration": 12,
+    "hand": "light",
+    "canvas": "paper"
+  },
+  {
+    "key": "dunk",
+    "style": "ink",
+    "duration": 12,
+    "hand": "medium",
+    "canvas": "paper"
+  },
+  {
+    "key": "rugby",
+    "style": "ink",
+    "duration": 12,
+    "hand": "dark",
+    "canvas": "paper"
+  },
+  {
+    "key": "cricketer",
+    "style": "ink",
+    "duration": 12,
+    "hand": "light",
+    "canvas": "paper"
+  },
+  {
+    "key": "fan",
+    "style": "ink",
+    "duration": 12,
+    "hand": "medium",
+    "canvas": "paper"
+  },
+  {
     "key": "strawberry",
     "style": "steps",
     "duration": 16,

@@ -17,6 +17,10 @@
       "name": "Nature"
     },
     {
+      "id": "sports",
+      "name": "Sports"
+    },
+    {
       "id": "occasion",
       "name": "Occasions"
     },
@@ -420,6 +424,70 @@
       "category": "occasion",
       "image": "occasion-07-wedding.jpg",
       "thumb": "occasion-07-wedding-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "sports-01-striker",
+      "title": "Striker",
+      "category": "sports",
+      "image": "sports-01-striker.jpg",
+      "thumb": "sports-01-striker-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "sports-02-goalkeeper",
+      "title": "Goalkeeper",
+      "category": "sports",
+      "image": "sports-02-goalkeeper.jpg",
+      "thumb": "sports-02-goalkeeper-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "sports-03-sprinter",
+      "title": "Sprinter",
+      "category": "sports",
+      "image": "sports-03-sprinter.jpg",
+      "thumb": "sports-03-sprinter-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "sports-04-boxer",
+      "title": "Boxer",
+      "category": "sports",
+      "image": "sports-04-boxer.jpg",
+      "thumb": "sports-04-boxer-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "sports-05-dunk",
+      "title": "Basketball dunk",
+      "category": "sports",
+      "image": "sports-05-dunk.jpg",
+      "thumb": "sports-05-dunk-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "sports-06-rugby",
+      "title": "Rugby",
+      "category": "sports",
+      "image": "sports-06-rugby.jpg",
+      "thumb": "sports-06-rugby-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "sports-07-cricketer",
+      "title": "Cricket",
+      "category": "sports",
+      "image": "sports-07-cricketer.jpg",
+      "thumb": "sports-07-cricketer-thumb.webp",
+      "tutorial": false
+    },
+    {
+      "id": "sports-08-fan",
+      "title": "Fan with flag",
+      "category": "sports",
+      "image": "sports-08-fan.jpg",
+      "thumb": "sports-08-fan-thumb.webp",
       "tutorial": false
     },
     {

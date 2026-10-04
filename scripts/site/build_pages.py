@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 FRONT = ROOT / 'frontend'
-GALLERY_VERSION = 'pen1'  # bump when the gallery clips are re-rendered, so Cloudflare's cache serves the new files
+GALLERY_VERSION = 'sports1'  # bump when the gallery clips are re-rendered, so Cloudflare's cache serves the new files
 
 HEAD = '''<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="theme-color" content="#FFF8EC"/>
 <title>{title}</title><meta name="description" content="{description}"/>
@@ -406,6 +406,11 @@ MADE = [
                                   ('kitchen', 'Kitchen', 'Ink · pen & brush', 'home-03-kitchen'),
                                   ('house', 'Family home', 'Ink · pen & brush', None),
                                   ('floorplan', 'Floor plan', 'Ink · walls first', 'home-04-floor-plan')]),
+    ('sports', 'Sports & clubs', [('striker', 'Striker', 'Ink · pen & brush', 'sports-01-striker'),
+                                  ('keeper', 'Goalkeeper', 'Ink · pen & brush', 'sports-02-goalkeeper'),
+                                  ('sprinter', 'Sprinter', 'Ink · pen & brush', 'sports-03-sprinter'),
+                                  ('dunk', 'Basketball dunk', 'Ink · pen & brush', 'sports-05-dunk'),
+                                  ('fan', 'Fan with flag', 'Ink · pen & brush', 'sports-08-fan')]),
     ('food', 'Cafés & food', [('cafe', 'Café badge', 'Ink · pen & brush', None), ('coffee', 'Coffee & croissant', 'Ink', 'food-00-coffee')]),
     ('learning', 'Teachers & lessons', [('strawberry', 'How to draw a strawberry', 'Tutorial · 4 steps', None),
                                         ('owl', 'How to draw an owl', 'Tutorial · 4 steps', 'tutorial-00-owl'),
@@ -424,7 +429,7 @@ def chips(groups, label):
 
 EXAMPLES_SHOWN = 18  # three rows of six before "See all"
 # The order categories take turns in, so the first rows mix businesses, food and fun instead of a block of animals.
-MIX = ['home', 'food', 'logo', 'animals', 'objects', 'occasion', 'tutorial', 'nature', 'travel']
+MIX = ['home', 'sports', 'food', 'logo', 'animals', 'objects', 'occasion', 'tutorial', 'nature', 'travel']
 
 
 def mixed(items):

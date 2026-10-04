@@ -27,6 +27,7 @@ sys.path.insert(0, str(ROOT / 'scripts' / 'social'))
 from render_showcase import make  # noqa: E402
 
 HERO, LIBRARY, HOME = ROOT / 'assets' / 'hero-src', ROOT / 'frontend' / 'public' / 'library', ROOT / 'assets' / 'interiors-src'
+SPORTS = ROOT / 'assets' / 'sports-src'
 MUSIC, OUT = ROOT / 'marketing' / 'music', ROOT / 'marketing' / 'social' / 'posts'
 FONT = ROOT / 'backend' / 'assets' / 'Figtree.ttf'
 MASCOT = ROOT / 'frontend' / 'public' / 'brand' / 'strokeberry-mascot@2x.png'
@@ -50,6 +51,7 @@ PLAN = {
     'guess-panda': (LIBRARY / 'animals-02-panda.jpg', 'ink', 'light', 'paper', 14, None, 'playful-curious-1'),
     'guess-van': (LIBRARY / 'travel-01-van.jpg', 'ink', 'medium', 'paper', 14, None, 'funk-bounce-1'),
     'guess-whale': (LIBRARY / 'animals-03-whale.jpg', 'ink', 'dark', 'paper', 14, None, 'playful-curious-1'),
+    'guess-dunk': (SPORTS / 'dunk-1.jpg', 'ink', 'medium', 'paper', 14, None, 'funk-bounce-2'),
     'pumpkin': (LIBRARY / 'occasion-04-pumpkin.jpg', 'ink', 'medium', 'paper', 16, None, 'playful-spooky-1'),
 }
 
