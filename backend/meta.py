@@ -99,7 +99,7 @@ def _reel_numbers(reel):
             'reactions': sum((data.get('post_video_likes_by_reaction_type') or {}).values()),
             'comments': actions.get('COMMENT', 0), 'shares': actions.get('SHARE', 0),
             'avg_watch': round(avg / 1000, 1) if avg else None,
-            'held_3s': graph.get('3'), 'follows': data.get('post_video_followers')}
+            'held_3s': graph.get('5'), 'follows': data.get('post_video_followers')}
 
 
 def _facebook(days):

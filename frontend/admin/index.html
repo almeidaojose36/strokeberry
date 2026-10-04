@@ -177,7 +177,7 @@ h2.section{font-size:18px;letter-spacing:-.01em;margin:28px 0 12px}
         kpi('New follows', num(t.page_follows), label);
       $('fbnote').hidden = fb.insights;
       $('fbnote').textContent = 'Reel numbers are not available: Meta needs the read_insights permission on the app.';
-      $('fbposts').innerHTML = '<table class="post-table"><thead><tr><th>Reel</th><th>Reach</th><th>Plays</th><th>Reactions</th><th>Comments</th><th>Shares</th><th>Avg watch</th><th>Still watching at 3s</th></tr></thead><tbody>' +
+      $('fbposts').innerHTML = '<table class="post-table"><thead><tr><th>Reel</th><th>Reach</th><th>Plays</th><th>Reactions</th><th>Comments</th><th>Shares</th><th>Avg watch</th><th>Still watching at 5s</th></tr></thead><tbody>' +
         fb.posts.map(function (p) {
           return '<tr><td><a href="' + esc(p.url) + '" target="_blank" rel="noopener">' + esc(p.caption || '(no caption)') + '</a><small>' + when(p.date) + ' · ' + p.seconds + 's</small></td><td>' +
             [num(p.reach), num(p.plays), num(p.reactions), num(p.comments), num(p.shares), p.avg_watch ? p.avg_watch + 's' : '–', p.held_3s === null || p.held_3s === undefined ? '–' : Math.round(p.held_3s * 100) + '%'].join('</td><td>') + '</td></tr>';
