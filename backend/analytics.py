@@ -22,7 +22,8 @@ PAGE = re.compile(r'^/(?:[a-z0-9-]+/)*(?:index\.html)?$', re.I)  # pages, not as
 SITE_HOSTS = ('strokeberry.com', 'www.strokeberry.com', 'localhost', '127.0.0.1')
 # Referral spam: sites (or their bots) that fake visits so their name shows up in analytics, e.g. increasebacklinks.site.
 SPAM_WORDS = ('backlink', 'linkbuilding', 'link-building', 'dofollow', 'linkmanagement', 'seo', 'traffic',
-              'buttons-for', 'free-share', 'social-buttons', 'best-price')
+              'buttons-for', 'free-share', 'social-buttons', 'best-price', 'linkgenerator', 'linkanalyz', 'linkanalys',
+              'competitorlinks')
 
 
 def init(db):
@@ -89,7 +90,7 @@ def record(db, name, request=None, user=None, detail=None, path=None):
 
 def is_page_view(request, status):
     return (request.method == 'GET' and status == 200 and PAGE.match(request.url.path)
-            and not request.url.path.startswith(('/api/', '/media/'))
+            and not request.url.path.startswith(('/api/', '/media/', '/admin'))
             and 'text/html' in request.headers.get('accept', '')
             and request.headers.get('purpose') != 'prefetch' and request.headers.get('sec-purpose') is None)
 
@@ -133,6 +134,43 @@ def report(db, days=30):
     daily = db.execute(f"SELECT day, count(DISTINCT visitor) FROM events WHERE day>=? AND {VIEWS} GROUP BY day ORDER BY day DESC LIMIT 14", (since,)).fetchall()
     out += ['', '  Visitors per day:'] + ([f'    {d}  {n}' for d, n in daily] or ['    (none yet)'])
     return '\n'.join(out)
+
+
+def stats(db, days=7):
+    """Everything the private dashboard shows, as plain data. days=1 is today (UTC); otherwise the last N days."""
+    days = max(1, min(int(days), 90))
+    now = datetime.now(timezone.utc)
+    since = (now - timedelta(days=days - 1)).strftime('%Y-%m-%d')
+    before = (now - timedelta(days=2 * days - 1)).strftime('%Y-%m-%d')   # the same length of time just before, for comparison
+
+    def count(where, key, start, end=None):
+        expr = 'count(DISTINCT day || visitor)' if key == 'visitor' else 'count(DISTINCT user_id)'
+        sql = f'SELECT {expr} FROM events WHERE day>=? AND {where}' + (' AND day<?' if end else '')
+        return db.execute(sql, (start, end) if end else (start,)).fetchone()[0]
+
+    funnel = [{'label': label, 'count': count(where, key, since), 'previous': count(where, key, before, since)}
+              for label, where, key in FUNNEL]
+    views = lambda start, end=None: db.execute(f"SELECT count(*) FROM events WHERE day>=? AND {VIEWS}" + (' AND day<?' if end else ''),
+                                               (start, end) if end else (start,)).fetchone()[0]
+    daily = {day: [visitors, page_views] for day, visitors, page_views in db.execute(
+        f"SELECT day, count(DISTINCT visitor), count(*) FROM events WHERE day>=? AND {VIEWS} GROUP BY day", (since,))}
+    series = [{'day': d, 'visitors': daily.get(d, [0, 0])[0], 'views': daily.get(d, [0, 0])[1]}
+              for d in ((now - timedelta(days=n)).strftime('%Y-%m-%d') for n in range(days - 1, -1, -1))]
+
+    def table(sql):
+        return [{'name': name, 'visitors': n} for name, n in db.execute(sql, (since,)).fetchall()]
+
+    return {
+        'generated': now.isoformat(timespec='seconds'), 'days': days, 'since': since,
+        'visitors': funnel[0]['count'], 'previous_visitors': funnel[0]['previous'],
+        'page_views': views(since), 'previous_page_views': views(before, since),
+        'funnel': funnel, 'series': series,
+        'today': {'visitors': count(VIEWS, 'visitor', now.strftime('%Y-%m-%d')), 'views': views(now.strftime('%Y-%m-%d'))},
+        'exports': [{'name': d or '?', 'count': n} for d, n in db.execute(
+            "SELECT detail, count(*) FROM events WHERE day>=? AND name='export' GROUP BY detail", (since,)).fetchall()],
+        'pages': table(f"SELECT path, count(DISTINCT day || visitor) n FROM events WHERE day>=? AND {VIEWS} GROUP BY path ORDER BY n DESC LIMIT 12"),
+        'sources': table(f"SELECT source, count(DISTINCT day || visitor) n FROM events WHERE day>=? AND {VIEWS} AND source IS NOT NULL GROUP BY source ORDER BY n DESC LIMIT 15"),
+    }
 
 
 if __name__ == '__main__':

@@ -50,3 +50,22 @@ def test_funnel_steps_and_report(tmp_path, monkeypatch):
 def test_referral_spam_is_recognised():
     assert analytics.is_spam('increasebacklinks.site') and analytics.is_spam('dofollowlink.space')
     assert not analytics.is_spam('tiktok') and not analytics.is_spam('youtube.com') and not analytics.is_spam(None)
+
+
+def test_dashboard_stats_need_the_secret_key(tmp_path, monkeypatch):
+    monkeypatch.setattr(app_module, 'DB', tmp_path / 'studio.sqlite')
+    monkeypatch.delenv('FIREBASE_PROJECT_ID', raising=False)
+    app_module.init_db()
+    client = TestClient(app_module.app)
+    monkeypatch.delenv('STROKEBERRY_ADMIN_KEY', raising=False)
+    assert client.get('/api/admin/stats').status_code == 404          # no key configured: the endpoint doesn't exist
+    monkeypatch.setenv('STROKEBERRY_ADMIN_KEY', 'a-long-test-key-1234')
+    monkeypatch.setattr(app_module.time, 'sleep', lambda s: None)
+    assert client.get('/api/admin/stats').status_code == 401
+    assert client.get('/api/admin/stats', headers={'x-admin-key': 'nope'}).status_code == 401
+    with app_module.connect() as db:
+        analytics.record(db, 'pageview', None, detail=None, path='/')   # a person's visit is stored without a request here
+    data = client.get('/api/admin/stats?days=7', headers={'x-admin-key': 'a-long-test-key-1234'}).json()
+    assert data['days'] == 7 and len(data['series']) == 7 and len(data['funnel']) == len(analytics.FUNNEL)
+    assert {'visitors', 'page_views', 'sources', 'pages', 'exports', 'today'} <= set(data)
+    assert client.get('/api/admin/stats?days=500', headers={'x-admin-key': 'a-long-test-key-1234'}).json()['days'] == 90

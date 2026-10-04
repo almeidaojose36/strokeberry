@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Dashboard · Strokeberry</title>
+<link rel="icon" href="/favicon-32.png"/>
+<style>
+:root{--paper:#fbf6ec;--surface:#fff;--ink:#1b1b1b;--body:#5b544a;--muted:#8a8174;--line:rgba(27,27,27,.1);--teal:#00bec8;--teal-deep:#0096a0;--accent:#ec2d34;--up:#2f8f3a;--down:#c81e2a}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--paper:#15130f;--surface:#1f1c17;--ink:#f4efe6;--body:#c9c1b3;--muted:#948b7c;--line:rgba(255,255,255,.12);--teal:#2fd3dc;--teal-deep:#2fd3dc;--accent:#ff6a70;--up:#6ccf78;--down:#ff8a8f}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1080px;margin:0 auto;padding:24px 16px 64px}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+header h1{font-size:22px;margin:0;letter-spacing:-.02em;flex:1}
+header h1 small{display:block;font-size:13px;font-weight:500;color:var(--muted);letter-spacing:0}
+.tabs{display:flex;gap:6px}
+.tabs button,.link{font:inherit;font-weight:600;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 14px;border-radius:999px;cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.link{color:var(--muted)}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.card h2{font-size:13px;font-weight:600;color:var(--muted);margin:0 0 10px;letter-spacing:.02em;text-transform:uppercase}
+.kpi b{display:block;font-size:34px;letter-spacing:-.03em;line-height:1.1}
+.kpi span{font-size:13px;color:var(--muted)}
+.delta{font-weight:600}.delta.up{color:var(--up)}.delta.down{color:var(--down)}
+.two{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));margin-top:12px}
+.bars{display:flex;align-items:flex-end;gap:3px;height:150px}
+.bars div{flex:1;background:var(--teal);border-radius:4px 4px 0 0;min-height:2px;position:relative}
+.bars div:hover::after{content:attr(data-tip);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:12px;padding:3px 8px;border-radius:6px;white-space:nowrap;margin-bottom:4px;z-index:2}
+.axis{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px}
+.row{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:14px}
+.row:first-of-type{border-top:0}
+.row .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .num{font-weight:700;font-variant-numeric:tabular-nums}
+.row .bar{grid-column:1/-1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.row .bar i{display:block;height:100%;background:var(--teal-deep);border-radius:3px}
+.row small{color:var(--muted);font-weight:500}
+.empty{color:var(--muted);font-size:14px;margin:0}
+#gate{max-width:380px;margin:12vh auto 0;text-align:center}
+#gate h1{font-size:26px;letter-spacing:-.02em}
+#gate p{color:var(--body)}
+#gate input{width:100%;font:inherit;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);margin:6px 0 10px}
+#gate button{width:100%;font:inherit;font-weight:700;padding:12px;border:0;border-radius:12px;background:var(--ink);color:var(--paper);cursor:pointer}
+.err{color:var(--down);min-height:1.4em;font-size:14px}
+[hidden]{display:none!important}
+@media (max-width:560px){.kpi b{font-size:28px}}
+</style>
+</head>
+<body>
+<section id="gate" hidden>
+  <h1>Strokeberry dashboard</h1>
+  <p>Enter your dashboard key to see the site numbers.</p>
+  <form id="form"><input id="key" type="password" autocomplete="current-password" placeholder="Dashboard key" aria-label="Dashboard key" required/><button>Open dashboard</button></form>
+  <p class="err" id="err" role="alert"></p>
+</section>
+
+<main id="dash" hidden>
+  <header>
+    <h1>Site traffic <small id="stamp">Loading…</small></h1>
+    <div class="tabs" role="group" aria-label="Time range">
+      <button data-days="1">Today</button><button data-days="7">7 days</button><button data-days="30">30 days</button>
+    </div>
+    <button class="link" id="out">Lock</button>
+  </header>
+
+  <div class="grid kpis" id="kpis"></div>
+
+  <div class="card"><h2>Visitors per day</h2><div class="bars" id="bars"></div><div class="axis"><span id="a1"></span><span id="a2"></span></div></div>
+
+  <div class="grid two">
+    <div class="card"><h2>Funnel</h2><div id="funnel"></div></div>
+    <div class="card"><h2>Where visitors came from</h2><div id="sources"></div></div>
+    <div class="card"><h2>Top pages</h2><div id="pages"></div></div>
+    <div class="card"><h2>Videos exported, by plan</h2><div id="exports"></div></div>
+  </div>
+  <p class="empty" style="margin-top:16px">Counts are private and cookie-free: a visitor is anonymous and counted once a day. Referral spam and bots are left out. Times are UTC.</p>
+</main>
+
+<script>
+(function () {
+  var store = {get: function (k) { try { return sessionStorage.getItem(k) } catch (e) { return null } },
+               set: function (k, v) { try { sessionStorage.setItem(k, v) } catch (e) {} },
+               del: function (k) { try { sessionStorage.removeItem(k) } catch (e) {} }};
+  var $ = function (id) { return document.getElementById(id) };
+  var days = Number(store.get('sb-days')) || 7, timer = null;
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c] }) }
+  function delta(now, before) {
+    if (!before) return now ? '<span class="delta up">new</span>' : '';
+    var pct = Math.round((now - before) / before * 100);
+    return '<span class="delta ' + (pct >= 0 ? 'up' : 'down') + '">' + (pct >= 0 ? '▲ ' : '▼ ') + Math.abs(pct) + '%</span>';
+  }
+  function rows(list, valueOf, extra) {
+    if (!list.length) return '<p class="empty">Nothing yet.</p>';
+    var top = Math.max.apply(null, list.map(valueOf)) || 1;
+    return list.map(function (item) {
+      return '<div class="row"><span class="name">' + esc(item.name) + (extra ? ' ' + extra(item) : '') + '</span><span class="num">' + valueOf(item) +
+             '</span><span class="bar"><i style="width:' + Math.max(2, valueOf(item) / top * 100) + '%"></i></span></div>';
+    }).join('');
+  }
+  function show(gate) { $('gate').hidden = !gate; $('dash').hidden = gate; }
+
+  function render(d) {
+    var label = days === 1 ? 'today' : 'last ' + days + ' days';
+    var f = d.funnel;
+    $('stamp').textContent = 'Updated ' + new Date(d.generated).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) + ' · ' + label;
+    var made = f[2].count, signed = f[3].count;
+    $('kpis').innerHTML = [
+      ['Visitors', d.visitors, delta(d.visitors, d.previous_visitors) + ' vs the period before'],
+      ['Page views', d.page_views, delta(d.page_views, d.previous_page_views) + ' vs the period before'],
+      ['Today so far', d.today.visitors, d.today.views + ' page views'],
+      ['Opened the studio', f[1].count, d.visitors ? Math.round(f[1].count / d.visitors * 100) + '% of visitors' : '—'],
+      ['Free accounts', signed, made + ' uploaded their own image'],
+      ['Paid or reserved', f[6].count + f[8].count, f[7].count + ' started a checkout']
+    ].map(function (k) { return '<div class="card kpi"><h2>' + k[0] + '</h2><b>' + k[1] + '</b><span>' + k[2] + '</span></div>' }).join('');
+
+    var max = Math.max.apply(null, d.series.map(function (s) { return s.visitors })) || 1;
+    $('bars').innerHTML = d.series.map(function (s) {
+      return '<div style="height:' + Math.max(2, s.visitors / max * 100) + '%" data-tip="' + s.day.slice(5) + ' · ' + s.visitors + ' visitors, ' + s.views + ' views"></div>';
+    }).join('');
+    $('a1').textContent = d.series[0].day.slice(5); $('a2').textContent = d.series[d.series.length - 1].day.slice(5);
+
+    $('funnel').innerHTML = rows(f.map(function (s) { return {name: s.label, visitors: s.count, previous: s.previous} }),
+      function (s) { return s.visitors }, function (s) { return s.previous ? '<small>(' + s.previous + ' before)</small>' : '' });
+    $('sources').innerHTML = rows(d.sources, function (s) { return s.visitors });
+    $('pages').innerHTML = rows(d.pages, function (s) { return s.visitors });
+    $('exports').innerHTML = rows(d.exports.map(function (e) { return {name: e.name, visitors: e.count} }), function (s) { return s.visitors });
+  }
+
+  function load() {
+    var key = store.get('sb-key');
+    if (!key) { show(true); return; }
+    fetch('/api/admin/stats?days=' + days, {headers: {'X-Admin-Key': key}, cache: 'no-store'}).then(function (r) {
+      if (r.status === 401) { store.del('sb-key'); $('err').textContent = 'That key is not right.'; show(true); return null; }
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    }).then(function (d) { if (d) { show(false); render(d); } }).catch(function () { $('stamp').textContent = 'Could not load. Retrying…'; });
+  }
+
+  [].forEach.call(document.querySelectorAll('.tabs button'), function (b) {
+    b.addEventListener('click', function () { days = Number(b.dataset.days); store.set('sb-days', days); mark(); load(); });
+  });
+  function mark() { [].forEach.call(document.querySelectorAll('.tabs button'), function (b) { b.setAttribute('aria-pressed', Number(b.dataset.days) === days) }); }
+  $('form').addEventListener('submit', function (e) { e.preventDefault(); $('err').textContent = ''; store.set('sb-key', $('key').value.trim()); $('key').value = ''; load(); });
+  $('out').addEventListener('click', function () { store.del('sb-key'); show(true); });
+  mark(); load();
+  timer = setInterval(function () { if (!document.hidden && store.get('sb-key')) load(); }, 60000);
+})();
+</script>
+</body>
+</html>

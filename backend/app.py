@@ -1,9 +1,12 @@
 import io
 import json
 import logging
+import os
+import secrets
 import shutil
 import sqlite3
 import threading
+import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
@@ -255,6 +258,20 @@ async def billing_webhook(request: Request):
 
 class Event(BaseModel):
     name: str = Field(max_length=40)
+
+
+@app.get('/api/admin/stats')
+def admin_stats(request: Request, days: int = 7):
+    """Site numbers for the private dashboard at /admin/. Protected by a secret key (STROKEBERRY_ADMIN_KEY in .env.local),
+    sent in the X-Admin-Key header; with no key configured the endpoint doesn't exist."""
+    key = os.environ.get('STROKEBERRY_ADMIN_KEY', '')
+    if len(key) < 16:
+        raise HTTPException(404, 'Not found.')
+    if not secrets.compare_digest(request.headers.get('x-admin-key', '').encode(), key.encode()):
+        time.sleep(1)  # slows down guessing
+        raise HTTPException(401, 'Wrong key.')
+    with connect() as db:
+        return analytics.stats(db, days)
 
 
 @app.post('/api/event')

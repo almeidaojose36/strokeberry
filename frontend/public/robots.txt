@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /media/
+Disallow: /admin/
 
 Sitemap: https://strokeberry.com/sitemap.xml

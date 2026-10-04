@@ -532,7 +532,7 @@ def build_sitemap(pages):
     entries = ''.join(f'<url><loc>https://strokeberry.com{u}</loc></url>' for u in dict.fromkeys(urls))
     (FRONT / 'public' / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n'
                                                   f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{entries}</urlset>\n')
-    (FRONT / 'public' / 'robots.txt').write_text('User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /media/\n\n'
+    (FRONT / 'public' / 'robots.txt').write_text('User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /media/\nDisallow: /admin/\n\n'
                                                  'Sitemap: https://strokeberry.com/sitemap.xml\n')
 
 
