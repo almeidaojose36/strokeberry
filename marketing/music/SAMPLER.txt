@@ -1,0 +1,14 @@
+Strokeberry music sampler (first 14 s of each track)
+
+0:00   1. playful-curious-1
+0:15   2. funk-bounce-1
+0:30   3. funk-bounce-2
+0:45   4. future-bass-1
+1:00   5. autumn-acoustic-1
+1:15   6. autumn-acoustic-2
+1:30   7. soul-lounge-1
+1:45   8. soul-lounge-2
+2:00   9. dreamy-indie-1
+2:15  10. dreamy-indie-2
+2:30  11. playful-spooky-1
+2:45  12. soft-piano-1
