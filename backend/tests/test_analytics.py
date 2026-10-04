@@ -69,3 +69,16 @@ def test_dashboard_stats_need_the_secret_key(tmp_path, monkeypatch):
     assert data['days'] == 7 and len(data['series']) == 7 and len(data['funnel']) == len(analytics.FUNNEL)
     assert {'visitors', 'page_views', 'sources', 'pages', 'exports', 'today'} <= set(data)
     assert client.get('/api/admin/stats?days=500', headers={'x-admin-key': 'a-long-test-key-1234'}).json()['days'] == 90
+
+
+def test_social_endpoint_needs_the_key_and_meta(tmp_path, monkeypatch):
+    monkeypatch.setattr(app_module, 'DB', tmp_path / 'studio.sqlite')
+    monkeypatch.delenv('FIREBASE_PROJECT_ID', raising=False)
+    for name in ('META_PAGE_TOKEN', 'META_PAGE_ID', 'META_IG_ID'):
+        monkeypatch.delenv(name, raising=False)
+    app_module.init_db()
+    client = TestClient(app_module.app)
+    monkeypatch.setenv('STROKEBERRY_ADMIN_KEY', 'a-long-test-key-1234')
+    monkeypatch.setattr(app_module.time, 'sleep', lambda s: None)
+    assert client.get('/api/admin/social').status_code == 401
+    assert client.get('/api/admin/social', headers={'x-admin-key': 'a-long-test-key-1234'}).status_code == 404   # Meta not connected

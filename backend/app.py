@@ -25,7 +25,7 @@ from .pipeline import prepare_image, render, load_scene
 from .sample import create_sample
 from .steps import detect_panels, fallback_layout, prepare_steps, original_path, four_step_reading_order
 from .enhance import clean_background
-from . import accounts, analytics, billing, brand, gallery, mailer, reservations
+from . import accounts, analytics, billing, brand, gallery, mailer, meta, reservations
 from starlette.concurrency import run_in_threadpool
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -260,18 +260,32 @@ class Event(BaseModel):
     name: str = Field(max_length=40)
 
 
-@app.get('/api/admin/stats')
-def admin_stats(request: Request, days: int = 7):
-    """Site numbers for the private dashboard at /admin/. Protected by a secret key (STROKEBERRY_ADMIN_KEY in .env.local),
-    sent in the X-Admin-Key header; with no key configured the endpoint doesn't exist."""
+def require_admin(request: Request):
+    """The dashboard's secret key (STROKEBERRY_ADMIN_KEY in .env.local), sent in the X-Admin-Key header. With no key
+    configured the admin endpoints don't exist."""
     key = os.environ.get('STROKEBERRY_ADMIN_KEY', '')
     if len(key) < 16:
         raise HTTPException(404, 'Not found.')
     if not secrets.compare_digest(request.headers.get('x-admin-key', '').encode(), key.encode()):
         time.sleep(1)  # slows down guessing
         raise HTTPException(401, 'Wrong key.')
+
+
+@app.get('/api/admin/stats')
+def admin_stats(request: Request, days: int = 7):
+    """Site numbers for the private dashboard at /admin/."""
+    require_admin(request)
     with connect() as db:
         return analytics.stats(db, days)
+
+
+@app.get('/api/admin/social')
+def admin_social(request: Request, days: int = 7):
+    """Facebook and Instagram numbers (read from Meta's Graph API) for the dashboard."""
+    require_admin(request)
+    if not meta.configured():
+        raise HTTPException(404, 'Meta is not connected.')
+    return meta.social(days)
 
 
 @app.post('/api/event')

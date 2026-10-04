@@ -38,6 +38,16 @@ header h1 small{display:block;font-size:13px;font-weight:500;color:var(--muted);
 .row .bar{grid-column:1/-1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 .row .bar i{display:block;height:100%;background:var(--teal-deep);border-radius:3px}
 .row small{color:var(--muted);font-weight:500}
+.post-table{width:100%;border-collapse:collapse;font-size:14px}
+.post-table th{font-size:12px;font-weight:600;color:var(--muted);text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.post-table th:first-child,.post-table td:first-child{text-align:left}
+.post-table td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.post-table td:first-child{white-space:normal;min-width:220px;max-width:420px}
+.post-table a{color:var(--ink);text-decoration:none;font-weight:600}.post-table a:hover{text-decoration:underline}
+.post-table small{display:block;color:var(--muted);font-weight:500}
+.scroll{overflow-x:auto;margin:0 -6px}
+.note{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--body);margin:0 0 12px}
+h2.section{font-size:18px;letter-spacing:-.01em;margin:28px 0 12px}
 .empty{color:var(--muted);font-size:14px;margin:0}
 #gate{max-width:380px;margin:12vh auto 0;text-align:center}
 #gate h1{font-size:26px;letter-spacing:-.02em}
@@ -75,6 +85,14 @@ header h1 small{display:block;font-size:13px;font-weight:500;color:var(--muted);
     <div class="card"><h2>Where visitors came from</h2><div id="sources"></div></div>
     <div class="card"><h2>Top pages</h2><div id="pages"></div></div>
     <div class="card"><h2>Videos exported, by plan</h2><div id="exports"></div></div>
+  </div>
+  <div id="social" hidden>
+    <h2 class="section">Instagram <small id="igname" style="color:var(--muted);font-weight:500"></small></h2>
+    <div class="grid kpis" id="igkpis"></div>
+    <div class="card"><h2>Posts</h2><div class="scroll" id="igposts"></div></div>
+    <h2 class="section">Facebook <small id="fbname" style="color:var(--muted);font-weight:500"></small></h2>
+    <div class="grid kpis" id="fbkpis"></div>
+    <div class="card"><h2>Reels</h2><p class="note" id="fbnote" hidden></p><div class="scroll" id="fbposts"></div></div>
   </div>
   <p class="empty" style="margin-top:16px">Counts are private and cookie-free: a visitor is anonymous and counted once a day. Referral spam and bots are left out. Times are UTC.</p>
 </main>
@@ -130,6 +148,51 @@ header h1 small{display:block;font-size:13px;font-weight:500;color:var(--muted);
     $('exports').innerHTML = rows(d.exports.map(function (e) { return {name: e.name, visitors: e.count} }), function (s) { return s.visitors });
   }
 
+  function num(v) { return v === null || v === undefined ? '–' : Number(v).toLocaleString('en-US') }
+  function when(iso) { return new Date(iso).toLocaleDateString([], {month: 'short', day: 'numeric'}) + ' ' + new Date(iso).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) }
+  function kpi(title, value, sub) { return '<div class="card kpi"><h2>' + title + '</h2><b>' + value + '</b><span>' + (sub || '') + '</span></div>' }
+  function renderSocial(d) {
+    $('social').hidden = false;
+    var label = days === 1 ? 'today' : 'last ' + days + ' days', ig = d.instagram || {}, fb = d.facebook || {};
+    if (ig.error) { $('igkpis').innerHTML = '<p class="empty">Instagram: ' + esc(ig.error) + '</p>'; $('igposts').innerHTML = ''; }
+    else {
+      var a = ig.account || {};
+      $('igname').textContent = '@' + ig.profile.username;
+      $('igkpis').innerHTML = kpi('Followers', num(ig.profile.followers_count), num(ig.profile.media_count) + ' posts') +
+        kpi('Accounts reached', num(a.reach), label) + kpi('Views', num(a.views), label) +
+        kpi('Profile visits', num(a.profile_views), label) + kpi('Link taps', num(a.website_clicks), label) +
+        kpi('Accounts engaged', num(a.accounts_engaged), label);
+      $('igposts').innerHTML = '<table class="post-table"><thead><tr><th>Post</th><th>Reach</th><th>Views</th><th>Likes</th><th>Comments</th><th>Shares</th><th>Saves</th><th>Avg watch</th></tr></thead><tbody>' +
+        ig.posts.map(function (p) {
+          return '<tr><td><a href="' + esc(p.url) + '" target="_blank" rel="noopener">' + esc(p.caption || '(no caption)') + '</a><small>' + p.type + ' · ' + when(p.date) + '</small></td><td>' +
+            [num(p.reach), num(p.views), num(p.likes), num(p.comments), num(p.shares), num(p.saves), p.avg_watch ? p.avg_watch + 's' : '–'].join('</td><td>') + '</td></tr>';
+        }).join('') + '</tbody></table>';
+    }
+    if (fb.error) { $('fbkpis').innerHTML = '<p class="empty">Facebook: ' + esc(fb.error) + '</p>'; $('fbposts').innerHTML = ''; }
+    else {
+      $('fbname').textContent = fb.profile.name;
+      var t = fb.totals || {};
+      $('fbkpis').innerHTML = kpi('Followers', num(fb.profile.followers_count), 'page followers') + kpi('Views', num(t.page_media_view), label) +
+        kpi('People reached', num(t.page_total_media_view_unique), label) + kpi('Engagements', num(t.page_post_engagements), label) +
+        kpi('New follows', num(t.page_follows), label);
+      $('fbnote').hidden = fb.insights;
+      $('fbnote').textContent = 'Reel numbers are not available: Meta needs the read_insights permission on the app.';
+      $('fbposts').innerHTML = '<table class="post-table"><thead><tr><th>Reel</th><th>Reach</th><th>Plays</th><th>Reactions</th><th>Comments</th><th>Shares</th><th>Avg watch</th><th>Still watching at 3s</th></tr></thead><tbody>' +
+        fb.posts.map(function (p) {
+          return '<tr><td><a href="' + esc(p.url) + '" target="_blank" rel="noopener">' + esc(p.caption || '(no caption)') + '</a><small>' + when(p.date) + ' · ' + p.seconds + 's</small></td><td>' +
+            [num(p.reach), num(p.plays), num(p.reactions), num(p.comments), num(p.shares), p.avg_watch ? p.avg_watch + 's' : '–', p.held_3s === null || p.held_3s === undefined ? '–' : Math.round(p.held_3s * 100) + '%'].join('</td><td>') + '</td></tr>';
+        }).join('') + '</tbody></table>';
+    }
+  }
+  function loadSocial() {
+    var key = store.get('sb-key');
+    fetch('/api/admin/social?days=' + days, {headers: {'X-Admin-Key': key}, cache: 'no-store'}).then(function (r) {
+      if (r.status === 404) { $('social').hidden = true; return null; }
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    }).then(function (d) { if (d) renderSocial(d); }).catch(function () {});
+  }
+
   function load() {
     var key = store.get('sb-key');
     if (!key) { show(true); return; }
@@ -137,7 +200,7 @@ header h1 small{display:block;font-size:13px;font-weight:500;color:var(--muted);
       if (r.status === 401) { store.del('sb-key'); $('err').textContent = 'That key is not right.'; show(true); return null; }
       if (!r.ok) throw new Error(r.status);
       return r.json();
-    }).then(function (d) { if (d) { show(false); render(d); } }).catch(function () { $('stamp').textContent = 'Could not load. Retrying…'; });
+    }).then(function (d) { if (d) { show(false); render(d); loadSocial(); } }).catch(function () { $('stamp').textContent = 'Could not load. Retrying…'; });
   }
 
   [].forEach.call(document.querySelectorAll('.tabs button'), function (b) {
