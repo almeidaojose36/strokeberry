@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 FRONT = ROOT / 'frontend'
-GALLERY_VERSION = 'sports1'  # bump when the gallery clips are re-rendered, so Cloudflare's cache serves the new files
+GALLERY_VERSION = 'sports3'  # bump when the gallery clips are re-rendered, so Cloudflare's cache serves the new files
 
 HEAD = '''<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="theme-color" content="#FFF8EC"/>
 <title>{title}</title><meta name="description" content="{description}"/>

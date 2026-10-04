@@ -21,6 +21,9 @@ const SET = arg("--set") || "hero";
 const OUT = path.join(root, { interiors: "assets/interiors-src", sports: "assets/sports-src" }[SET] || "assets/hero-src");
 const KIE_API = "https://api.kie.ai/api/v1/jobs";
 const MODEL = arg("--model") || "grok-imagine-image-2-0/text-to-image";
+// Sports art is briefed like a children's drawing book: thick black outlines around every shape, flat colour fills.
+const SPORTS_STYLE =
+  "Drawing-book illustration, like a page from a kids' how-to-draw book: thick, clean, uniform black outlines around every shape and every detail, flat solid colour fills inside the outlines, no shading. Pure white background, subject centered with generous margins. No text, no letters, no numbers, no logos, no brand names, no watermark, no border frame, no signature.";
 const STYLE =
   "Clean vector-style illustration with bold, smooth black outlines and flat solid colors. Pure white background, subject centered with generous margins. No shading gradients, no texture, no text, no letters, no numbers, no logos, no brand names, no watermark, no border, no signature.";
 
@@ -43,14 +46,14 @@ export const INTERIORS = [
 
 // Invented athletes in plain flag-coloured kits: no real people, no federation crests, no sponsor or brand marks.
 export const SPORTS = [
-  { key: "striker", prompt: "Illustration of an invented football striker celebrating a goal, mouth open in a shout, fists clenched, wearing a plain green and yellow shirt with a blue stripe across the chest (flag colours, no badge, no logo, no number). Green, yellow, blue and warm skin tones." },
-  { key: "keeper", prompt: "Illustration of an invented football goalkeeper diving to the left with outstretched gloves and a ball just beyond his fingertips, wearing a plain sky blue and white vertically striped shirt (flag colours, no badge, no logo). Sky blue, white and bright orange gloves." },
-  { key: "sprinter", prompt: "Illustration of an invented sprinter at full speed, leaning forward on a running track, in a plain red, white and green kit (flag colours, no logo, no number). Red, white, green and rust track." },
-  { key: "boxer", prompt: "Illustration of an invented boxer in a guard stance wearing red boxing gloves and plain tricolour trunks of blue, white and red horizontal bands (flag colours, no logo, no text). Blue, white and red." },
-  { key: "dunk", prompt: "Illustration of an invented basketball player mid-air about to dunk, one arm cocked back holding the ball, wearing a plain orange, white and green kit (flag colours, no logo, no number). Orange, white, green and a wooden hoop backboard." },
-  { key: "rugby", prompt: "Illustration of an invented rugby player running with the ball tucked under one arm, wearing a plain black jersey with a white stripe and silver trim (flag colours, no badge, no logo). Black, white, silver and grass green." },
-  { key: "cricketer", prompt: "Illustration of an invented cricket batter in mid-swing, bat raised, wearing plain white cricket clothes with a green and gold trim and a green helmet (flag colours, no logo). White, green and gold." },
-  { key: "fan", prompt: "Illustration of an invented football fan cheering with arms raised, face painted in stripes of yellow, green and blue, a scarf in the same colours and a flag waving behind (a plain flag of three stripes, no emblem). Yellow, green and blue." },
+  { key: "striker", prompt: "Illustration of an invented football (soccer) striker celebrating a goal, running with arms spread and mouth open in a shout. A detailed, well-drawn face with two eyes, nose, mouth and short dark hair, correct human anatomy with exactly two arms and two legs. He wears a plain Portugal-flag kit: a deep red shirt with a green sleeve and green collar trim, red shorts and green socks, in the colours of the Portuguese flag. No badge, no crest, no logo, no number, no text." },
+  { key: "keeper", prompt: "Illustration of an invented football (soccer) goalkeeper diving to his left with both gloved hands stretched towards a ball. A detailed, well-drawn face with two eyes, nose, mouth and short dark hair, correct human anatomy with exactly two arms and two legs. He wears a plain Argentina-flag kit: a shirt with sky blue and white vertical stripes, sky blue shorts, white socks and neon yellow gloves. No badge, no crest, no logo, no number, no text." },
+  { key: "sprinter", prompt: "Illustration of an invented African American female sprinter running at full speed on a track, leaning forward, side view. A detailed, well-drawn face in profile with a focused expression, dark brown skin, hair tied back, correct human anatomy with exactly two arms and two legs and both feet in running spikes. She wears a plain United States-flag kit: a white crop top with red and blue stripes across the chest and blue shorts with white stars, in the colours of the American flag. No logo, no number, no text." },
+  { key: "boxer", prompt: "Illustration of an invented boxer in a guard stance, facing the viewer, with a determined expression. A detailed, well-drawn face with two eyes, nose, mouth and short hair, correct human anatomy with exactly two arms and two legs. He wears red boxing gloves and plain France-flag trunks of blue, white and red vertical bands. No logo, no text." },
+  { key: "dunk", prompt: "Illustration of an invented African American basketball player in mid-air making a one-handed dunk, shown with correct human anatomy: exactly two arms and exactly two legs, both legs clearly visible and both feet in sneakers. A detailed, well-drawn face with two eyes, nose and mouth, dark brown skin, short hair. He wears a plain Spain-flag kit: a red basketball jersey and shorts with yellow trim, in the colours of the Spanish flag. A hoop and backboard at the top. No logo, no number, no text." },
+  { key: "rugby", prompt: "Illustration of an invented rugby player running with the ball held in both hands, powerful build. A detailed, well-drawn face with two eyes, nose, mouth and short hair, correct human anatomy with exactly two arms and two legs. He wears a plain Ireland-flag kit: a green jersey with white and orange trim, green shorts and socks, in the colours of the Irish flag. No badge, no logo, no number, no text." },
+  { key: "cricketer", prompt: "Illustration of an invented cricket batter in mid-swing, bat raised, wearing a helmet with the face visible. A detailed, well-drawn face with two eyes, nose and mouth, correct human anatomy with exactly two arms and two legs. He wears a plain India-flag kit: a saffron orange and white shirt with a green trim, white trousers and pads, in the colours of the Indian flag. No logo, no number, no text." },
+  { key: "fan", prompt: "Illustration of an invented football fan cheering with arms raised, a joyful detailed face with two eyes, nose and open smiling mouth, correct human anatomy with exactly two arms. Face painted with stripes of green, yellow and blue, a scarf in the same colours, holding up a large plain Brazil-style flag of a green field, yellow diamond and blue circle with no text. No logo." },
 ];
 
 async function loadEnv() {
@@ -70,7 +73,7 @@ async function kie(method, url, key, body) {
   return json.data;
 }
 async function generate(job, n, key) {
-  const { taskId } = await kie("POST", `${KIE_API}/createTask`, key, { model: MODEL, input: { prompt: `${job.prompt} ${STYLE}`, aspect_ratio: "1:1" } });
+  const { taskId } = await kie("POST", `${KIE_API}/createTask`, key, { model: MODEL, input: { prompt: `${job.prompt} ${SET === "sports" ? SPORTS_STYLE : STYLE}`, aspect_ratio: "1:1" } });
   const deadline = Date.now() + 6 * 60_000;
   while (Date.now() < deadline) {
     await sleep(4000);
