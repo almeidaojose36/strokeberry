@@ -172,3 +172,17 @@ def test_the_finished_picture_is_held_for_a_couple_of_seconds_however_long_the_v
         assert abs(hold_seconds - 2.0) < 1e-9                                # ~2 s, not 24 s on a 5-minute video
         assert abs(phase_bounds(duration, False)[0] * duration - (duration - 2.0)) < 1e-9
     assert stage_hold(2) == .1 and abs(stage_hold(300) * 300 - 1.5) < 1e-9
+
+
+def test_the_experimental_human_order_keeps_every_stroke_and_the_big_shape_first():
+    import numpy as np
+    from backend.artistry import order_strokes_human
+    strokes = [loop(200, 250, 300, 380), loop(200, 150, 90, 70), loop(120, 300, 8, 8), thin_line(200, 100, 400),
+               loop(100, 250, 40, 40), loop(300, 250, 40, 40)]
+    ordered = order_strokes_human(strokes, 400, 500)
+    key = lambda s: sorted(map(tuple, np.round(np.asarray(s)[:-1], 3)))
+    assert sorted(map(key, ordered)) == sorted(map(key, strokes))
+    assert max(p[1] for p in ordered[0]) - min(p[1] for p in ordered[0]) == 380   # the silhouette first
+    pair = [i for i, s in enumerate(ordered) if abs(max(p[0] for p in s) - min(p[0] for p in s) - 40) < 1]
+    assert pair[1] - pair[0] == 1                                                  # the two matching shapes are drawn together
+    assert order_strokes_human([], 400, 300) == []

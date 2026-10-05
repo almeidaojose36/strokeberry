@@ -20,6 +20,13 @@ def ink_mask(rgb, gray):
     return (gray < 125) & (spread < 80)
 
 
+def ink_mask_no_green(rgb, gray):
+    """Like ink_mask but without dark GREEN pixels. A dark green fill (the leaves of a wreath, a roof) is not a pen line, and thinning
+    it breaks it into dashes; used only as a second try when the normal rule finds no usable outlines."""
+    r, g, b = (rgb[..., k].astype(np.int16) for k in range(3))
+    return ink_mask(rgb, gray) & ~((g > r + 10) & (g > b + 6))
+
+
 def thin(binary):
     """Zhang-Suen thinning: reduce every stroke to a one-pixel-wide centre line."""
     image = (binary > 0).astype(np.uint8)
@@ -120,13 +127,14 @@ def trace(skeleton, min_length=8):
     return result
 
 
-def extract_strokes(rgb):
-    """Centre-line strokes for the artwork's dark outlines, or None if it has none worth drawing."""
+def extract_strokes(rgb, mask=None):
+    """Centre-line strokes for the artwork's dark outlines, or None if it has none worth drawing. `mask` picks which pixels
+    count as pen ink (default: ink_mask)."""
     from .artistry import smooth_path
 
     gray = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
     height, width = gray.shape
-    dark = np.uint8(ink_mask(rgb, gray)) * 255
+    dark = np.uint8((mask or ink_mask)(rgb, gray)) * 255
     if not 0.004 <= dark.mean() / 255 <= 0.30:
         return None
     dark = cv2.morphologyEx(dark, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8))

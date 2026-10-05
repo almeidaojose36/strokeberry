@@ -14,7 +14,7 @@ from PIL import Image, ImageOps
 from . import watermark
 from .brand import hex_to_rgb
 from . import endcard, hands
-from .linework import edge_strokes, extract_strokes, ink_mask, missing_lines
+from .linework import edge_strokes, extract_strokes, ink_mask, ink_mask_no_green, missing_lines
 from .artistry import SCENE_VERSION, clean_paths, make_timeline, event_position, order_strokes, phase_bounds
 
 _scene_lock = threading.Lock()
@@ -43,6 +43,7 @@ def blend_white_background(rgb):
 
 BRUSH_DEPTH = .06  # how far (as a share of the colour reveal) the bristle texture pushes the painted edge back and forth
 PAINT_SAMPLES = 48
+MARKER_WIDTH = 2.6  # a marker stroke (filling a black shape) is this many times wider than the outline pen
 BOARDS = {'blackboard': (40, 44, 42), 'greenboard': (38, 76, 60)}
 CHALK = (240, 240, 232)
 
@@ -58,17 +59,18 @@ def brush_texture(shape):
     return np.clip(.65 * streaks + .35 * blotches, 0, 1) - .5
 
 
-def paint_path(reveal, content):
+def paint_path(reveal, content, samples=None, tolerance=12, reach_share=.12, offset=10):
     """Where the brush is while the colour comes in: for evenly spaced moments of the reveal, a point on the edge being
     painted, chosen close to the previous one so the hand glides instead of jumping. Returns [[x, y], ...] in source
     pixels (shared verbatim by the browser preview and the MP4 renderer)."""
     ranks = reveal.astype(np.float32)
     height, width = ranks.shape
-    reach = .12 * np.hypot(width, height)
+    reach = reach_share * np.hypot(width, height)
+    samples = samples or PAINT_SAMPLES
     points, previous = [], None
-    for k in range(PAINT_SAMPLES):
-        amount = (k + .5) / PAINT_SAMPLES
-        front = content & (np.abs(ranks - (amount * 270 - 10)) < 12)
+    for k in range(samples):
+        amount = (k + .5) / samples
+        front = content & (np.abs(ranks - (amount * 270 - offset)) < tolerance)
         ys, xs = np.nonzero(front)
         if len(xs):
             if previous is None:
@@ -125,7 +127,7 @@ def prepare_image(raw, folder: Path):
         image.save(folder / 'source.png')
     rgb = np.array(image)
     gray = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
-    outlines = extract_strokes(rgb)
+    outlines = extract_strokes(rgb) or extract_strokes(rgb, ink_mask_no_green)   # the second rule only when the first finds no outlines
     if outlines:
         paths, method = outlines[0], 'outlines'  # the artwork's own black lines, one centre line each
     else:
@@ -297,18 +299,19 @@ def render(folder: Path, settings, update, output=None):
                '-s', f'{width}x{height}', '-r', str(fps), '-i', '-', '-an', '-c:v', 'libx264',
                '-preset', 'veryfast', '-crf', '21', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', str(temporary)]
     log_path = final.with_suffix('.log')
+    pose = {}  # which hand is drawing (natural_hand scenes), kept from frame to frame
     index = 0
     with log_path.open('wb') as log:
         process = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=log)
         try:
             for frame in range(frames):
                 progress = frame / max(1, frames - 1)
-                line_end, reveal_span = phase_bounds(settings['duration'], settings['color'])
+                line_end, reveal_span = phase_bounds(settings['duration'], settings['color'], scene.get('reveal_share'))
                 draw_progress = min(1, progress / line_end)
                 while index < len(events) and events[index]['end'] <= draw_progress:
                     event = events[index]
                     if event['kind'] == 'draw':
-                        draw_mark(paper, screen(event['a']), screen(event['b']), event['pressure'], settings['style'], mark_unit, tint, ground)
+                        draw_mark(paper, screen(event['a']), screen(event['b']), event['pressure'], settings['style'], mark_unit * (MARKER_WIDTH if event.get('marker') else 1), tint, ground)
                     index += 1
                 canvas = paper.copy()
                 tip, lift = None, 0
@@ -318,10 +321,10 @@ def render(folder: Path, settings, update, output=None):
                     position, lift = event_position(event, fraction)
                     tip = screen(position)
                     if event['kind'] == 'draw':
-                        draw_mark(canvas, screen(event['a']), tip, event['pressure'], settings['style'], mark_unit, tint, ground)
+                        draw_mark(canvas, screen(event['a']), tip, event['pressure'], settings['style'], mark_unit * (MARKER_WIDTH if event.get('marker') else 1), tint, ground)
                 if settings['color'] and progress > line_end:
                     amount = min(1, (progress - line_end) / reveal_span)
-                    mask = np.clip((amount * 270 - reveal.astype(np.float32)) / 20, 0, 1)[..., None]
+                    mask = np.clip((amount * 270 - reveal.astype(np.float32)) / scene.get('reveal_edge', 20), 0, 1)[..., None]
                     if keep_chalk is not None:
                         mask = mask * keep_chalk
                     area = canvas[oy:oy + size[1], ox:ox + size[0]]
@@ -335,9 +338,9 @@ def render(folder: Path, settings, update, output=None):
                 painting = settings['color'] and not step_frames and line_end < progress < line_end + reveal_span
                 if settings['pen'] and tone and painting and paint:
                     spot = frame_point(paint, (progress - line_end) / reveal_span)
-                    hands.draw(canvas, tone, 'brush', screen(spot))
+                    hands.draw(canvas, tone, 'brush', screen(spot), natural=bool(scene.get('natural_hand')), pose=pose)
                 elif settings['pen'] and tone and tip and (step_frames or progress < line_end):
-                    hands.draw(canvas, tone, 'pen' if settings['style'] == 'ink' else 'pencil', tip, lift)
+                    hands.draw(canvas, tone, 'pen' if settings['style'] == 'ink' else 'pencil', tip, lift, natural=bool(scene.get('natural_hand')), pose=pose)
                 elif settings['pen'] and tip and (step_frames or progress < line_end):
                     x, y = tip
                     if lift > 0:
